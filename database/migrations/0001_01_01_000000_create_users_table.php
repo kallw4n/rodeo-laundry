@@ -16,7 +16,7 @@ return new class extends Migration
         $table->string('username', 50)->unique();
         $table->string('email', 100)->unique();
         $table->string('password');
-        $table->enum('role', ['admin', 'customer', 'staff']);
+        $table->enum('role', ['admin', 'customer']);
         $table->timestamps(); // membuat created_at & updated_at
     });
 

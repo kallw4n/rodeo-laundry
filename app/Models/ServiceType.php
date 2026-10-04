@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceType extends Model
 {
-    //
+    protected $fillable = ['name', 'price', 'description'];
+
+    public function orderItems() { return $this->hasMany(OrderItem::class, 'service_id'); }
 }
