@@ -8,7 +8,64 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased"
-      x-data="{ }">
+      x-data="{
+        orders: [
+            {
+                id: 'RDL-2510-003',
+                date: '6 Oktober 2025, 14:32',
+                status: 'processing',
+                statusLabel: 'Sedang Dicuci',
+                items: [
+                    { name: 'Cuci Kiloan', qty: 3, unit: 'kg', price: 45000 },
+                    { name: 'Cuci Sepatu Premium', qty: 1, unit: 'psg', price: 25000 },
+                ],
+                total: 70000,
+                address: 'Jl. Soekarno Hatta No. 45, Lowokwaru',
+                canCancel: true,
+                canEditAddress: true,
+            },
+            {
+                id: 'RDL-2509-018',
+                date: '28 September 2025, 10:15',
+                status: 'completed',
+                statusLabel: 'Selesai',
+                items: [
+                    { name: 'Cuci Kiloan', qty: 5, unit: 'kg', price: 75000 },
+                ],
+                total: 75000,
+                address: 'Gedung Coworking Lantai 2, Jl. Ijen No. 12, Klojen',
+                canCancel: false,
+                canEditAddress: false,
+            },
+            {
+                id: 'RDL-2509-005',
+                date: '15 September 2025, 09:45',
+                status: 'cancelled',
+                statusLabel: 'Dibatalkan',
+                items: [
+                    { name: 'Bed Cover & Selimut King', qty: 2, unit: 'pcs', price: 70000 },
+                ],
+                total: 70000,
+                address: 'Jl. Soekarno Hatta No. 45, Lowokwaru',
+                canCancel: false,
+                canEditAddress: false,
+            },
+        ],
+        get hasOrders() { return this.orders.length > 0; },
+        formatRp(n) { return 'Rp ' + n.toLocaleString('id-ID'); },
+        statusColor(status) {
+            return {
+                'pending':    { bg: 'bg-[#EAEDFF]', text: 'text-[#1A1743]', dot: 'bg-[#1A1743]' },
+                'processing': { bg: 'bg-[#EAEDFF]', text: 'text-[#1A1743]', dot: 'bg-[#1A1743]' },
+                'ready':      { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
+                'completed':  { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
+                'cancelled':  { bg: 'bg-red-100',   text: 'text-red-700',   dot: 'bg-red-500' },
+            }[status];
+        },
+        stepIndex(status) {
+            return { 'pending': 0, 'processing': 1, 'ready': 2, 'completed': 3, 'cancelled': -1 }[status];
+        }
+      }">
 
     <!-- ================= HEADER ================= -->
     <header class="fixed top-0 w-full h-20 bg-[#FAF8FF]/85 backdrop-blur-md shadow-sm z-50">
@@ -28,7 +85,7 @@
             <nav class="hidden md:flex items-center gap-1 bg-[#F2F3FF] p-1.5 rounded-full">
                 <a href="{{ url('/') }}" class="px-4 py-1.5 text-sm font-semibold text-[#47464E] hover:text-[#1A1743] rounded-full">Beranda</a>
                 <a href="{{ route('pemesanan') }}" class="px-4 py-1.5 text-sm font-semibold text-[#47464E] hover:text-[#1A1743] rounded-full">Layanan</a>
-                <a href="{{ route('pesanan') }}" class="px-4 py-1.5 bg-[#EAEDFF] rounded-full text-sm font-bold">Pesanan</a>
+                <a href="{{ url('/orders') }}" class="px-4 py-1.5 bg-[#EAEDFF] rounded-full text-sm font-bold">Pesanan</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -42,267 +99,175 @@
         </div>
     </header>
 
-    <main class="pt-28 max-w-[1440px] mx-auto px-6 pb-16 space-y-6">
+    <main class="pt-28 max-w-[1440px] mx-auto px-6 pb-16">
 
-        <!-- ================= HERO CARD: STATUS PESANAN ================= -->
-        <div class="relative bg-gradient-to-br from-[#1A1743] to-[#2F2D59] rounded-[32px] p-6 md:p-10 overflow-hidden shadow-2xl text-white">
-            <!-- Dekorasi blur -->
-            <div class="absolute w-80 h-80 bg-[#BFF138]/10 blur-3xl rounded-full -top-20 -right-20"></div>
+        <!-- ================= HERO ================= -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#C2F43B]/50 text-[#4E6700] text-xs font-bold uppercase rounded-full mb-3">
+                    <span class="w-2 h-2 bg-[#4E6700] rounded-full"></span> Riwayat & Pelacakan
+                </span>
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2">Pesanan Saya</h1>
+                <p class="text-[#47464E] max-w-lg">Pantau status cucian Anda secara real-time, mulai dari penjemputan sampai kembali ke lemari.</p>
+            </div>
+            <a href="{{ route('pemesanan') }}"
+               class="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1743] text-white font-bold rounded-full self-start md:self-end
+                      transition-all duration-300 ease-out
+                      hover:shadow-[0_15px_35px_-8px_rgba(26,23,67,0.5)]
+                      hover:-translate-y-1">
+                + Pesanan Baru
+            </a>
+        </div>
 
-            <div class="relative z-10">
-                <!-- Header: Order ID + Status -->
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full border border-white/10 w-fit">
-                        <span class="text-[#BFF138] font-bold text-xs">#</span>
-                        <span class="text-xs font-semibold text-[#9895C8]">ORDER ID:</span>
-                        <span class="text-xs font-bold">#RDL-2024-001</span>
-                        <span class="w-1 h-1 bg-[#9895C8] rounded-full"></span>
-                        <span class="text-xs text-[#9895C8]">DIBUAT HARI INI, 09:45 WIB</span>
+        <!-- ================= LIST PESANAN ================= -->
+        <div class="space-y-6">
+
+            <template x-if="!hasOrders">
+                <div class="text-center py-20 bg-white rounded-[32px] border border-dashed border-[#E2E7FF]">
+                    <div class="w-16 h-16 bg-[#F2F3FF] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-[#9895C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#BFF138] text-[#131B2E] rounded-full w-fit">
-                        <span class="w-2 h-2 bg-[#131B2E] rounded-full animate-pulse"></span>
-                        <span class="text-xs font-extrabold uppercase tracking-wide">Sedang Dicuci</span>
-                    </div>
+                    <h3 class="text-lg font-bold mb-1">Belum Ada Pesanan</h3>
+                    <p class="text-sm text-[#47464E] mb-5">Yuk mulai laundry pertama Anda sekarang!</p>
+                    <a href="{{ route('pemesanan') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[#BFF138] text-[#131B2E] font-bold rounded-full
+                              transition-all duration-300 hover:shadow-[0_15px_35px_rgba(204,255,70,0.5)]">
+                        Mulai Pesan Layanan
+                        <span>→</span>
+                    </a>
                 </div>
+            </template>
 
-                <!-- Target Penyelesaian -->
-                <div class="mb-6">
-                    <p class="text-xs font-bold text-[#BFF138] uppercase tracking-wider mb-2">Target Penyelesaian Garment</p>
-                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-[#BFF138]/20 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-[#BFF138]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <template x-for="order in orders" :key="order.id">
+                <div class="bg-white rounded-[28px] border border-[#E2E7FF]/60 overflow-hidden
+                            transition-all duration-300 hover:shadow-[0_15px_40px_-12px_rgba(26,23,67,0.15)]">
+
+                    <!-- Header Kartu -->
+                    <div class="px-6 md:px-8 pt-6 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-[#E2E7FF]/60">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span class="font-bold text-[#1A1743]" x-text="'#' + order.id"></span>
                             </div>
-                            <h2 class="text-3xl md:text-4xl font-extrabold">Hari ini, 17:00 WIB</h2>
+                            <span class="text-xs text-[#47464E]" x-text="order.date"></span>
                         </div>
-                        <div class="px-4 py-2 bg-white/10 rounded-full border border-white/10 w-fit">
-                            <span class="text-xs text-[#9895C8]">Sisa Waktu: </span>
-                            <span class="text-xs font-bold text-[#BFF138]">~ 5 Jam 30 Menit</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar -->
-                <div class="mb-8">
-                    <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-[#BFF138]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span class="text-sm font-semibold text-white">Tahap 3 dari 6 • Proses Pencucian Utama &amp; Ozon</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5"
+                                  :class="statusColor(order.status).bg + ' ' + statusColor(order.status).text">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="statusColor(order.status).dot"></span>
+                                <span x-text="order.statusLabel"></span>
+                            </span>
                         </div>
-                        <span class="text-sm font-bold text-[#BFF138]">60% Selesai</span>
                     </div>
-                    <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-[#BFF138] to-[#A7D717] rounded-full transition-all duration-1000" style="width: 60%"></div>
-                    </div>
-                </div>
 
-                <!-- Info Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-2xl border border-white/10">
-                        <div class="w-8 h-8 bg-[#BFF138]/20 rounded-lg flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4 text-[#BFF138]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-bold text-[#9895C8] uppercase tracking-wider">Hub Operasional</p>
-                            <p class="text-sm font-bold text-white truncate">Soekarno-Hatta Malang</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-2xl border border-white/10">
-                        <div class="w-8 h-8 bg-[#BFF138]/20 rounded-lg flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4 text-[#BFF138]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-bold text-[#9895C8] uppercase tracking-wider">Jenis Layanan</p>
-                            <p class="text-sm font-bold text-white truncate">Regular Express 8 Jam</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-2xl border border-white/10">
-                        <div class="w-8 h-8 bg-[#BFF138]/20 rounded-lg flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4 text-[#BFF138]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-bold text-[#9895C8] uppercase tracking-wider">Moda Transportasi</p>
-                            <p class="text-sm font-bold text-white truncate">Jemput &amp; Antar Kurir</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <!-- Progress Bar -->
+                    <template x-if="order.status !== 'cancelled'">
+                        <div class="px-6 md:px-8 py-5 bg-[#FAF8FF]">
+                            <div class="flex items-center justify-between relative">
+                                <div class="absolute top-3 left-3 right-3 h-0.5 bg-[#E2E7FF]"></div>
+                                <div class="absolute top-3 left-3 h-0.5 bg-[#BFF138] transition-all duration-500"
+                                     :style="'width: calc(' + (stepIndex(order.status) / 3) * 100 + '% - ' + (stepIndex(order.status) === 0 ? '0px' : '24px') + ')'"></div>
 
-        <!-- ================= CARD: PROGRES CUCIAN (TIMELINE) ================= -->
-        <div class="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-[#E2E7FF]/60">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-6 border-b border-[#E2E7FF]/60">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold">Progres Cucian</h2>
-                        <p class="text-sm text-[#47464E]">Dilengkapi sensor telemetri temperatur dan pemantauan RFID</p>
-                    </div>
-                </div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#C2F43B]/30 rounded-full w-fit">
-                    <span class="w-2 h-2 bg-[#4E6700] rounded-full animate-pulse"></span>
-                    <span class="text-xs font-bold text-[#4E6700]">RFID Feed: Terkoneksi</span>
-                </div>
-            </div>
+                                <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center bg-[#BFF138]">
+                                        <svg class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-[10px] md:text-xs font-bold text-[#1A1743]">Diterima</span>
+                                </div>
 
-            <!-- Timeline -->
-            <div class="relative pl-8 space-y-8">
+                                <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                         :class="stepIndex(order.status) >= 1 ? 'bg-[#BFF138]' : 'bg-white border-2 border-[#E2E7FF]'">
+                                        <svg x-show="stepIndex(order.status) >= 1" class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <span x-show="stepIndex(order.status) < 1" class="w-1.5 h-1.5 bg-[#E2E7FF] rounded-full"></span>
+                                    </div>
+                                    <span class="text-[10px] md:text-xs font-bold" :class="stepIndex(order.status) >= 1 ? 'text-[#1A1743]' : 'text-[#9895C8]'">Dicuci</span>
+                                </div>
 
-                <!-- Garis vertikal -->
-                <div class="absolute left-[11px] top-3 bottom-3 w-px bg-[#E2E7FF]"></div>
-                <div class="absolute left-[11px] top-3 w-px bg-[#BFF138]" style="height: 40%;"></div>
+                                <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                         :class="stepIndex(order.status) >= 2 ? 'bg-[#BFF138]' : 'bg-white border-2 border-[#E2E7FF]'">
+                                        <svg x-show="stepIndex(order.status) >= 2" class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <span x-show="stepIndex(order.status) < 2" class="w-1.5 h-1.5 bg-[#E2E7FF] rounded-full"></span>
+                                    </div>
+                                    <span class="text-[10px] md:text-xs font-bold" :class="stepIndex(order.status) >= 2 ? 'text-[#1A1743]' : 'text-[#9895C8]'">Diantar</span>
+                                </div>
 
-                <!-- Step 1: Dijemput Kurir (DONE) -->
-                <div class="relative">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#BFF138] rounded-full flex items-center justify-center border-4 border-white shadow">
-                        <svg class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <h3 class="font-bold text-[#1A1743]">Dijemput Kurir</h3>
-                                <span class="px-2 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] font-bold text-[#1A1743]">Tuntas</span>
+                                <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                         :class="stepIndex(order.status) >= 3 ? 'bg-[#BFF138]' : 'bg-white border-2 border-[#E2E7FF]'">
+                                        <svg x-show="stepIndex(order.status) >= 3" class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <span x-show="stepIndex(order.status) < 3" class="w-1.5 h-1.5 bg-[#E2E7FF] rounded-full"></span>
+                                    </div>
+                                    <span class="text-[10px] md:text-xs font-bold" :class="stepIndex(order.status) >= 3 ? 'text-[#1A1743]' : 'text-[#9895C8]'">Selesai</span>
+                                </div>
                             </div>
-                            <p class="text-sm text-[#47464E]">Pakaian kotor telah diserahkan di Kost Griya Suhat oleh pelanggan. Armada Driver Rodeo #02.</p>
                         </div>
-                        <span class="text-xs font-semibold text-[#47464E] shrink-0">10:00 WIB</span>
-                    </div>
-                </div>
+                    </template>
 
-                <!-- Step 2: Diterima Outlet Hub (DONE) -->
-                <div class="relative">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#BFF138] rounded-full flex items-center justify-center border-4 border-white shadow">
-                        <svg class="w-3 h-3 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <h3 class="font-bold text-[#1A1743]">Diterima Outlet Hub Soekarno-Hatta</h3>
-                                <span class="px-2 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] font-bold text-[#1A1743]">Tuntas</span>
+                    <!-- Info Dibatalkan -->
+                    <template x-if="order.status === 'cancelled'">
+                        <div class="px-6 md:px-8 py-4 bg-red-50 border-b border-red-100">
+                            <p class="text-xs text-red-700 font-semibold">Pesanan ini telah dibatalkan.</p>
+                        </div>
+                    </template>
+
+                    <!-- Body Kartu -->
+                    <div class="px-6 md:px-8 py-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-[#47464E] mb-3">Layanan Dipesan</h4>
+                            <div class="space-y-2">
+                                <template x-for="item in order.items" :key="item.name">
+                                    <div class="flex justify-between items-start text-sm">
+                                        <div class="flex-1 min-w-0 pr-3">
+                                            <p class="font-bold text-[#1A1743] truncate" x-text="item.name"></p>
+                                            <p class="text-xs text-[#47464E]" x-text="item.qty + ' ' + item.unit"></p>
+                                        </div>
+                                        <span class="font-semibold text-[#1A1743] shrink-0" x-text="formatRp(item.price)"></span>
+                                    </div>
+                                </template>
                             </div>
-                            <p class="text-sm text-[#47464E]">Penimbangan, tagging RFID barcode, dan disinfeksi awal selesai (2.0 Kg, 1 Pasang Sepatu).</p>
                         </div>
-                        <span class="text-xs font-semibold text-[#47464E] shrink-0">10:30 WIB</span>
-                    </div>
-                </div>
 
-                <!-- Step 3: Sedang Dicuci (ACTIVE) -->
-                <div class="relative">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#1A1743] rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                        <span class="w-2 h-2 bg-[#BFF138] rounded-full animate-pulse"></span>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <h3 class="font-bold text-[#1A1743]">Sedang Dicuci &amp; Sterilisasi Ozone</h3>
-                                <span class="px-2 py-0.5 bg-[#1A1743] text-[#BFF138] rounded-full text-[10px] font-bold uppercase tracking-wide">Aktif Sekarang</span>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-[#47464E] mb-3">Alamat</h4>
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-[#1A1743] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <p class="text-sm text-[#47464E]" x-text="order.address"></p>
                             </div>
-                            <p class="text-sm text-[#47464E]">Sedang diproses dalam mesin cuci komersial dengan formulasi deterjen hypo-allergenic ramah serat kain.</p>
                         </div>
-                        <span class="text-xs font-semibold text-[#1A1743] shrink-0">11:00 WIB</span>
                     </div>
-                </div>
 
-                <!-- Step 4: Disetrika (PENDING) -->
-                <div class="relative opacity-60">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#F2F3FF] rounded-full flex items-center justify-center border-4 border-white shadow">
-                        <span class="w-2 h-2 bg-[#E2E7FF] rounded-full"></span>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-[#1A1743] mb-1">Disetrika Uap Presisi &amp; Dilipat Higienis</h3>
-                            <p class="text-sm text-[#47464E]">Treatment pewangi Magnolia &amp; lipatan garment rapi standar boutique.</p>
+                    <!-- Footer Kartu -->
+                    <div class="px-6 md:px-8 py-4 bg-[#FAF8FF] border-t border-[#E2E7FF]/60 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <span class="text-xs text-[#47464E]">Total Pembayaran</span>
+                            <div class="text-xl font-extrabold text-[#1A1743]" x-text="formatRp(order.total)"></div>
                         </div>
-                        <span class="text-xs font-semibold text-[#47464E] shrink-0">Est. 14:30 WIB</span>
-                    </div>
-                </div>
 
-                <!-- Step 5: Siap Diantar (PENDING) -->
-                <div class="relative opacity-60">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#F2F3FF] rounded-full flex items-center justify-center border-4 border-white shadow">
-                        <span class="w-2 h-2 bg-[#E2E7FF] rounded-full"></span>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-[#1A1743] mb-1">Siap Diantar Kurir Rodeo</h3>
-                            <p class="text-sm text-[#47464E]">Pakaian dimasukkan ke tas kedap udara higienis armada motor steril UV-C.</p>
-                        </div>
-                        <span class="text-xs font-semibold text-[#47464E] shrink-0">Est. 16:00 WIB</span>
-                    </div>
-                </div>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-if="order.canEditAddress">
+                                <button class="px-4 py-2 bg-white border border-[#E2E7FF] hover:border-[#1A1743] text-[#1A1743] rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Ubah Alamat
+                                </button>
+                            </template>
 
-                <!-- Step 6: Pesanan Selesai (PENDING) -->
-                <div class="relative opacity-60">
-                    <div class="absolute -left-8 top-1 w-6 h-6 bg-[#F2F3FF] rounded-full flex items-center justify-center border-4 border-white shadow">
-                        <span class="w-2 h-2 bg-[#E2E7FF] rounded-full"></span>
-                    </div>
-                    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-[#1A1743] mb-1">Pesanan Selesai / Diterima</h3>
-                            <p class="text-sm text-[#47464E]">Konfirmasi penerimaan dengan PIN serah terima digital kepada kurir.</p>
+                            <template x-if="order.canCancel">
+                                <button class="px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    Batalkan Pesanan
+                                </button>
+                            </template>
+
+                            <a href="#" class="px-4 py-2 bg-[#1A1743] hover:bg-[#2F2D59] text-white rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                Lihat Detail
+                                <span>→</span>
+                            </a>
                         </div>
-                        <span class="text-xs font-semibold text-[#47464E] shrink-0">Est. 17:00 WIB</span>
                     </div>
                 </div>
-            </div>
+            </template>
         </div>
-
-        <!-- ================= CARD: ALAMAT & KURIR ================= -->
-        <div class="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-[#E2E7FF]/60">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold">Alamat Penjemputan &amp; Pengantaran</h2>
-                        <p class="text-sm text-[#47464E]">Titik serah terima paket kurir Rodeo</p>
-                    </div>
-                </div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#C2F43B]/30 rounded-full w-fit">
-                    <svg class="w-3.5 h-3.5 text-[#4E6700]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                    <span class="text-xs font-bold text-[#4E6700]">Terverifikasi GPS</span>
-                </div>
-            </div>
-
-            <!-- Kotak Alamat -->
-            <div class="p-5 rounded-2xl bg-[#FAF8FF] border border-[#E2E7FF]/60 mb-5">
-                <div class="flex items-start gap-3 mb-3">
-                    <div class="w-8 h-8 bg-[#BFF138] rounded-lg flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-bold text-[#1A1743] mb-1">Kost Griya Suhat Residence</h3>
-                        <p class="text-sm text-[#47464E] mb-3">Jl. Soekarno Hatta No. 45, Kecamatan Lowokwaru, Kota Malang, Jawa Timur 65141</p>
-                        <div class="flex items-start gap-2 text-xs text-[#47464E]">
-                            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span><span class="font-bold">Catatan:</span> Pagar hitam depan ruko samping minimarket, titip di resepsionis jika sedang keluar.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Courier Info -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4 border-t border-[#E2E7FF]/60">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-[#EAEDFF] rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 text-[#1A1743]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <p class="text-sm text-[#47464E]">
-                        Dijemput oleh <span class="font-bold text-[#1A1743]">Budi Santoso</span> (Armada Driver #02)
-                    </p>
-                </div>
-                <a href="#" class="inline-flex items-center gap-2 text-sm font-bold text-[#1A1743] hover:text-[#4E6700] transition">
-                    Buka Petunjuk Arah
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-            </div>
-        </div>
-
     </main>
 
     <!-- ================= FOOTER ================= -->
