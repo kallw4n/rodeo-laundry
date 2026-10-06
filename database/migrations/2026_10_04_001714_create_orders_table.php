@@ -8,7 +8,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->decimal('total_price', 10, 2)->default(0);
-            $table->enum('status', ['pending', 'washing', 'drying', 'ironing', 'packing', 'ready', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'processing', 'ready', 'completed', 'cancelled'])->default('pending');
             $table->dateTime('estimated_completion_time')->nullable();
             $table->timestamps();
         });
