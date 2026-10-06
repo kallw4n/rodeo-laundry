@@ -70,6 +70,10 @@ Route::get('/pengiriman', function () {
 
     return view('pengiriman', compact('services'));
 })->name('pengiriman');
+// INI MASIH UHHH DATA DUMMY
+Route::get('/orders', function () {
+    return view('pesanan');
+})->name('pesanan.index');
 
 Route::get('/pembayaran', function () {
     $services = \App\Models\ServiceType::take(6)->get()
