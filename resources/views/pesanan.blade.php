@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesanan Saya - Rodeo Laundry Malang</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased"
       x-data="{
@@ -72,13 +71,13 @@
         <div class="max-w-[1440px] mx-auto h-full px-6 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center gap-2">
                 <div class="w-10 h-10 bg-[#2F2D59] flex items-center justify-center shadow-lg">
-                    <div class="w-4 h-5 bg-[#BFF138]"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#BFF108" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-washing-machine preview-icon"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                 </div>
                 <div>
                     <div class="flex items-center text-lg font-semibold leading-none">
-                        Rodeo<span class="text-[#A7D717]">.</span>
+                        Rodeo Laundry<span class="text-[#A7D717]">.</span>
                     </div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Laundry Malang</div>
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Malang</div>
                 </div>
             </a>
 

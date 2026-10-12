@@ -12,7 +12,11 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return view('orders.index', ['items' => Order::with('customer')->latest()->paginate(15)]);
+        $orders = Order::with(['customer', 'items.service'])
+            ->latest()
+            ->get();
+            
+        return view('pesanan', compact('orders'));
     }
 
     public function create()

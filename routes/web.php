@@ -17,93 +17,120 @@ Route::resource('expenses', ExpenseController::class);
 
 //INI UNTUK PAGE NYA PELANGGAN
 Route::get('/', function () {
-    $services = ServiceType::take(6)->get(); 
+    $services = ServiceType::take(6)->get()->map(function ($s) {
+        $name = strtolower($s->name);
+        $unit = 'pcs';
+        if (str_contains($name, 'kiloan')) $unit = 'kg';
+        elseif (str_contains($name, 'sepatu')) $unit = 'psg';
+        elseif (str_contains($name, 'gorden')) $unit = 'meter';
+
+        return (object) [
+            'id'          => $s->id,
+            'name'        => $s->name,
+            'price'       => (int) $s->price,
+            'description' => $s->description,
+            'unit'        => $unit,
+        ];
+    });
+
     return view('frontPage', compact('services'));
+})->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/pemesanan', function (\Illuminate\Http\Request $request) {
+        $preselectId = $request->query('service');
+        $preselectName = null;
+
+        if ($preselectId) {
+            $found = ServiceType::find($preselectId);
+            if ($found) $preselectName = $found->name;
+        }
+
+        $allServices = ServiceType::all()->map(function ($s) {
+            $name = strtolower($s->name);
+            $unit = 'pcs';
+            if (str_contains($name, 'kiloan')) $unit = 'kg';
+            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
+            elseif (str_contains($name, 'gorden')) $unit = 'meter';
+            return [
+                'id'          => $s->id,
+                'name'        => $s->name,
+                'price'       => (int) $s->price,
+                'description' => $s->description,
+                'unit'        => $unit,
+                'tag'         => 'Layanan',
+            ];
+        });
+
+        $kiloanService = $allServices->firstWhere('unit', 'kg');
+        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+
+        return view('pemesanan', [
+            'services'      => $otherServices,
+            'kiloanService' => $kiloanService,
+            'preselectId'   => $preselectId,
+            'preselectName' => $preselectName,
+        ]);
+    })->name('pemesanan');
+
+    Route::get('/pengiriman', function () {
+        $allServices = ServiceType::all()->map(function ($s) {
+            $name = strtolower($s->name);
+            $unit = 'pcs';
+            if (str_contains($name, 'kiloan')) $unit = 'kg';
+            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
+            elseif (str_contains($name, 'gorden')) $unit = 'meter';
+
+            return [
+                'id'          => $s->id,
+                'name'        => $s->name,
+                'price'       => (int) $s->price,
+                'description' => $s->description,
+                'unit'        => $unit,
+                'tag'         => 'Layanan',
+            ];
+        });
+
+        $kiloanService = $allServices->firstWhere('unit', 'kg');
+        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+
+        return view('pengiriman', [
+            'services'      => $otherServices,
+            'kiloanService' => $kiloanService,
+        ]);
+    })->name('pengiriman');
+
+    Route::get('/pembayaran', function () {
+        $allServices = ServiceType::all()->map(function ($s) {
+            $name = strtolower($s->name);
+            $unit = 'pcs';
+            if (str_contains($name, 'kiloan')) $unit = 'kg';
+            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
+            elseif (str_contains($name, 'gorden')) $unit = 'meter';
+
+            return [
+                'id'          => $s->id,
+                'name'        => $s->name,
+                'price'       => (int) $s->price,
+                'description' => $s->description,
+                'unit'        => $unit,
+                'tag'         => 'Layanan',
+            ];
+        });
+
+        $kiloanService = $allServices->firstWhere('unit', 'kg');
+        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+
+        return view('pembayaran', [
+            'services'      => $otherServices,
+            'kiloanService' => $kiloanService,
+        ]);
+    })->name('pembayaran');
+
+    Route::get('/orders', function () {
+        return view('pesanan');
+    })->name('pesanan.index');
 });
-Route::get('/pemesanan', function (\Illuminate\Http\Request $request) {
-    $preselectId = $request->query('service');
-    $preselectName = null;
-    
-    if ($preselectId) {
-        $found = \App\Models\ServiceType::find($preselectId);
-        if ($found) $preselectName = $found->name;
-    }
-    
-    $services = \App\Models\ServiceType::take(6)->get()
-        ->filter(fn($s) => !str_contains(strtolower($s->name), 'kiloan')) // Filter kiloan, karena sudah hardcode
-        ->map(function ($s) {
-            $unit = 'pcs';
-            if (str_contains(strtolower($s->name), 'sepatu')) $unit = 'psg';
-            elseif (str_contains(strtolower($s->name), 'gorden')) $unit = 'meter';
-            
-            return [
-                'id'          => $s->id,
-                'name'        => $s->name,
-                'price'       => (int) $s->price,
-                'description' => $s->description,
-                'unit'        => $unit,
-                'tag'         => 'Layanan',
-            ];
-        })->values();
-    
-    return view('pemesanan', [
-        'services'      => $services,
-        'preselectId'   => $preselectId,
-        'preselectName' => $preselectName,
-    ]);
-})->name('pemesanan');
-
-Route::get('/pengiriman', function () {
-    $services = \App\Models\ServiceType::take(6)->get()
-        ->filter(fn($s) => !str_contains(strtolower($s->name), 'kiloan'))
-        ->map(function ($s) {
-            $unit = 'pcs';
-            if (str_contains(strtolower($s->name), 'sepatu')) $unit = 'psg';
-            elseif (str_contains(strtolower($s->name), 'gorden')) $unit = 'meter';
-            return [
-                'id'          => $s->id,
-                'name'        => $s->name,
-                'price'       => (int) $s->price,
-                'description' => $s->description,
-                'unit'        => $unit,
-                'tag'         => 'Layanan',
-            ];
-        })->values();
-
-    return view('pengiriman', compact('services'));
-})->name('pengiriman');
-// INI MASIH UHHH DATA DUMMY
-Route::get('/orders', function () {
-    return view('pesanan');
-})->name('pesanan.index');
-
-Route::get('/pembayaran', function () {
-    $services = \App\Models\ServiceType::take(6)->get()
-        ->filter(fn($s) => !str_contains(strtolower($s->name), 'kiloan'))
-        ->map(function ($s) {
-            $unit = 'pcs';
-            if (str_contains(strtolower($s->name), 'sepatu')) $unit = 'psg';
-            elseif (str_contains(strtolower($s->name), 'gorden')) $unit = 'meter';
-            return [
-                'id'          => $s->id,
-                'name'        => $s->name,
-                'price'       => (int) $s->price,
-                'description' => $s->description,
-                'unit'        => $unit,
-                'tag'         => 'Layanan',
-            ];
-        })->values();
-
-    return view('pembayaran', compact('services'));
-})->name('pembayaran');
-
-Route::get('/pesanan', function () {
-    return view('pesanan');
-})->name('pesanan');
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
