@@ -12,13 +12,70 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['customer', 'items.service'])
-            ->latest()
-            ->get();
-            
-        return view('pesanan', compact('orders'));
+        $user = $request->user();
+        $customer = Customer::where('user_id', $user->id)->first();
+
+        $orders = $customer
+            ? Order::with(['items.service', 'delivery', 'payment'])
+                ->where('customer_id', $customer->id)
+                ->latest()
+                ->get()
+            : collect();
+
+        $statusLabels = [
+            'pending'    => 'Menunggu Konfirmasi',
+            'processing' => 'Sedang Dicuci',
+            'ready'      => 'Siap Diambil/Diantar',
+            'completed'  => 'Selesai',
+            'cancelled'  => 'Dibatalkan',
+        ];
+
+        $formattedOrders = $orders->map(function ($order) use ($statusLabels) {
+            return [
+                'id'             => 'ROD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT),
+                'raw_id'         => $order->id,
+                'date'           => $order->created_at ? $order->created_at->translatedFormat('d F Y, H:i') : '-',
+                'status'         => $order->status,
+                'statusLabel'    => $statusLabels[$order->status] ?? ucfirst($order->status),
+                'items'          => $order->items->map(function ($item) {
+                    $name = strtolower($item->service->name ?? '');
+                    $unit = 'pcs';
+                    if (str_contains($name, 'kiloan')) $unit = 'kg';
+                    elseif (str_contains($name, 'sepatu')) $unit = 'psg';
+                    elseif (str_contains($name, 'gorden')) $unit = 'meter';
+
+                    return [
+                        'name'  => $item->service->name ?? 'Layanan Laundry',
+                        'qty'   => (float) $item->quantity,
+                        'unit'  => $unit,
+                        'price' => (int) ($item->price * $item->quantity),
+                    ];
+                }),
+                'total'          => (int) $order->total_price,
+                'address'        => $order->delivery->address ?? ($order->customer->address ?? 'Ambil di Outlet Rodeo Malang'),
+                'canCancel'      => $order->status === 'pending',
+                'canEditAddress' => in_array($order->status, ['pending', 'processing']),
+            ];
+        });
+
+        return view('pesanan', ['orders' => $formattedOrders]);
+    }
+
+    public function cancelCustomerOrder(Request $request, Order $order)
+    {
+        $customer = Customer::where('user_id', $request->user()->id)->first();
+        if (!$customer || $order->customer_id !== $customer->id) {
+            abort(403);
+        }
+
+        if ($order->status === 'pending') {
+            $order->update(['status' => 'cancelled']);
+            return back()->with('success', 'Pesanan berhasil dibatalkan.');
+        }
+
+        return back()->with('error', 'Pesanan yang sedang diproses tidak dapat dibatalkan.');
     }
 
     public function create()

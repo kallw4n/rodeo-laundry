@@ -127,9 +127,8 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('pembayaran');
 
-    Route::get('/orders', function () {
-        return view('pesanan');
-    })->name('pesanan.index');
+    Route::get('/orders', [OrderController::class, 'index'])->name('pesanan.index');
+    Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancelCustomerOrder'])->name('pesanan.cancel');
 
     Route::post('/pesan', [OrderController::class, 'checkout'])->name('pesan.store');
 });

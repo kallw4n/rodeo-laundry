@@ -40,7 +40,21 @@ Dokumen ini mencatat keputusan arsitektural dan implementasi penting yang telah 
 
 ---
 
-## 3. Database Schema Alignment
+## 3. Integrasi Riwayat Pesanan Pelanggan (`/orders`)
+* **Tanggal:** 18 Oktober 2026
+* **Konteks:**
+  Halaman `/orders` sebelumnya menggunakan data dummy statis di Alpine.js.
+* **Keputusan Teknis:**
+  1. **Scoping Data Sesuai Kepemilikan (Privacy & Security):**
+     Query pesanan difilter berdasarkan `customer_id` yang terhubung ke `user_id` yang sedang login (`Order::where('customer_id', $customer->id)`). Pelanggan tidak dapat melihat transaksi pelanggan lain.
+  2. **Mapping Data Responsif:**
+     Controller memformat tanggal, label status Indonesia, relasi item pakaian, dan alamat pengiriman agar langsung sesuai dengan struktur Alpine.js di `pesanan.blade.php`.
+  3. **Aksi Pembatalan Pesanan (`PATCH /orders/{order}/cancel`):**
+     Pelanggan dapat membatalkan pesanan secara mandiri selama statusnya masih `pending` (belum diproses atau dicuci oleh pihak laundry).
+
+---
+
+## 4. Database Schema Alignment
 * Penambahan kolom `remember_token` dan `email_verified_at` pada tabel `users`.
 * Default role pada tabel `users` adalah `'customer'`.
 * Foreign key `customers.user_id` nullable dengan aksi `nullOnDelete`.

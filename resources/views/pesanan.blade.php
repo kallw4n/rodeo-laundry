@@ -8,48 +8,7 @@
 </head>
 <body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased"
       x-data="{
-        orders: [
-            {
-                id: 'RDL-2510-003',
-                date: '6 Oktober 2025, 14:32',
-                status: 'processing',
-                statusLabel: 'Sedang Dicuci',
-                items: [
-                    { name: 'Cuci Kiloan', qty: 3, unit: 'kg', price: 45000 },
-                    { name: 'Cuci Sepatu Premium', qty: 1, unit: 'psg', price: 25000 },
-                ],
-                total: 70000,
-                address: 'Jl. Soekarno Hatta No. 45, Lowokwaru',
-                canCancel: true,
-                canEditAddress: true,
-            },
-            {
-                id: 'RDL-2509-018',
-                date: '28 September 2025, 10:15',
-                status: 'completed',
-                statusLabel: 'Selesai',
-                items: [
-                    { name: 'Cuci Kiloan', qty: 5, unit: 'kg', price: 75000 },
-                ],
-                total: 75000,
-                address: 'Jacatra homestay, Jl. Jakarta No.62, klojen',
-                canCancel: false,
-                canEditAddress: false,
-            },
-            {
-                id: 'RDL-2509-005',
-                date: '15 September 2025, 09:45',
-                status: 'cancelled',
-                statusLabel: 'Dibatalkan',
-                items: [
-                    { name: 'Bed Cover & Selimut King', qty: 2, unit: 'pcs', price: 70000 },
-                ],
-                total: 70000,
-                address: 'Di situlah pokoknya, Jl. Itulah pokoknya',
-                canCancel: false,
-                canEditAddress: false,
-            },
-        ],
+        orders: @json($orders),
         get hasOrders() { return this.orders.length > 0; },
         formatRp(n) { return 'Rp ' + n.toLocaleString('id-ID'); },
         statusColor(status) {
@@ -59,10 +18,21 @@
                 'ready':      { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
                 'completed':  { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
                 'cancelled':  { bg: 'bg-red-100',   text: 'text-red-700',   dot: 'bg-red-500' },
-            }[status];
+            }[status] || { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' };
         },
         stepIndex(status) {
-            return { 'pending': 0, 'processing': 1, 'ready': 2, 'completed': 3, 'cancelled': -1 }[status];
+            return { 'pending': 0, 'processing': 1, 'ready': 2, 'completed': 3, 'cancelled': -1 }[status] ?? 0;
+        },
+        async cancelOrder(id) {
+            if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) return;
+            await fetch(`/orders/${id}/cancel`, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                }
+            });
+            window.location.reload();
         }
       }">
 
@@ -252,7 +222,7 @@
                             </template>
 
                             <template x-if="order.canCancel">
-                                <button class="px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                <button @click="cancelOrder(order.raw_id)" class="px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                     Batalkan Pesanan
                                 </button>
