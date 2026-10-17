@@ -20,9 +20,33 @@
         kiloan: $persist(0).as('cart_kiloan'),
         serviceQty: $persist({}).as('cart_service_qty'),
         notes: $persist('').as('cart_notes'),
+        courierNotes: $persist('').as('cart_courier_notes'),
+        pickupMethod: $persist('courier').as('cart_pickup'),
 
         summaryOpen: true,
         paymentMethod: 'qris',
+        submitting: false,
+        error: '',
+
+        async checkout() {
+            this.submitting = true;
+            this.error = '';
+            const items = this.selectedServices.map(s => ({ id: s.id, qty: this.serviceQty[s.id] }));
+            if (this.kiloan > 0 && this.kiloanService) items.unshift({ id: this.kiloanService.id, qty: this.kiloan });
+            const res = await fetch('{{ route('pesan.store') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({
+                    items,
+                    payment_method: this.paymentMethod,
+                    pickup: this.pickupMethod,
+                    notes: [this.notes, this.courierNotes].filter(Boolean).join(' / '),
+                }),
+            });
+            if (!res.ok) { this.error = 'Gagal membuat pesanan, coba lagi.'; this.submitting = false; return; }
+            ['cart_kiloan', 'cart_service_qty', 'cart_notes', 'cart_courier_notes', 'cart_pickup'].forEach(k => localStorage.removeItem('_x_' + k));
+            window.location = (await res.json()).redirect;
+        },
 
         get hargaKiloan() { return this.kiloanService?.price ?? 0; },
         get kiloanName() { return this.kiloanService?.name ?? 'Cuci Kiloan'; },
@@ -313,7 +337,8 @@
             </div>
 
             <!-- ====== TOMBOL KONFIRMASI & BAYAR ====== -->
-            <button class="w-full mt-6 md:mt-8 px-5 md:px-8 py-4 bg-[#BFF138] text-[#131B2E] font-bold rounded-2xl
+            <p x-show="error" x-text="error" class="mt-4 text-sm font-semibold text-red-600"></p>
+            <button @click="checkout()" :disabled="!hasAnySelected || submitting" class="disabled:opacity-50 disabled:cursor-not-allowed w-full mt-6 md:mt-8 px-5 md:px-8 py-4 bg-[#BFF138] text-[#131B2E] font-bold rounded-2xl
                            flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0
                            transition-all duration-300 ease-out
                            hover:shadow-[0_15px_35px_rgba(204,255,70,0.65)]

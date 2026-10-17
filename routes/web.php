@@ -130,6 +130,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', function () {
         return view('pesanan');
     })->name('pesanan.index');
+
+    Route::post('/pesan', [OrderController::class, 'checkout'])->name('pesan.store');
 });
 
 Route::middleware('auth')->group(function () {

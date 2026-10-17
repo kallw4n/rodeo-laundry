@@ -43,7 +43,7 @@
             },
         ],
 
-        pickupMethod: 'courier',
+        pickupMethod: $persist('courier').as('cart_pickup'),
         deliveryMethod: 'courier',
 
         quickNotes: [
