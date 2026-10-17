@@ -138,4 +138,45 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// ==========================================
+// ADMIN PORTAL & POS ROUTES (ROLE: ADMIN)
+// ==========================================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+
+    // 1. Dashboard Overview
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // 2. POS / Kasir
+    Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos');
+    Route::post('/pos/order', [\App\Http\Controllers\Admin\PosController::class, 'storeOrder'])->name('pos.order');
+
+    // 3. Kelola Pelanggan
+    Route::get('/customers', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'index'])->name('customers.index');
+    Route::post('/customers', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'store'])->name('customers.store');
+    Route::put('/customers/{customer}', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'update'])->name('customers.update');
+    Route::delete('/customers/{customer}', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'destroy'])->name('customers.destroy');
+
+    // 4. Kelola Layanan
+    Route::get('/services', [\App\Http\Controllers\Admin\AdminServiceController::class, 'index'])->name('services.index');
+    Route::post('/services', [\App\Http\Controllers\Admin\AdminServiceController::class, 'store'])->name('services.store');
+    Route::put('/services/{service}', [\App\Http\Controllers\Admin\AdminServiceController::class, 'update'])->name('services.update');
+    Route::delete('/services/{service}', [\App\Http\Controllers\Admin\AdminServiceController::class, 'destroy'])->name('services.destroy');
+
+    // 5. Kelola Pembayaran
+    Route::get('/payments', [\App\Http\Controllers\Admin\AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::post('/payments', [\App\Http\Controllers\Admin\AdminPaymentController::class, 'store'])->name('payments.store');
+    Route::put('/payments/{payment}', [\App\Http\Controllers\Admin\AdminPaymentController::class, 'update'])->name('payments.update');
+    Route::delete('/payments/{payment}', [\App\Http\Controllers\Admin\AdminPaymentController::class, 'destroy'])->name('payments.destroy');
+
+    // 6. Kelola Pengiriman
+    Route::get('/deliveries', [\App\Http\Controllers\Admin\AdminDeliveryController::class, 'index'])->name('deliveries.index');
+    Route::post('/deliveries', [\App\Http\Controllers\Admin\AdminDeliveryController::class, 'store'])->name('deliveries.store');
+    Route::put('/deliveries/{delivery}', [\App\Http\Controllers\Admin\AdminDeliveryController::class, 'update'])->name('deliveries.update');
+    Route::patch('/deliveries/{delivery}/status', [\App\Http\Controllers\Admin\AdminDeliveryController::class, 'updateStatus'])->name('deliveries.updateStatus');
+    Route::delete('/deliveries/{delivery}', [\App\Http\Controllers\Admin\AdminDeliveryController::class, 'destroy'])->name('deliveries.destroy');
+});
+
 require __DIR__.'/auth.php';
