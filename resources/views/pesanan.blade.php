@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pesanan Saya - Rodeo Laundry Malang</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        window.pesananData = {
+            orders: @json($orders),
+        };
+    </script>
 </head>
 <body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased"
       x-data="{
-        orders: @json($orders),
+        orders: window.pesananData.orders || [],
         get hasOrders() { return this.orders.length > 0; },
         formatRp(n) { return 'Rp ' + n.toLocaleString('id-ID'); },
         statusColor(status) {
@@ -25,7 +30,7 @@
         },
         async cancelOrder(id) {
             if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) return;
-            await fetch(`/orders/${id}/cancel`, {
+            await fetch('/orders/' + id + '/cancel', {
                 method: 'PATCH',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
