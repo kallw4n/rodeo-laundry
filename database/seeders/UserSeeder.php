@@ -20,10 +20,11 @@ class UserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        // 5 Akun Customer tetap untuk kemudahan login testing & demo
         for ($i = 1; $i <= 5; $i++) {
             User::create([
                 'username' => 'customer' . $i,
-                'email' => $faker->unique()->safeEmail,
+                'email' => 'customer' . $i . '@rodeo.com',
                 'password' => Hash::make('password'),
                 'role' => 'customer',
             ]);

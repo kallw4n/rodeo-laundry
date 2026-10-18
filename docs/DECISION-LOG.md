@@ -77,3 +77,14 @@ Dokumen ini mencatat keputusan arsitektural dan implementasi penting yang telah 
 * **Keputusan Teknis:**
   - expenses dihapus dari outes/web.php karena ExpenseController masih stub kosong, tidak ada view yang menyertainya, dan modul pengeluaran tidak masuk dalam spesifikasi PRD/Figma.
   - Route mati /riwayat, /laporan, dan /profil dibersihkan dari outes/web.php sehingga seluruh route aplikasi kini valid, bersih, dan terlindungi sesuai hak akses role.
+
+---
+
+## 7. Standardisasi Akun Customer Tetap pada Seeder
+* **Tanggal:** 18 Oktober 2026
+* **Konteks:** Sebelumnya email customer diacak oleh Faker (@example.org), sehingga email berubah setiap kali seeding ulang dan akun user belum memiliki riwayat pesanan langsung saat login.
+* **Keputusan Teknis:**
+  - Menetapkan 5 akun customer deterministik: customer1@rodeo.com s/d customer5@rodeo.com (semua password: password).
+  - CustomerSeeder langsung memetakan akun user tersebut ke profil Customer (Budi Santoso, Siti Rahmawati, dkk.) lengkap dengan nomor HP dan alamat Malang.
+  - OrderSeeder otomatis menautkan data pesanan dan item cucian ke akun-akun ini, sehingga saat login pertama kali ke /orders, pelanggan langsung memiliki data riwayat pesanan riil untuk keperluan demo/presentasi.
+  - Menyiapkan 5 data customer walk-in offline (user_id = null) untuk simulasi transaksi langsung di kasir POS.

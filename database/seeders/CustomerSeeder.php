@@ -12,31 +12,39 @@ class CustomerSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('id_ID');
-        $users = User::where('role', 'customer')->get();
+        $customerNames = [
+            'Budi Santoso',
+            'Siti Rahmawati',
+            'Ahmad Fauzi',
+            'Dewi Lestari',
+            'Rizky Pratama',
+        ];
+
+        $users = User::where('role', 'customer')->orderBy('id')->get();
         
-        foreach ($users as $user) {
+        foreach ($users as $index => $user) {
             Customer::create([
                 'user_id' => $user->id,
-                'name' => $faker->name,
+                'name' => $customerNames[$index] ?? $faker->name,
                 'email' => $user->email,
-                'phone' => $faker->phoneNumber,
-                'address' => $faker->address,
-                'city' => $faker->city,
-                'loyalty_points' => $faker->numberBetween(0, 100),
+                'phone' => '08' . $faker->numerify('##########'),
+                'address' => 'Jl. ' . $faker->streetName . ' No. ' . $faker->buildingNumber . ', Malang',
+                'city' => 'Kota Malang',
+                'loyalty_points' => $faker->numberBetween(10, 80),
                 'total_spent' => 0,
             ]);
         }
 
-        // Add some customers without user account
+        // 5 pelanggan walk-in / offline tanpa akun user (transaksi kasir POS)
         for ($i = 0; $i < 5; $i++) {
             Customer::create([
                 'user_id' => null,
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
-                'phone' => $faker->phoneNumber,
-                'address' => $faker->address,
-                'city' => $faker->city,
-                'loyalty_points' => $faker->numberBetween(0, 50),
+                'phone' => '08' . $faker->numerify('##########'),
+                'address' => 'Jl. ' . $faker->streetName . ' No. ' . $faker->buildingNumber . ', Malang',
+                'city' => 'Kota Malang',
+                'loyalty_points' => $faker->numberBetween(0, 30),
                 'total_spent' => 0,
             ]);
         }
