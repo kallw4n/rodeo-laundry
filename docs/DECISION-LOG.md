@@ -58,3 +58,13 @@ Dokumen ini mencatat keputusan arsitektural dan implementasi penting yang telah 
 * Penambahan kolom `remember_token` dan `email_verified_at` pada tabel `users`.
 * Default role pada tabel `users` adalah `'customer'`.
 * Foreign key `customers.user_id` nullable dengan aksi `nullOnDelete`.
+
+---
+
+## 5. Pembersihan OrderController Lama
+* **Tanggal:** 18 Oktober 2026
+* **Keputusan:** Method create, store, show, edit, update, destroy dihapus karena:
+  - Tidak ada route yang memakainya, dan view orders.* tidak ada.
+  - store() menduplikasi checkout() dan me-redirect ke route orders.index yang tidak ada (error).
+  - Manajemen order oleh staf sudah ditangani Admin\PosController dan portal admin.
+* **Dipertahankan:** index (riwayat pelanggan), cancelCustomerOrder, checkout.
