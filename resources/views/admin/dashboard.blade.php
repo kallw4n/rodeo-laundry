@@ -119,6 +119,13 @@
         </div>
     </div>
 
+    @if(session('success'))
+    <div class="mb-4 px-5 py-3 bg-[#ECFDF5] border border-[#6EE7B7] rounded-2xl text-[#065F46] text-sm font-semibold flex items-center gap-2">
+        <svg class="w-4 h-4 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+
     <!-- Main Section: Pesanan Terbaru Table -->
     <div class="bg-white rounded-[32px] p-6 md:p-8 border border-[#E9ECF4] shadow-sm">
         
@@ -247,8 +254,21 @@
                                         <!-- Dropdown Menu -->
                                         <div x-show="open" 
                                              @click.outside="open = false"
-                                             class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-[#E9ECF4] py-2 z-30 text-left text-xs font-semibold">
-                                            <a href="{{ route('admin.pos') }}" class="block px-4 py-2 hover:bg-[#F8F9FD] text-[#1E1B4B]">Buka di POS / Kasir</a>
+                                             class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#E9ECF4] py-2 z-30 text-left text-xs font-semibold">
+                                            <!-- Update Status -->
+                                            <div class="px-4 py-2 text-[10px] uppercase tracking-wider text-[#94A3B8] font-bold">Ubah Status</div>
+                                            <form method="POST" action="{{ route('admin.orders.updateStatus', $order) }}">
+                                                @csrf @method('PATCH')
+                                                <div class="px-4 pb-2 flex gap-1.5">
+                                                    <select name="status" class="flex-1 text-xs border border-[#E9ECF4] rounded-xl px-2 py-1.5 text-[#1E1B4B] bg-[#F8F9FD] focus:outline-none focus:border-[#4338CA]">
+                                                        @foreach(['pending' => 'Antrian', 'processing' => 'Dicuci', 'ready' => 'Siap Ambil', 'completed' => 'Selesai', 'cancelled' => 'Batal'] as $val => $lbl)
+                                                            <option value="{{ $val }}" {{ $order->status === $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="px-2.5 py-1.5 bg-[#1E1B4B] text-white rounded-xl hover:bg-[#4338CA] transition text-xs font-bold">✓</button>
+                                                </div>
+                                            </form>
+                                            <div class="border-t border-[#F1F3F8] my-1"></div>
                                             <a href="{{ route('admin.payments.index') }}" class="block px-4 py-2 hover:bg-[#F8F9FD] text-[#1E1B4B]">Cek Pembayaran</a>
                                             <a href="{{ route('admin.deliveries.index') }}" class="block px-4 py-2 hover:bg-[#F8F9FD] text-[#1E1B4B]">Jadwal Pengiriman</a>
                                         </div>

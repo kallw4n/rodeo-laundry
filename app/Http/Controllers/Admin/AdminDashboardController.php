@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
@@ -57,5 +58,16 @@ class AdminDashboardController extends Controller
             'urgentCount',
             'recentOrders'
         ));
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => ['required', Rule::in(['pending', 'processing', 'ready', 'completed', 'cancelled'])],
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return back()->with('success', 'Status pesanan #RD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' diperbarui.');
     }
 }

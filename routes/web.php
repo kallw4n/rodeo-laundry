@@ -141,6 +141,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // 1. Dashboard Overview
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/orders/{order}/status', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateOrderStatus'])->name('orders.updateStatus');
 
     // 2. POS / Kasir
     Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos');
