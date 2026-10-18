@@ -68,3 +68,12 @@ Dokumen ini mencatat keputusan arsitektural dan implementasi penting yang telah 
   - store() menduplikasi checkout() dan me-redirect ke route orders.index yang tidak ada (error).
   - Manajemen order oleh staf sudah ditangani Admin\PosController dan portal admin.
 * **Dipertahankan:** index (riwayat pelanggan), cancelCustomerOrder, checkout.
+
+---
+
+## 6. Pembersihan Route Legacy & Insecure (Expenses & Dead Routes)
+* **Tanggal:** 18 Oktober 2026
+* **Konteks:** Terdapat route Route::resource('expenses') tanpa proteksi auth/role guard, serta route legacy /riwayat, /laporan, dan /profil yang mengarah ke method tidak ada.
+* **Keputusan Teknis:**
+  - expenses dihapus dari outes/web.php karena ExpenseController masih stub kosong, tidak ada view yang menyertainya, dan modul pengeluaran tidak masuk dalam spesifikasi PRD/Figma.
+  - Route mati /riwayat, /laporan, dan /profil dibersihkan dari outes/web.php sehingga seluruh route aplikasi kini valid, bersih, dan terlindungi sesuai hak akses role.

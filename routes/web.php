@@ -1,21 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ServiceTypeController;
-use App\Http\Controllers\ExpenseController;
 use App\Models\ServiceType; // INI UNTUK PELANGGAN
 use Illuminate\Support\Facades\Route;
 
-Route::get('/riwayat', [OrderController::class, 'history'])->name('riwayat');
-Route::get('/profil', [CustomerController::class, 'profile'])->name('profil');
-Route::get('/laporan', [OrderController::class, 'report'])->name('laporan');
-Route::resource('expenses', ExpenseController::class);
-
-//INI UNTUK PAGE NYA PELANGGAN
+// INI UNTUK PAGE NYA PELANGGAN
 Route::get('/', function () {
     $services = ServiceType::take(6)->get()->map(function ($s) {
         $name = strtolower($s->name);
