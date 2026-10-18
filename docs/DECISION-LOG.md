@@ -88,3 +88,15 @@ Dokumen ini mencatat keputusan arsitektural dan implementasi penting yang telah 
   - CustomerSeeder langsung memetakan akun user tersebut ke profil Customer (Budi Santoso, Siti Rahmawati, dkk.) lengkap dengan nomor HP dan alamat Malang.
   - OrderSeeder otomatis menautkan data pesanan dan item cucian ke akun-akun ini, sehingga saat login pertama kali ke /orders, pelanggan langsung memiliki data riwayat pesanan riil untuk keperluan demo/presentasi.
   - Menyiapkan 5 data customer walk-in offline (user_id = null) untuk simulasi transaksi langsung di kasir POS.
+
+---
+
+## 8. Integrasi Alamat Pengiriman Riil Pelanggan
+* **Tanggal:** 18 Oktober 2026
+* **Konteks:** Sebelumnya alamat di halaman /pengiriman masih dummy statis ('Fahri Haikal').
+* **Keputusan Teknis:**
+  - Route /pengiriman menyertakan data $customer dari DB yang sesuai dengan user login.
+  - Form pilihan alamat membaca nama, nomor HP, dan alamat asli pelanggan dari database.
+  - Alamat terpilih disimpan ke state cart_address (Alpine $persist) dan dikirim bersama payload /pesan.
+  - Backend mencatat alamat terpilih ke deliveries.address dan memperbarui customers.address jika sebelumnya kosong.
+  - Validasi test otomatis diperbarui di CustomerCheckoutTest (37 tests passed, 95 assertions).

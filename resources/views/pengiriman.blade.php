@@ -10,6 +10,7 @@
     window.pengirimanData = {
         services: @json($services),
         kiloanService: @json($kiloanService),
+        customer: @json($customer),
     };
     </script>
 </head>
@@ -20,28 +21,43 @@
         kiloan: $persist(0).as('cart_kiloan'),
         serviceQty: $persist({}).as('cart_service_qty'),
         courierNotes: $persist('').as('cart_courier_notes'),
+        cartAddress: $persist('').as('cart_address'),
 
         selectedAddress: 1,
-        addresses: [
-            {
-                id: 1,
-                label: 'Rumah Utama',
-                isDefault: true,
-                name: 'Fahri Haikal',
-                phone: '0822-8840-8699',
-                address: 'Jl. Soekarno Hatta No. 45, Lowokwaru',
-                detail: 'Kecamatan Lowokwaru, Kota Malang, Jawa Timur 65141 (Depan Ruko Niaga Graha Polinema)',
-            },
-            {
-                id: 2,
-                label: 'Kantor',
-                isDefault: false,
-                name: 'Fahri Haikal',
-                phone: '0822-8840-8699',
-                address: 'Gedung Coworking Lantai 2, Jl. Ijen No. 12, Klojen',
-                detail: 'Kecamatan Klojen, Kota Malang 65115 (Titip Resepsionis / Lobby Barat)',
-            },
-        ],
+        get addresses() {
+            const cust = this.customer || {};
+            return [
+                {
+                    id: 1,
+                    label: 'Alamat Profil',
+                    isDefault: true,
+                    name: cust.name || 'Pelanggan',
+                    phone: cust.phone || '0812-3456-7890',
+                    address: cust.address || 'Jl. Soekarno Hatta No. 45, Lowokwaru',
+                    detail: cust.city || 'Kota Malang',
+                },
+                {
+                    id: 2,
+                    label: 'Alamat Kantor/Kos',
+                    isDefault: false,
+                    name: cust.name || 'Pelanggan',
+                    phone: cust.phone || '0812-3456-7890',
+                    address: 'Gedung Coworking Lantai 2, Jl. Ijen No. 12',
+                    detail: 'Klojen, Kota Malang (Titip Resepsionis)',
+                },
+            ];
+        },
+
+        init() {
+            if (!this.cartAddress && this.addresses.length > 0) {
+                const a = this.addresses[0];
+                this.cartAddress = a.address + ', ' + a.detail;
+            }
+        },
+        chooseAddress(addr) {
+            this.selectedAddress = addr.id;
+            this.cartAddress = addr.address + ', ' + addr.detail;
+        },
 
         pickupMethod: $persist('courier').as('cart_pickup'),
         deliveryMethod: 'courier',
@@ -204,7 +220,7 @@
                 <template x-for="addr in addresses" :key="addr.id">
                     <label class="block cursor-pointer">
                         <input type="radio" name="address" class="peer sr-only" 
-                               :value="addr.id" x-model="selectedAddress">
+                               :value="addr.id" x-model="selectedAddress" @change="chooseAddress(addr)">
                         <div class="p-4 md:p-5 rounded-2xl border-2 transition-all
                                     border-[#E2E7FF] bg-white
                                     peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">

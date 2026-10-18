@@ -21,6 +21,7 @@ class CustomerCheckoutTest extends TestCase
             'items' => [['id' => $svc->id, 'qty' => 3]],
             'payment_method' => 'qris',
             'pickup' => 'courier',
+            'address' => 'Jl. Ijen No. 10, Klojen, Malang',
             'notes' => 'Titip satpam',
         ])->assertOk()->assertJsonStructure(['redirect']);
 
@@ -30,6 +31,7 @@ class CustomerCheckoutTest extends TestCase
         $this->assertEquals('e-wallet', $order->payment->method);
         $this->assertEquals('pending', $order->payment->status);
         $this->assertEquals('delivery', $order->delivery->type);
+        $this->assertStringContainsString('Jl. Ijen No. 10', $order->delivery->address);
     }
 
     public function test_guest_cannot_checkout(): void

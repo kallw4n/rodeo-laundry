@@ -22,6 +22,7 @@
         notes: $persist('').as('cart_notes'),
         courierNotes: $persist('').as('cart_courier_notes'),
         pickupMethod: $persist('courier').as('cart_pickup'),
+        cartAddress: $persist('').as('cart_address'),
 
         summaryOpen: true,
         paymentMethod: 'qris',
@@ -40,11 +41,12 @@
                     items,
                     payment_method: this.paymentMethod,
                     pickup: this.pickupMethod,
+                    address: this.cartAddress,
                     notes: [this.notes, this.courierNotes].filter(Boolean).join(' / '),
                 }),
             });
             if (!res.ok) { this.error = 'Gagal membuat pesanan, coba lagi.'; this.submitting = false; return; }
-            ['cart_kiloan', 'cart_service_qty', 'cart_notes', 'cart_courier_notes', 'cart_pickup'].forEach(k => localStorage.removeItem('_x_' + k));
+            ['cart_kiloan', 'cart_service_qty', 'cart_notes', 'cart_courier_notes', 'cart_pickup', 'cart_address'].forEach(k => localStorage.removeItem('_x_' + k));
             window.location = (await res.json()).redirect;
         },
 

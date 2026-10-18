@@ -83,10 +83,12 @@ Route::middleware('auth')->group(function () {
 
         $kiloanService = $allServices->firstWhere('unit', 'kg');
         $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+        $customer = \App\Models\Customer::where('user_id', auth()->id())->first();
 
         return view('pengiriman', [
             'services'      => $otherServices,
             'kiloanService' => $kiloanService,
+            'customer'      => $customer,
         ]);
     })->name('pengiriman');
 

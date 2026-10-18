@@ -87,6 +87,7 @@ class OrderController extends Controller
             'items.*.qty' => 'required|numeric|min:0.1',
             'payment_method' => 'required|in:qris,va,ewallet,cod',
             'pickup' => 'required|in:courier,self',
+            'address' => 'nullable|string|max:500',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -95,6 +96,10 @@ class OrderController extends Controller
             ['user_id' => $user->id],
             ['name' => $user->username, 'email' => $user->email]
         );
+
+        if (!empty($data['address']) && empty($customer->address)) {
+            $customer->update(['address' => $data['address']]);
+        }
 
         DB::transaction(function () use ($data, $customer) {
             $services = ServiceType::whereIn('id', collect($data['items'])->pluck('id'))->get()->keyBy('id');
@@ -125,10 +130,11 @@ class OrderController extends Controller
             ]);
 
             $delivery = $data['pickup'] === 'courier';
+            $addrText = !empty($data['address']) ? $data['address'] : ($customer->address ?? 'Alamat belum diisi');
             Delivery::create([
                 'order_id' => $order->id,
                 'type' => $delivery ? 'delivery' : 'pickup',
-                'address' => ($delivery ? ($customer->address ?? 'Alamat belum diisi') : 'Ambil di Outlet Rodeo Malang')
+                'address' => ($delivery ? $addrText : 'Ambil di Outlet Rodeo Malang')
                     . ($data['notes'] ?? '' ? ' | Catatan: ' . $data['notes'] : ''),
                 'scheduled_date' => now()->addDays(2),
                 'status' => 'scheduled',
