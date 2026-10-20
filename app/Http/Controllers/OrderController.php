@@ -60,7 +60,8 @@ class OrderController extends Controller
             ];
         });
 
-        return view('pesanan', ['orders' => $formattedOrders]);
+        $viewName = view()->exists('pelanggan.pesanan') ? 'pelanggan.pesanan' : 'pesanan';
+        return view($viewName, ['orders' => $formattedOrders]);
     }
 
     public function cancelCustomerOrder(Request $request, Order $order)

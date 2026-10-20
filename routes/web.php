@@ -23,7 +23,8 @@ Route::get('/', function () {
         ];
     });
 
-    return view('frontPage', compact('services'));
+        $viewName = view()->exists('pelanggan.frontPage') ? 'pelanggan.frontPage' : 'frontPage';
+        return view($viewName, compact('services'));
 })->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -55,7 +56,8 @@ Route::middleware('auth')->group(function () {
         $kiloanService = $allServices->firstWhere('unit', 'kg');
         $otherServices = $allServices->where('unit', '!=', 'kg')->values();
 
-        return view('pemesanan', [
+        $viewName = view()->exists('pelanggan.pemesanan') ? 'pelanggan.pemesanan' : 'pemesanan';
+        return view($viewName, [
             'services'      => $otherServices,
             'kiloanService' => $kiloanService,
             'preselectId'   => $preselectId,
@@ -85,7 +87,8 @@ Route::middleware('auth')->group(function () {
         $otherServices = $allServices->where('unit', '!=', 'kg')->values();
         $customer = \App\Models\Customer::where('user_id', auth()->id())->first();
 
-        return view('pengiriman', [
+        $viewName = view()->exists('pelanggan.pengiriman') ? 'pelanggan.pengiriman' : 'pengiriman';
+        return view($viewName, [
             'services'      => $otherServices,
             'kiloanService' => $kiloanService,
             'customer'      => $customer,
@@ -113,14 +116,17 @@ Route::middleware('auth')->group(function () {
         $kiloanService = $allServices->firstWhere('unit', 'kg');
         $otherServices = $allServices->where('unit', '!=', 'kg')->values();
 
-        return view('pembayaran', [
+        $viewName = view()->exists('pelanggan.pembayaran') ? 'pelanggan.pembayaran' : 'pembayaran';
+        return view($viewName, [
             'services'      => $otherServices,
             'kiloanService' => $kiloanService,
         ]);
     })->name('pembayaran');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('pesanan.index');
+    Route::get('/pesanan', [OrderController::class, 'index'])->name('pesanan');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancelCustomerOrder'])->name('pesanan.cancel');
+    Route::patch('/pesanan/{order}/cancel', [OrderController::class, 'cancelCustomerOrder']);
 
     Route::post('/pesan', [OrderController::class, 'checkout'])->name('pesan.store');
 });
