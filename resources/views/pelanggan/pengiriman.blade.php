@@ -30,28 +30,25 @@
             return [
                 {
                     id: 1,
-                    label: 'Alamat Profil',
+                    label: 'Rumah',
                     isDefault: true,
                     name: cust.name || 'Pelanggan',
                     phone: cust.phone || '0812-3456-7890',
                     address: cust.address || 'Jl. Soekarno Hatta No. 45, Lowokwaru',
                     detail: cust.city || 'Kota Malang',
                 },
-                {
-                    id: 2,
-                    label: 'Alamat Kantor/Kos',
-                    isDefault: false,
-                    name: cust.name || 'Pelanggan',
-                    phone: cust.phone || '0812-3456-7890',
-                    address: 'Gedung Coworking Lantai 2, Jl. Ijen No. 12',
-                    detail: 'Klojen, Kota Malang (Titip Resepsionis)',
-                },
             ];
         },
 
         init() {
-            if (!this.cartAddress && this.addresses.length > 0) {
+            if (this.cartAddress) {
+                const match = this.addresses.find(a => (a.address + ', ' + a.detail) === this.cartAddress);
+                if (match) {
+                    this.selectedAddress = match.id;
+                }
+            } else if (this.addresses.length > 0) {
                 const a = this.addresses[0];
+                this.selectedAddress = a.id;
                 this.cartAddress = a.address + ', ' + a.detail;
             }
         },
@@ -61,7 +58,7 @@
         },
 
         pickupMethod: $persist('courier').as('cart_pickup'),
-        deliveryMethod: 'courier',
+        deliveryMethod: $persist('courier').as('cart_delivery'),
 
         quickNotes: [
             'Titip di Satpam',
@@ -186,9 +183,6 @@
         <!-- ================= HERO + STEPPER ================= -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-                <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#C2F43B]/50 text-[#4E6700] text-[10px] md:text-xs font-bold uppercase rounded-full mb-3">
-                    <span class="w-2 h-2 bg-[#4E6700] rounded-full"></span> Layanan On-Demand Malang
-                </span>
                 <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2 md:mb-3">Jadwal & Pengiriman</h1>
                 <p class="text-xs md:text-base text-[#47464E] max-w-lg">Pilih alamat, metode penjemputan, dan cara pengantaran cucian Anda.</p>
             </div>
@@ -204,8 +198,7 @@
                 <div class="w-3 md:w-6 h-px bg-[#E2E7FF]"></div>
                 <div class="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-[#1A1743] text-white rounded-full">
                     <div class="w-4 h-4 bg-[#BFF138] rounded-full shrink-0 flex items-center justify-center">
-                        <span class="w-1.5 h-1.5 bg-[#1A1743] rounded-full"></span>
-                    </div>
+                        <span class="w-5 h-5 rounded-full bg-[#BFF138] text-[#131B2E] text-[11px] font-extrabold flex items-center justify-center shrink-0">2</span>                    </div>
                     <span class="text-xs md:text-sm font-bold">Pengiriman</span>
                 </div>
                 <div class="w-3 md:w-6 h-px bg-[#E2E7FF]"></div>
@@ -225,27 +218,30 @@
                     </div>
                     <div>
                         <h2 class="text-base md:text-lg font-bold">Alamat Penjemputan</h2>
-                        <p class="text-xs md:text-sm text-[#47464E]">Pilih alamat kurir menjemput cucian kotor Anda</p>
+                        <p class="text-xs md:text-sm text-[#47464E]">Pilih alamat penjemputan cucian Anda</p>
                     </div>
                 </div>
-                <button class="px-3 md:px-4 py-2 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs md:text-sm font-bold transition self-start sm:self-auto flex items-center gap-1.5">
+                <a href="{{ route('profile.edit') }}" class="px-3 md:px-4 py-2 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs md:text-sm font-bold transition self-start sm:self-auto flex items-center gap-1.5">
                     <i class="fa-solid fa-plus text-xs"></i> Alamat Baru
-                </button>
+                </a>
             </div>
 
             <div class="space-y-3">
                 <template x-for="addr in addresses" :key="addr.id">
                     <label class="block cursor-pointer">
-                        <input type="radio" name="address" class="peer sr-only" 
-                               :value="addr.id" x-model="selectedAddress" @change="chooseAddress(addr)">
-                        <div class="p-4 md:p-5 rounded-2xl border-2 transition-all
-                                    border-[#E2E7FF] bg-white
-                                    peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                        <input type="radio" name="address" class="sr-only" 
+                               :value="addr.id" 
+                               :checked="selectedAddress === addr.id"
+                               x-model="selectedAddress" 
+                               @change="chooseAddress(addr)">
+                        <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                             :class="selectedAddress === addr.id ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
                                 <div class="flex gap-3 flex-1 min-w-0">
-                                    <div class="w-5 h-5 rounded-full border-2 border-[#E2E7FF] flex items-center justify-center shrink-0 mt-1
-                                                peer-checked:border-[#1A1743] peer-checked:bg-[#1A1743]">
-                                        <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                         :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                        <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                             :class="selectedAddress === addr.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -268,21 +264,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="px-3 py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-bold transition shrink-0 self-start">
-                                    Ubah Alamat
-                                </button>
+                                <a href="{{ route('profile.edit') }}" @click.stop class="px-3 py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-bold transition shrink-0 self-start">
+                                    Edit Alamat
+                                </a>
                             </div>
                         </div>
                     </label>
                 </template>
-            </div>
-
-            <div class="mt-4 md:mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 md:px-4 py-3 bg-[#F2F3FF] rounded-2xl">
-                <div class="flex items-start gap-2 md:gap-3">
-                    <i class="fa-solid fa-circle-info text-sm text-[#1A1743] shrink-0 mt-0.5"></i>
-                    <p class="text-[10px] md:text-sm text-[#47464E]">Punya lokasi kost, apartemen, atau vila lain di Malang?</p>
-                </div>
-                <button class="text-xs md:text-sm font-bold text-[#1A1743] hover:underline self-start sm:self-auto shrink-0">Tambahkan →</button>
             </div>
         </div>
 
@@ -293,28 +281,34 @@
                     <i class="fa-solid fa-truck-ramp-box text-base md:text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-base md:text-lg font-bold">Metode Penjemputan</h2>
-                    <p class="text-xs md:text-sm text-[#47464E]">Pilih cara penyerahan pakaian kotor Anda ke Rodeo</p>
+                    <h2 class="text-base md:text-lg font-bold">Alamat Pengiriman</h2>
+                    <p class="text-xs md:text-sm text-[#47464E]">Pilih alamat pengiriman cucian Anda</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <!-- Dijemput Kurir -->
-                <label class="cursor-pointer">
-                    <input type="radio" name="pickup" value="courier" class="peer sr-only" x-model="pickupMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all
-                                border-[#E2E7FF] bg-white
-                                peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                <label class="cursor-pointer block">
+                    <input type="radio" name="pickup" value="courier" class="sr-only" x-model="pickupMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200"
+                         :class="pickupMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-motorcycle text-sm md:text-base"></i>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-motorcycle text-sm md:text-base"></i>
+                                </div>
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold shrink-0">Drop & Go</span>
+                                </div>
                             </div>
-                            <div class="flex gap-1.5 md:gap-2 flex-wrap">
-                                <span class="px-2 md:px-2.5 py-0.5 bg-[#1A1743] text-white rounded-full text-[10px] font-bold">Populer</span>
-                                <span class="px-2 md:px-2.5 py-0.5 bg-[#C2F43B] text-[#4E6700] rounded-full text-[10px] font-bold">Gratis</span>
+                            <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="pickupMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="pickupMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                             </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Dijemput Kurir Rodeo</h3>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Dijemput Kurir</h3>
                         <p class="text-xs text-[#47464E] mb-3 md:mb-4">Estimasi tiba 20-30 menit. Kurir kami membawa laundry bag steril khusus anti-kontaminasi langsung ke pintu Anda.</p>
                         <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/60 text-[10px] md:text-xs gap-2">
                             <span class="flex items-center gap-1.5 text-[#4E6700] font-bold">
@@ -327,19 +321,26 @@
                 </label>
 
                 <!-- Antar Sendiri -->
-                <label class="cursor-pointer">
-                    <input type="radio" name="pickup" value="self" class="peer sr-only" x-model="pickupMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all
-                                border-[#E2E7FF] bg-white
-                                peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                <label class="cursor-pointer block">
+                    <input type="radio" name="pickup" value="self" class="sr-only" x-model="pickupMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200"
+                         :class="pickupMethod === 'self' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-store text-sm md:text-base"></i>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-store text-sm md:text-base"></i>
+                                </div>
+                                <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold shrink-0">Drop & Go</span>
                             </div>
-                            <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold shrink-0">Drop & Go</span>
+                            <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="pickupMethod === 'self' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="pickupMethod === 'self' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Antar Sendiri ke Outlet</h3>
-                        <p class="text-xs text-[#47464E] mb-3 md:mb-4">Bawa ke Outlet Hub Soekarno-Hatta (07.00 - 21.00 WIB). Tanpa antre, cukup serahkan ke loker kasir express.</p>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Antar Sendiri</h3>
+                        <p class="text-xs text-[#47464E] mb-3 md:mb-4">Bawa ke Outlet Kami (07.00 - 21.00 WIB). cukup serahkan ke kasir.</p>
                         <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/60 text-[10px] md:text-xs gap-2">
                             <span class="text-[#47464E]">Lokasi Outlet Utama</span>
                             <span class="font-bold text-[#4E6700]">Gratis Ongkir</span>
@@ -363,18 +364,25 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <!-- Diantar Kurir -->
-                <label class="cursor-pointer">
-                    <input type="radio" name="delivery" value="courier" class="peer sr-only" x-model="deliveryMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all
-                                border-[#E2E7FF] bg-white
-                                peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                <label class="cursor-pointer block">
+                    <input type="radio" name="delivery" value="courier" class="sr-only" x-model="deliveryMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200"
+                         :class="deliveryMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-truck-fast text-sm md:text-base"></i>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-truck-fast text-sm md:text-base"></i>
+                                </div>
+                                <span class="px-2 md:px-2.5 py-0.5 bg-[#1A1743] text-white rounded-full text-[10px] font-bold shrink-0">Rekomendasi</span>
                             </div>
-                            <span class="px-2 md:px-2.5 py-0.5 bg-[#1A1743] text-white rounded-full text-[10px] font-bold shrink-0">Rekomendasi</span>
+                            <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="deliveryMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="deliveryMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Diantar Kurir Rodeo</h3>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Diantar Kurir</h3>
                         <p class="text-xs text-[#47464E] mb-3 md:mb-4">Pakaian diantar rapi, wangi, berstandar boutique dalam garment bag waterproof steril langsung ke alamat utama.</p>
                         <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/60 text-[10px] md:text-xs gap-2">
                             <span class="font-bold text-[#4E6700]">Garansi Sampai Rapi</span>
@@ -384,21 +392,28 @@
                 </label>
 
                 <!-- Ambil Sendiri -->
-                <label class="cursor-pointer">
-                    <input type="radio" name="delivery" value="locker" class="peer sr-only" x-model="deliveryMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all
-                                border-[#E2E7FF] bg-white
-                                peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                <label class="cursor-pointer block">
+                    <input type="radio" name="delivery" value="locker" class="sr-only" x-model="deliveryMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200"
+                         :class="deliveryMethod === 'locker' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-boxes-stacked text-sm md:text-base"></i>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-boxes-stacked text-sm md:text-base"></i>
+                                </div>
+                                <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold shrink-0">24 Jam</span>
                             </div>
-                            <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold shrink-0">24 Jam</span>
+                            <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="deliveryMethod === 'locker' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="deliveryMethod === 'locker' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Ambil Mandiri di Smart Locker</h3>
-                        <p class="text-xs text-[#47464E] mb-3 md:mb-4">Ambil kapan pun di Smart Locker Outlet Soekarno-Hatta menggunakan kode OTP SMS/WhatsApp tanpa antre.</p>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Ambil Sendiri</h3>
+                        <p class="text-xs text-[#47464E] mb-3 md:mb-4">Ambil kapan pun di Outlet Kami (07.00 - 21.00 WIB).</p>
                         <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/60 text-[10px] md:text-xs gap-2">
-                            <span class="text-[#47464E]">Akses Fleksibel 24/7</span>
+                            <span class="text-[#47464E]">Akses Fleksibel</span>
                             <span class="font-bold text-[#4E6700]">Bebas Biaya</span>
                         </div>
                     </div>
@@ -436,7 +451,7 @@
             <div class="mt-3 md:mt-4 flex items-center gap-2 flex-wrap">
                 <span class="text-[10px] md:text-xs font-semibold text-[#47464E] w-full md:w-auto mb-1 md:mb-0">Instruksi Cepat:</span>
                 <template x-for="chip in quickNotes" :key="chip">
-                    <button @click="addQuickNote(chip)"
+                    <button type="button" @click="addQuickNote(chip)"
                             class="px-2.5 md:px-3 py-1 md:py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-semibold transition">
                         <span x-text="chip"></span>
                     </button>
@@ -446,33 +461,34 @@
     </main>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="bg-white border-t border-gray-100 mt-12 md:mt-16">
+    <footer class="bg-white border-t border-[#E2E7FF]/70 mt-12 md:mt-16">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
                 <div class="sm:col-span-2">
-                    <div class="flex items-center gap-2 mb-4">
+                    <div class="flex items-center gap-2.5 mb-4">
                         <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                         </div>
-                        <span class="text-lg md:text-xl font-bold">Rodeo Laundry<span class="text-[#bff108ff]">.</span></span>
+                        <span class="text-lg md:text-xl font-bold tracking-tight text-[#1A1743]">Rodeo Laundry</span>
                     </div>
-                    <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm">Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.</p>
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#C2F43B] rounded-full text-[10px] md:text-xs font-bold text-[#151F00]">
-                        <span class="w-2 h-2 bg-[#4E6700] rounded-full"></span> Outlet Soekarno Hatta Malang
-                    </span>
+                    <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm leading-relaxed">
+                        Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.
+                    </p>
                 </div>
+
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Layanan Kami</h4>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Layanan Kami</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li>Kiloan Premium</li>
-                        <li>Dry Cleaning Satuan</li>
-                        <li>Cuci Sepatu & Tas</li>
-                        <li>Bed Cover & Karpet</li>
-                        <li>Express 3 Jam</li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Setrika Kiloan</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Gorden</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Boneka & Bantal</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu Premium</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Tas & Ransel</a></li>
                     </ul>
                 </div>
+
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Area & Bantuan</h4>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area & Bantuan</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
                         <li>Lowokwaru & Soekarno Hatta</li>
                         <li>Klojen & Sekitar Kampus UB/UM</li>
@@ -482,19 +498,31 @@
                     </ul>
                 </div>
             </div>
-            <div class="mb-10 md:mb-12">
-                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Operasional & Kontak</h4>
-                <div class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                    <p><i class="fa-solid fa-location-dot text-[#1A1743] mr-2"></i>Jl. Soekarno Hatta No. 45, Mojolangu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65142</p>
-                    <p><i class="fa-regular fa-clock text-[#1A1743] mr-2"></i>Buka Setiap Hari: 07.00 - 21.00 WIB</p>
-                    <p><i class="fa-brands fa-whatsapp text-[#25D366] mr-2"></i>WhatsApp: 0812-3456-7890</p>
+
+            <div class="mb-10 md:mb-12 pt-6 border-t border-[#E2E7FF]/50">
+                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional & Kontak</h4>
+                <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
+                    <p class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
+                        <span>Jl. Soekarno Hatta No. 45, Mojolangu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65142</span>
+                    </p>
+                    <p class="flex items-center gap-2.5">
+                        <i class="fa-regular fa-clock text-[#9895C8] shrink-0"></i>
+                        <span>Buka Setiap Hari: 07.00 - 21.00 WIB</span>
+                    </p>
+                    <p class="flex items-center gap-2.5">
+                        <i class="fa-brands fa-whatsapp text-[#25D366] shrink-0"></i>
+                        <span>WhatsApp: 0812-3456-7890</span>
+                    </p>
                 </div>
             </div>
-            <div class="pt-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
+
+            <div class="pt-6 border-t border-[#E2E7FF]/60 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
                 <p class="text-center md:text-left">© 2025 Rodeo Laundry Malang. Hak Cipta Dilindungi Undang-Undang.</p>
-                <div class="flex gap-4 flex-wrap justify-center">
-                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]"><i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis</span>
-                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]"><i class="fa-solid fa-circle-check text-[#4E6700]"></i> 1 Mesin 1 Pelanggan</span>
+                <div class="flex gap-4 sm:gap-6 flex-wrap justify-center">
+                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
+                        <i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis
+                    </span>
                 </div>
             </div>
         </div>

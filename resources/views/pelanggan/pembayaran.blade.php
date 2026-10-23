@@ -167,9 +167,6 @@
         <!-- ================= HERO + STEPPER ================= -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-                <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#C2F43B]/50 text-[#4E6700] text-[10px] md:text-xs font-bold uppercase rounded-full mb-3">
-                    <i class="fa-solid fa-bolt text-[#4E6700] text-[10px]"></i> Layanan On-Demand Malang
-                </span>
                 <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2 md:mb-3">Pembayaran</h1>
                 <p class="text-xs md:text-base text-[#47464E] max-w-lg">Selesaikan pembayaran pesanan Anda dengan metode instan &amp; aman. Pakaian siap dijemput dan diproses higienis.</p>
             </div>
@@ -276,8 +273,7 @@
                             </div>
                             <div class="min-w-0 flex-1 text-xs">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-bold text-[#1A1743]" x-text="pickupMethod === 'courier' ? 'Dijemput &amp; Diantar Kurir Rodeo' : 'Drop &amp; Ambil di Outlet Soekarno-Hatta'"></span>
-                                    <span class="px-2 py-0.5 bg-[#C2F43B] text-[#4E6700] rounded-full text-[10px] font-bold">Gratis Ongkir</span>
+                                    <span class="font-bold text-[#1A1743]" x-text="pickupMethod === 'courier' ? 'Dijemput & Diantar Kurir' : 'Antar Sendiri & Ambil Sendiri'"></span>
                                 </div>
                                 <p class="text-[#47464E] mt-1 text-[11px]" x-show="cartAddress" x-text="'Alamat: ' + cartAddress"></p>
                                 <p class="text-[#47464E] mt-0.5 text-[11px]" x-show="courierNotes" x-text="'Catatan Kurir: ' + courierNotes"></p>
@@ -308,12 +304,16 @@
 
                 <!-- 1. QRIS -->
                 <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="qris" class="peer sr-only" x-model="paymentMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all border-[#E2E7FF] bg-white peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                    <input type="radio" name="payment" value="qris" class="sr-only" x-model="paymentMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                         :class="paymentMethod === 'qris' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
-                                <div class="w-5 h-5 rounded-full border-2 border-[#E2E7FF] flex items-center justify-center shrink-0 mt-1 peer-checked:border-[#1A1743] peer-checked:bg-[#1A1743]">
-                                    <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                     :class="paymentMethod === 'qris' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="paymentMethod === 'qris' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
                                 <div class="w-10 h-10 md:w-11 md:h-11 bg-[#1A1743] text-[#BFF138] rounded-xl flex items-center justify-center shrink-0 shadow-sm">
                                     <i class="fa-solid fa-qrcode text-lg"></i>
@@ -347,12 +347,16 @@
 
                 <!-- 2. Transfer Bank / VA -->
                 <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="va" class="peer sr-only" x-model="paymentMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all border-[#E2E7FF] bg-white peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                    <input type="radio" name="payment" value="va" class="sr-only" x-model="paymentMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                         :class="paymentMethod === 'va' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
-                                <div class="w-5 h-5 rounded-full border-2 border-[#E2E7FF] flex items-center justify-center shrink-0 mt-1 peer-checked:border-[#1A1743] peer-checked:bg-[#1A1743]">
-                                    <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                     :class="paymentMethod === 'va' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="paymentMethod === 'va' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
                                 <div class="w-10 h-10 md:w-11 md:h-11 bg-[#EAEDFF] text-[#1A1743] rounded-xl flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-building-columns text-base md:text-lg"></i>
@@ -386,12 +390,16 @@
 
                 <!-- 3. E-Wallet -->
                 <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="ewallet" class="peer sr-only" x-model="paymentMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all border-[#E2E7FF] bg-white peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                    <input type="radio" name="payment" value="ewallet" class="sr-only" x-model="paymentMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                         :class="paymentMethod === 'ewallet' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
-                                <div class="w-5 h-5 rounded-full border-2 border-[#E2E7FF] flex items-center justify-center shrink-0 mt-1 peer-checked:border-[#1A1743] peer-checked:bg-[#1A1743]">
-                                    <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                     :class="paymentMethod === 'ewallet' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="paymentMethod === 'ewallet' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
                                 <div class="w-10 h-10 md:w-11 md:h-11 bg-[#EAEDFF] text-[#1A1743] rounded-xl flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-wallet text-base md:text-lg"></i>
@@ -425,12 +433,16 @@
 
                 <!-- 4. COD -->
                 <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="cod" class="peer sr-only" x-model="paymentMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all border-[#E2E7FF] bg-white peer-checked:border-[#BFF138] peer-checked:bg-[#FAF8FF]">
+                    <input type="radio" name="payment" value="cod" class="sr-only" x-model="paymentMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                         :class="paymentMethod === 'cod' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
-                                <div class="w-5 h-5 rounded-full border-2 border-[#E2E7FF] flex items-center justify-center shrink-0 mt-1 peer-checked:border-[#1A1743] peer-checked:bg-[#1A1743]">
-                                    <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                                <!-- Radio Button Circle: bulat kosong -> bulat terisi -->
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                     :class="paymentMethod === 'cod' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="paymentMethod === 'cod' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
                                 <div class="w-10 h-10 md:w-11 md:h-11 bg-[#EAEDFF] text-[#1A1743] rounded-xl flex items-center justify-center shrink-0">
                                     <i class="fa-solid fa-hand-holding-dollar text-base md:text-lg"></i>
@@ -508,67 +520,67 @@
     </main>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="bg-white border-t border-gray-100 mt-16">
+    <footer class="bg-white border-t border-[#E2E7FF]/70 mt-12 md:mt-16">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
                 <div class="sm:col-span-2">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-9 h-9 bg-[#2F2D59] rounded-xl flex items-center justify-center text-[#BFF108]">
-                            <i class="fa-solid fa-soap text-lg"></i>
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                         </div>
-                        <span class="text-lg md:text-xl font-bold">Rodeo Laundry</span>
+                        <span class="text-lg md:text-xl font-bold tracking-tight text-[#1A1743]">Rodeo Laundry</span>
                     </div>
-                    <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm">Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.</p>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C2F43B] rounded-full text-[10px] md:text-xs font-bold text-[#151F00]">
-                        <i class="fa-solid fa-location-dot text-[#4E6700] text-[10px]"></i> Outlet Soekarno Hatta Malang
-                    </span>
+                    <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm leading-relaxed">
+                        Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.
+                    </p>
                 </div>
+
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Layanan Kami</h4>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Layanan Kami</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li>Kiloan Premium</li>
-                        <li>Dry Cleaning Satuan</li>
-                        <li>Cuci Sepatu &amp; Tas</li>
-                        <li>Bed Cover &amp; Karpet</li>
-                        <li>Express 3 Jam</li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Setrika Kiloan</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Gorden</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Boneka & Bantal</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu Premium</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Tas & Ransel</a></li>
                     </ul>
                 </div>
+
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Area &amp; Bantuan</h4>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area & Bantuan</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li>Lowokwaru &amp; Soekarno Hatta</li>
-                        <li>Klojen &amp; Sekitar Kampus UB/UM</li>
-                        <li>Blimbing &amp; Sukun</li>
+                        <li>Lowokwaru & Soekarno Hatta</li>
+                        <li>Klojen & Sekitar Kampus UB/UM</li>
+                        <li>Blimbing & Sukun</li>
                         <li>Pertanyaan Umum (FAQ)</li>
-                        <li>Syarat &amp; Ketentuan Garansi</li>
+                        <li>Syarat & Ketentuan Garansi</li>
                     </ul>
                 </div>
             </div>
-            <div class="mb-10 md:mb-12">
-                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">Operasional &amp; Kontak</h4>
-                <div class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                    <p class="flex items-start gap-2">
+
+            <div class="mb-10 md:mb-12 pt-6 border-t border-[#E2E7FF]/50">
+                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional & Kontak</h4>
+                <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
+                    <p class="flex items-start gap-2.5">
                         <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
                         <span>Jl. Soekarno Hatta No. 45, Mojolangu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65142</span>
                     </p>
-                    <p class="flex items-center gap-2">
+                    <p class="flex items-center gap-2.5">
                         <i class="fa-regular fa-clock text-[#9895C8] shrink-0"></i>
                         <span>Buka Setiap Hari: 07.00 - 21.00 WIB</span>
                     </p>
-                    <p class="flex items-center gap-2">
+                    <p class="flex items-center gap-2.5">
                         <i class="fa-brands fa-whatsapp text-[#25D366] shrink-0"></i>
                         <span>WhatsApp: 0812-3456-7890</span>
                     </p>
                 </div>
             </div>
-            <div class="pt-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
+
+            <div class="pt-6 border-t border-[#E2E7FF]/60 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
                 <p class="text-center md:text-left">© 2025 Rodeo Laundry Malang. Hak Cipta Dilindungi Undang-Undang.</p>
-                <div class="flex gap-4 flex-wrap justify-center">
+                <div class="flex gap-4 sm:gap-6 flex-wrap justify-center">
                     <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
                         <i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis
-                    </span>
-                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
-                        <i class="fa-solid fa-circle-check text-[#4E6700]"></i> 1 Mesin 1 Pelanggan
                     </span>
                 </div>
             </div>

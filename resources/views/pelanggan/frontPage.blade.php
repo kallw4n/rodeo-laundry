@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rodeo Laundry Malang — Bersih, Higienis &amp; Antar Jemput Tepat Waktu</title>
+    <title>Rodeo Laundry Malang — Bersih, Higienis & Antar Jemput Tepat Waktu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Font Awesome CDN -->
@@ -104,9 +104,6 @@
         <section class="max-w-[1440px] mx-auto px-4 md:px-6 py-10 md:py-16 lg:py-20">
             <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-14">
                 <div class="flex-1 flex flex-col gap-4 w-full">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#C2F43B]/50 text-[#4E6700] text-[10px] md:text-xs font-bold uppercase rounded-full self-start">
-                        <i class="fa-solid fa-bolt text-[#4E6700] text-[10px]"></i> Layanan On-Demand Malang
-                    </span>
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight">
                         Cucian Numpuk?<br>
                         Biar Kami yang Urus<span class="text-[#bff108ff]">.</span>
@@ -154,8 +151,8 @@
                         <i class="fa-regular fa-clock text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-sm font-bold text-[#1A1743]">Cepat &amp; Tepat Waktu</div>
-                        <div class="text-xs text-[#47464E]">Express 6 Jam &amp; Reguler</div>
+                        <div class="text-sm font-bold text-[#1A1743]">Cepat & Tepat Waktu</div>
+                        <div class="text-xs text-[#47464E]">Express 6 Jam & Reguler</div>
                     </div>
                 </div>
 
@@ -165,7 +162,7 @@
                         <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-sm font-bold text-[#1A1743]">Bersih &amp; Wangi Tahan Lama</div>
+                        <div class="text-sm font-bold text-[#1A1743]">Bersih & Wangi Tahan Lama</div>
                         <div class="text-xs text-[#47464E]">Detergen ramah serat kain</div>
                     </div>
                 </div>
@@ -176,7 +173,7 @@
                         <i class="fa-solid fa-shield-halved text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-sm font-bold text-[#1A1743]">Terpercaya &amp; Higienis</div>
+                        <div class="text-sm font-bold text-[#1A1743]">Terpercaya & Higienis</div>
                         <div class="text-xs text-[#47464E]">1 Mesin khusus 1 Pelanggan</div>
                     </div>
                 </div>
@@ -192,23 +189,19 @@
                     <div class="flex-1">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#BFF108] text-[#131B2E] text-[10px] md:text-xs font-extrabold uppercase rounded-full mb-3 md:mb-4 shadow-sm">
                             <i class="fa-solid fa-star text-xs"></i>
-                            PROMO KHUSUS PELANGGAN BARU
+                            Tidak perlu pusing cari tempat laundry lagi
                         </span>
                         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight mb-2 md:mb-3">
                             Siap Mencoba Layanan Kami?
                         </h2>
                         <p class="text-[#B9B6E5] text-xs sm:text-sm md:text-base max-w-xl leading-relaxed">
-                            Dapatkan diskon 20% untuk pesanan pertama Anda. Kurir kami siap menjemput cucian sekarang juga ke lokasi Anda!
+                            Kami akan mengurus cucian Anda dengan profesional sampai bersih, rapi dan wangi. Kurir kami siap menjemput cucian sekarang juga ke lokasi Anda!
                         </p>
                     </div>
                     <div class="flex flex-col gap-3 w-full md:w-auto md:min-w-[280px]">
                         <a href="{{ route('pemesanan') }}" class="flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-3.5 bg-[#BFF108] text-[#131B2E] font-bold rounded-full text-sm md:text-base transition-all duration-300 ease-out hover:shadow-[0_15px_35px_rgba(191,241,8,0.45)] hover:-translate-y-1 hover:brightness-105">
                             <i class="fa-solid fa-basket-shopping text-sm"></i>
                             Pesan Jasa Laundry Sekarang
-                        </a>
-                        <a href="https://wa.me/6281234567890" target="_blank" class="flex items-center justify-center gap-2 px-6 py-3 md:py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full text-sm md:text-base backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-1">
-                            <i class="fa-brands fa-whatsapp text-base text-[#25D366]"></i>
-                            Hubungi CS WhatsApp
                         </a>
                     </div>
                 </div>
@@ -218,9 +211,9 @@
         <!-- ================= LAYANAN SECTION ================= -->
         <section class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="text-center mb-8 md:mb-12">
-                <span class="inline-block px-4 py-1 bg-[#BFF108]/30 text-[#4E6700] text-[10px] md:text-xs font-extrabold uppercase rounded-full mb-3">Pilihan Layanan</span>
+                <span class="inline-block px-4 py-1 bg-[#BFF108] text-[#131B2E] text-[10px] md:text-xs font-extrabold uppercase rounded-full mb-3">Pilihan Layanan</span>
                 <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3">Layanan Andalan Kami</h2>
-                <p class="text-xs sm:text-sm md:text-base text-[#47464E] max-w-xl mx-auto">Semua kebutuhan laundry pakaian &amp; perlengkapan Anda dalam satu tempat dengan penanganan standar hotel bintang lima.</p>
+                <p class="text-xs sm:text-sm md:text-base text-[#47464E] max-w-xl mx-auto">Semua kebutuhan laundry pakaian & perlengkapan Anda dalam satu tempat dengan penanganan standar hotel bintang lima.</p>
             </div>
 
             <!-- Grid Layanan Dinamis (CLEAN VERSION) -->
@@ -270,10 +263,7 @@
                             <h3 class="text-base md:text-lg font-bold mb-2 text-[#1A1743]">{{ $service->name }}</h3>
                             <p class="text-xs md:text-sm text-[#47464E] leading-relaxed mb-4 md:mb-6 line-clamp-2">{{ $service->description }}</p>
                         </div>
-                        <div class="pt-3.5 md:pt-4 border-t border-[#E2E7FF]/70 flex justify-between items-center">
-                            <span class="px-2.5 py-0.5 bg-[#F2F3FF] text-[#47464E] rounded-full text-[10px] md:text-xs font-semibold">
-                                Estimasi 24-48 Jam
-                            </span>
+                        <div class="pt-3.5 md:pt-4 border-t border-[#E2E7FF]/70 flex justify-between items-center">   
                             <span class="text-xs md:text-sm font-bold flex items-center gap-1.5 transition-transform duration-300 group-hover:translate-x-1 text-[#1A1743]">
                                 <span>Pilih Layanan</span>
                                 <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -282,7 +272,7 @@
                     </a>
                 @empty
                     <div class="col-span-full text-center py-12 bg-white rounded-[24px] md:rounded-[32px] border border-[#E2E7FF]/60">
-                        <p class="text-[#47464E] text-sm">Belum ada layanan yang ditambahkan ke database.</p>
+                        <p class="text-[#47464E] text-sm">Belum ada layanan yang tersedia.</p>
                     </div>
                 @endforelse
             </div>
@@ -352,7 +342,7 @@
                                 <i class="fa-solid fa-circle-check text-base"></i>
                             </div>
                         </div>
-                        <h3 class="text-base md:text-lg font-bold text-white mb-2">Selesai &amp; Diantar</h3>
+                        <h3 class="text-base md:text-lg font-bold text-white mb-2">Selesai & Diantar</h3>
                         <p class="text-xs md:text-sm text-[#B9B6E5] leading-relaxed">Pakaian dikembalikan dalam kondisi bersih sempurna, rapi, harum semerbak, siap pakai ke lemari pakaian Anda.</p>
                     </div>
 
@@ -365,47 +355,43 @@
     <footer class="bg-white border-t border-[#E2E7FF]/70 mt-12 md:mt-16">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
-                
                 <div class="sm:col-span-2">
                     <div class="flex items-center gap-2.5 mb-4">
-                        <div class="w-9 h-9 bg-[#2F2D59] rounded-xl flex items-center justify-center text-[#BFF108]">
-                            <i class="fa-solid fa-soap text-lg"></i>
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                         </div>
                         <span class="text-lg md:text-xl font-bold tracking-tight text-[#1A1743]">Rodeo Laundry</span>
                     </div>
                     <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm leading-relaxed">
                         Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.
                     </p>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#C2F43B] rounded-full text-[10px] md:text-xs font-bold text-[#151F00]">
-                        <i class="fa-solid fa-location-dot text-[#4E6700] text-[10px]"></i> Outlet Soekarno Hatta Malang
-                    </span>
                 </div>
 
                 <div>
                     <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Layanan Kami</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Kiloan Premium</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Dry Cleaning Satuan</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu &amp; Tas</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Bed Cover &amp; Karpet</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Express 3 Jam</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Setrika Kiloan</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Gorden</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Boneka & Bantal</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu Premium</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Tas & Ransel</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area &amp; Bantuan</h4>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area & Bantuan</h4>
                     <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li>Lowokwaru &amp; Soekarno Hatta</li>
-                        <li>Klojen &amp; Sekitar Kampus UB/UM</li>
-                        <li>Blimbing &amp; Sukun</li>
+                        <li>Lowokwaru & Soekarno Hatta</li>
+                        <li>Klojen & Sekitar Kampus UB/UM</li>
+                        <li>Blimbing & Sukun</li>
                         <li>Pertanyaan Umum (FAQ)</li>
-                        <li>Syarat &amp; Ketentuan Garansi</li>
+                        <li>Syarat & Ketentuan Garansi</li>
                     </ul>
                 </div>
             </div>
 
             <div class="mb-10 md:mb-12 pt-6 border-t border-[#E2E7FF]/50">
-                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional &amp; Kontak</h4>
+                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional & Kontak</h4>
                 <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
                     <p class="flex items-start gap-2.5">
                         <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
@@ -427,9 +413,6 @@
                 <div class="flex gap-4 sm:gap-6 flex-wrap justify-center">
                     <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
                         <i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis
-                    </span>
-                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
-                        <i class="fa-solid fa-circle-check text-[#4E6700]"></i> 1 Mesin 1 Pelanggan
                     </span>
                 </div>
             </div>

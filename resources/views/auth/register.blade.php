@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Rodeo Laundry</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#FAF8FF] font-sans antialiased">
 
@@ -20,25 +19,25 @@
             </div>
         </div>
 
-        <!-- ================= KANAN: FORM (Scrollable) ================= -->
+        <!-- ================= KANAN: FORM REGISTER (Scrollable) ================= -->
         <div class="w-full lg:w-1/2 overflow-y-auto bg-[#FAF8FF]">
             <div class="min-h-full flex items-center justify-center p-6 md:p-12">
-                <div class="w-full max-w-md">
+                <div class="w-full max-w-md" x-data="{ showPassword: false, showConfirm: false }">
 
                     <!-- Logo -->
                     <div class="flex items-center gap-2 mb-8">
-                        <div class="w-10 h-10 bg-[#1A1743] rounded-xl flex items-center justify-center">
-                            <div class="w-4 h-5 bg-[#BFF138]"></div>
-                        </div>
+                    <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
+                    </div>
                         <div class="flex items-center text-xl font-semibold text-[#1A1743]">
                             Rodeo Laundry<span class="text-[#A7D717]">.</span>
                         </div>
                     </div>
 
                     <!-- Judul -->
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-[#1A1743] mb-3">Buat Akun Baru</h1>
+                    <h1 class="text-3xl md:text-4xl fontss-extrabold text-[#1A1743] mb-3">Buat Akun Baru</h1>
                     <p class="text-sm text-[#47464E] mb-8 leading-relaxed">
-                        Silahkan daftarkan diri Anda untuk mulai menggunakan layanan Rodeo Laundry.
+                        Daftar sekarang dan nikmati kemudahan layanan laundry premium dengan antar-jemput gratis.
                     </p>
 
                     <!-- Error messages -->
@@ -52,7 +51,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('register') }}" class="space-y-5" x-data="{ showPassword: false, showConfirm: false }">
+                    <form method="POST" action="{{ route('register') }}" class="space-y-5">
                         @csrf
 
                         <!-- Username -->
@@ -81,7 +80,7 @@
                                    value="{{ old('email') }}" 
                                    required 
                                    autocomplete="email"
-                                   placeholder="example@gmail.com"
+                                   placeholder="contoh@gmail.com"
                                    class="w-full px-5 py-4 rounded-2xl bg-[#F2F3FF] border-2 border-transparent 
                                           text-sm text-[#1A1743] placeholder:text-[#9895C8]
                                           focus:outline-none focus:border-[#BFF138] focus:bg-white
@@ -97,7 +96,7 @@
                                        name="password" 
                                        required 
                                        autocomplete="new-password"
-                                       placeholder="Kata sandi"
+                                       placeholder="Kata Sandi"
                                        class="w-full px-5 py-4 pr-12 rounded-2xl bg-[#F2F3FF] border-2 border-transparent 
                                               text-sm text-[#1A1743] placeholder:text-[#9895C8]
                                               focus:outline-none focus:border-[#BFF138] focus:bg-white
