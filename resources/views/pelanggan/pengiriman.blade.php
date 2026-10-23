@@ -11,7 +11,7 @@
     window.pengirimanData = {
         services: @json($services),
         kiloanService: @json($kiloanService),
-        customer: @json($customer),
+        customerData: @json($customer),
     };
     </script>
 </head>
@@ -274,7 +274,7 @@
             </div>
         </div>
 
-        <!-- ================= SECTION 2: METODE PENJEMPUTAN ================= -->
+        <!-- ================= SECTION 2: ALAMAT PENJEMPUTAN ================= -->
         <div class="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-8 shadow-sm border border-[#E2E7FF]/60 mb-4 md:mb-6">
             <div class="flex gap-3 md:gap-4 items-start mb-4 md:mb-6">
                 <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">

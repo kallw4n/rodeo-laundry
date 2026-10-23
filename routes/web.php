@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Models\ServiceType; // INI UNTUK PELANGGAN
+use App\Http\Controllers\CustomerProfileController;
 use Illuminate\Support\Facades\Route;
 
 // INI UNTUK PAGE NYA PELANGGAN
@@ -132,9 +133,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [CustomerProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // ==========================================
