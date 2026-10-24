@@ -5,12 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - Rodeo Laundry</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- ini untuk popup nya -->
+    <style> /* BUAT ANIMASI POP UP NYA */
+        @keyframes fadeSlideDown {
+            0% {
+                opacity: 0; 
+                transform: translateY(-30px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        @keyframes fadeSlideUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-30px); 
+            }
+        }
+        
+        .pop-down {
+            animation: fadeSlideDown 0.5s cubic-bezier(0.2, 1, 0.5, 1) forwards !important;
+        }
+        .pop-up {
+            animation: fadeSlideUp 0.5s ease-in forwards !important;
+        }
+    </style>
 </head>
 <body class="bg-[#FAF8FF] font-sans antialiased">
-
     <div class="h-screen flex overflow-hidden">
 
-        <!-- ================= KIRI: GAMBAR (Fixed, Desktop only) ================= -->
+        <!-- ================= GAMBAR UNUTK BAGIAN LOGIN DI KIRI ================= -->
         <div class="hidden lg:block lg:w-1/2 p-8 bg-[#1A1743] shrink-0">
             <div class="relative w-full h-full rounded-[40px] overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=2071&auto=format&fit=crop"
@@ -19,7 +48,7 @@
             </div>
         </div>
 
-        <!-- ================= KANAN: FORM LOGIN (Scrollable) ================= -->
+        <!-- ================= FORM LOGIN DI BAGIAN KANAN ================= -->
         <div class="w-full lg:w-1/2 overflow-y-auto bg-[#FAF8FF]">
             <div class="min-h-full flex items-center justify-center p-6 md:p-12">
                 <div class="w-full max-w-md" x-data="{ showPassword: false }">
@@ -34,13 +63,9 @@
                         </div>
                     </div>
 
-                    <!-- Judul -->
                     <h1 class="text-3xl md:text-4xl font-extrabold text-[#1A1743] mb-3">Masuk ke Akun</h1>
-                    <p class="text-sm text-[#47464E] mb-8 leading-relaxed">
-                        Masukkan email dan kata sandi Anda untuk mengakses portal Rodeo Laundry.
-                    </p>
 
-                    <!-- Error messages -->
+                    <!-- text kala error login -->
                     @if($errors->any())
                         <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl">
                             <ul class="text-xs text-red-600 list-disc list-inside">
@@ -60,7 +85,6 @@
 
                     <form method="POST" action="{{ route('login') }}" class="space-y-5">
                         @csrf
-
                         <!-- Email -->
                         <div>
                             <label for="email" class="block text-sm font-bold text-[#1A1743] mb-2">Alamat Email</label>
@@ -78,7 +102,7 @@
                                           transition-all">
                         </div>
 
-                        <!-- Password -->
+                        <!-- Kata sandi -->
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label for="password" class="block text-sm font-bold text-[#1A1743]">Kata Sandi</label>
@@ -95,7 +119,7 @@
                                        name="password" 
                                        required 
                                        autocomplete="current-password"
-                                       placeholder="•••••••••••••"
+                                       placeholder="Kata Sandi"
                                        class="w-full px-5 py-4 pr-12 rounded-2xl bg-[#F2F3FF] border-2 border-transparent 
                                               text-sm text-[#1A1743] placeholder:text-[#9895C8]
                                               focus:outline-none focus:border-[#BFF138] focus:bg-white
@@ -123,7 +147,7 @@
                                           focus:ring-0 focus:ring-offset-0 cursor-pointer
                                           checked:bg-[#1A1743] checked:border-[#1A1743]">
                             <label for="remember_me" class="ml-3 text-sm text-[#47464E] cursor-pointer select-none">
-                                Ingat sesi saya di perangkat ini
+                                Ingat saya
                             </label>
                         </div>
 
@@ -155,5 +179,37 @@
         </div>
     </div>
 
+@if(session()->has('url.intended') && !$errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                showClass: {
+                    popup: 'pop-down' 
+                },
+                hideClass: {
+                    popup: 'pop-up'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            Toast.fire({
+                icon: 'warning',
+                title: 'Silakan login terlebih dahulu ya!',
+                customClass: {
+                    popup: 'rounded-xl shadow-lg border border-[#E2E7FF]',
+                    title: 'text-sm font-bold text-[#1A1743]'
+                }
+            });
+        });
+    </script>
+@endif
 </body>
 </html>
