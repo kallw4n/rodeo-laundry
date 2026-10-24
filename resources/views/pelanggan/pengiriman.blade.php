@@ -12,6 +12,7 @@
         services: @json($services),
         kiloanService: @json($kiloanService),
         customerData: @json($customer),
+        userAddresses: @json($addresses),
     };
     </script>
 </head>
@@ -24,32 +25,39 @@
         courierNotes: $persist('').as('cart_courier_notes'),
         cartAddress: $persist('').as('cart_address'),
 
-        selectedAddress: 1,
+        selectedAddress: null,
         get addresses() {
-            const cust = this.customer || {};
-            return [
-                {
-                    id: 1,
-                    label: 'Rumah',
+            if (!this.userAddresses || this.userAddresses.length === 0) {
+                // Fallback kalau user belum punya alamat di tabel addresses
+                const cust = this.customerData || {};
+                return [{
+                    id: 0,
+                    label: 'Alamat Belum Diatur',
                     isDefault: true,
                     name: cust.name || 'Pelanggan',
-                    phone: cust.phone || '0812-3456-7890',
-                    address: cust.address || 'Jl. Soekarno Hatta No. 45, Lowokwaru',
-                    detail: cust.city || 'Kota Malang',
-                },
-            ];
+                    phone: cust.phone || '-',
+                    address: cust.address || 'Silakan tambah alamat di menu profil',
+                    detail: cust.city || '-',
+                }];
+            }
+            // Mapping dari database addresses
+            return this.userAddresses.map(a => ({
+                id: a.id,
+                label: a.label,
+                isDefault: a.is_default == 1,
+                name: a.recipient_name,
+                phone: a.phone,
+                address: a.address,
+                detail: a.city,
+            }));
         },
 
         init() {
-            if (this.cartAddress) {
-                const match = this.addresses.find(a => (a.address + ', ' + a.detail) === this.cartAddress);
-                if (match) {
-                    this.selectedAddress = match.id;
-                }
-            } else if (this.addresses.length > 0) {
-                const a = this.addresses[0];
-                this.selectedAddress = a.id;
-                this.cartAddress = a.address + ', ' + a.detail;
+            if (this.addresses.length > 0) {
+                const defaultAddr = this.addresses.find(a => a.isDefault) || this.addresses[0];
+                
+                this.selectedAddress = defaultAddr.id;
+                this.cartAddress = defaultAddr.address + ', ' + defaultAddr.detail;
             }
         },
         chooseAddress(addr) {
@@ -237,9 +245,9 @@
                         <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
                              :class="selectedAddress === addr.id ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
-                                <div class="flex gap-3 flex-1 min-w-0">
-                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
-                                         :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="flex gap-3 flex-1 min-w-0 items-center">
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                                        :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
                                         <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
                                              :class="selectedAddress === addr.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                     </div>

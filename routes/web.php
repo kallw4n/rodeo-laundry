@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Models\ServiceType; // INI UNTUK PELANGGAN
 use App\Http\Controllers\CustomerProfileController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
 
-// INI UNTUK PAGE NYA PELANGGAN
+// ==========================================
+// 1. ROUTE PUBLIK (Bisa diakses tanpa login)
+// ==========================================
 Route::get('/', function () {
     $services = ServiceType::take(6)->get()->map(function ($s) {
         $name = strtolower($s->name);
@@ -24,11 +26,19 @@ Route::get('/', function () {
         ];
     });
 
-        $viewName = view()->exists('pelanggan.frontPage') ? 'pelanggan.frontPage' : 'frontPage';
-        return view($viewName, compact('services'));
+    $viewName = view()->exists('pelanggan.frontPage') ? 'pelanggan.frontPage' : 'frontPage';
+    return view($viewName, compact('services'));
 })->name('dashboard');
 
+
+// ==========================================
+// 2. ROUTE PELANGGAN (Wajib Login)
+// ==========================================
 Route::middleware('auth')->group(function () {
+    
+    // ----------------------------------------
+    // A. ALUR PEMESANAN (Pemesanan -> Pengiriman -> Pembayaran)
+    // ----------------------------------------
     Route::get('/pemesanan', function (\Illuminate\Http\Request $request) {
         $preselectId = $request->query('service');
         $preselectName = null;
@@ -87,12 +97,16 @@ Route::middleware('auth')->group(function () {
         $kiloanService = $allServices->firstWhere('unit', 'kg');
         $otherServices = $allServices->where('unit', '!=', 'kg')->values();
         $customer = \App\Models\Customer::where('user_id', auth()->id())->first();
+        
+        // Ambil alamat dari tabel addresses untuk ditampilkan di halaman checkout
+        $addresses = \App\Models\Address::where('user_id', auth()->id())->orderBy('is_default', 'desc')->get();
 
         $viewName = view()->exists('pelanggan.pengiriman') ? 'pelanggan.pengiriman' : 'pengiriman';
         return view($viewName, [
             'services'      => $otherServices,
             'kiloanService' => $kiloanService,
             'customer'      => $customer,
+            'addresses'     => $addresses,
         ]);
     })->name('pengiriman');
 
@@ -124,18 +138,31 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('pembayaran');
 
+    // Proses Checkout (Simpan pesanan)
+    Route::post('/pesan', [OrderController::class, 'checkout'])->name('pesan.store');
+
+
+    // ----------------------------------------
+    // B. RIWAYAT PESANAN
+    // ----------------------------------------
     Route::get('/orders', [OrderController::class, 'index'])->name('pesanan.index');
     Route::get('/pesanan', [OrderController::class, 'index'])->name('pesanan');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancelCustomerOrder'])->name('pesanan.cancel');
     Route::patch('/pesanan/{order}/cancel', [OrderController::class, 'cancelCustomerOrder']);
 
-    Route::post('/pesan', [OrderController::class, 'checkout'])->name('pesan.store');
-});
 
-Route::middleware('auth')->group(function () {
+    // ----------------------------------------
+    // C. PROFIL & ALAMAT PELANGGAN
+    // ----------------------------------------
+    // Profil Data Diri
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [CustomerProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Kelola Alamat (Tambah, Hapus, Jadikan Utama)
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
 });
 
 // ==========================================

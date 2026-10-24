@@ -179,7 +179,7 @@
         </div>
     </div>
 
-@if(session()->has('url.intended') && !$errors->any())
+@if(session()->has('url.intended') && !request()->has('ref') && !$errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const Toast = Swal.mixin({

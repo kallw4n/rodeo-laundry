@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rodeo Laundry Malang — Bersih, Higienis & Antar Jemput Tepat Waktu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased selection:bg-[#BFF108] selection:text-[#1A1743]">
@@ -55,9 +53,9 @@
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="px-4 md:px-5 py-2 bg-[#1A1743] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#2F2D59] shadow-sm transition">
+                    <a href="{{ route('login', ['ref' => 'navbar']) }}" class="px-4 md:px-5 py-2 bg-[#1A1743] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#2F2D59] shadow-sm transition">
                         Masuk
-                    </a>
+                    </a>  
                 @endauth
 
                 <!-- Hamburger Mobile -->

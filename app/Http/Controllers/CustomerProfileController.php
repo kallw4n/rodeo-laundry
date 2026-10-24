@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Address; // <-- TAMBAHKAN IMPORT INI
 use Illuminate\Support\Facades\Auth;
 
 class CustomerProfileController extends Controller
@@ -22,7 +23,8 @@ class CustomerProfileController extends Controller
             ]
         );
 
-        return view('profile.edit', compact('customer'));
+        $addresses = Address::where('user_id', Auth::id())->orderBy('is_default', 'desc')->get();
+        return view('profile.edit', compact('customer', 'addresses'));
     }
 
     public function update(Request $request)
@@ -30,8 +32,6 @@ class CustomerProfileController extends Controller
         $request->validate([
             'name'    => 'required|string|max:255',
             'phone'   => 'required|string|max:20',
-            'address' => 'required|string',
-            'city'    => 'required|string',
         ]);
 
         $customer = Customer::where('user_id', Auth::id())->first();
@@ -39,10 +39,8 @@ class CustomerProfileController extends Controller
         $customer->update([
             'name'    => $request->name,
             'phone'   => $request->phone,
-            'address' => $request->address,
-            'city'    => $request->city,
         ]);
 
-        return redirect()->back()->with('success', 'Profil dan alamat berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Data diri berhasil diperbarui!');
     }
 }
