@@ -3,179 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Rodeo Laundry</title>
+    <title>Masuk ke Akun - Rodeo Laundry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- ini untuk popup nya -->
-    <style> /* BUAT ANIMASI POP UP NYA */
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         @keyframes fadeSlideDown {
-            0% {
-                opacity: 0; 
-                transform: translateY(-30px); 
-            }
-            100% { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes fadeSlideUp {
-            0% { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateY(-30px); 
-            }
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-30px); }
         }
-        
-        .pop-down {
-            animation: fadeSlideDown 0.5s cubic-bezier(0.2, 1, 0.5, 1) forwards !important;
-        }
-        .pop-up {
-            animation: fadeSlideUp 0.5s ease-in forwards !important;
-        }
+        .pop-down { animation: fadeSlideDown 0.5s cubic-bezier(0.2, 1, 0.5, 1) forwards !important; }
+        .pop-up { animation: fadeSlideUp 0.5s ease-in forwards !important; }
     </style>
 </head>
-<body class="bg-[#FAF8FF] font-sans antialiased">
-    <div class="h-screen flex overflow-hidden">
+<body class="bg-[#FAF8FF] font-sans antialiased text-[#1A1743] min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10">
 
-        <!-- ================= GAMBAR UNUTK BAGIAN LOGIN DI KIRI ================= -->
-        <div class="hidden lg:block lg:w-1/2 p-8 bg-[#1A1743] shrink-0">
-            <div class="relative w-full h-full rounded-[40px] overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=2071&auto=format&fit=crop"
-                     alt="Laundry" 
-                     class="absolute inset-0 w-full h-full object-cover">
+    <!-- ================= CENTERED MODAL / CARD CONTAINER ================= -->
+    <div class="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl border border-[#E2E7FF]/70 overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+
+        <!-- ================= KIRI: GAMBAR & TESTIMONIAL ================= -->
+        <div class="relative min-h-[380px] lg:min-h-[620px] bg-[#1A1743] overflow-hidden flex flex-col justify-end p-6 md:p-8 order-2 lg:order-1">
+            <!-- Background Image -->
+            <img src="{{ asset('images/hero-laundry.jpg') }}"
+                 alt="Rodeo Laundry Interior" 
+                 class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#1A1743]/70 via-black/10 to-transparent"></div>
+
+            <!-- Floating Testimonial Card -->
+            <div class="relative bg-white/95 backdrop-blur-md rounded-2xl md:rounded-[24px] p-5 md:p-6 shadow-xl border border-white/60">
+                <div class="flex items-center justify-between gap-3 mb-2.5">
+                    <div class="flex items-center gap-1.5 text-emerald-700 text-xs md:text-sm font-black">
+                        <div class="flex text-emerald-600 text-xs gap-0.5">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-[#1A1743] ml-1 font-extrabold text-xs">4.9/5.0</span>
+                    </div>
+                    <span class="px-2.5 py-1 bg-[#EAEDFF] text-[#1A1743] font-extrabold text-[11px] rounded-full">
+                        18.4k+ Pesanan
+                    </span>
+                </div>
+                <p class="text-xs md:text-sm text-[#3A3852] font-medium leading-relaxed">
+                    “Layanan cuci &amp; garment care premium terpercaya di Malang. Menjaga kelembutan pakaian dan keharuman tahan lama sejak 2021.”
+                </p>
             </div>
         </div>
 
-        <!-- ================= FORM LOGIN DI BAGIAN KANAN ================= -->
-        <div class="w-full lg:w-1/2 overflow-y-auto bg-[#FAF8FF]">
-            <div class="min-h-full flex items-center justify-center p-6 md:p-12">
-                <div class="w-full max-w-md" x-data="{ showPassword: false }">
+        <!-- ================= KANAN: FORM LOGIN ================= -->
+        <div class="p-8 sm:p-10 md:p-12 lg:p-14 flex flex-col justify-center bg-white order-1 lg:order-2" 
+             x-data="{ showPassword: false }">
 
-                    <!-- Logo -->
-                    <div class="flex items-center gap-2 mb-8">
-                        <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
-                        </div>
-                        <div class="flex items-center text-xl font-semibold text-[#1A1743]">
-                            Rodeo Laundry<span class="text-[#A7D717]">.</span>
-                        </div>
-                    </div>
-
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-[#1A1743] mb-3">Masuk ke Akun</h1>
-
-                    <!-- text kala error login -->
-                    @if($errors->any())
-                        <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl">
-                            <ul class="text-xs text-red-600 list-disc list-inside">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <!-- Status message -->
-                    @if(session('status'))
-                        <div class="mb-5 p-4 bg-green-50 border border-green-200 rounded-2xl">
-                            <p class="text-sm text-green-700 font-semibold">{{ session('status') }}</p>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
-                        @csrf
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-bold text-[#1A1743] mb-2">Alamat Email</label>
-                            <input id="email" 
-                                   type="email" 
-                                   name="email" 
-                                   value="{{ old('email') }}" 
-                                   required 
-                                   autofocus 
-                                   autocomplete="username"
-                                   placeholder="nama@rodeolaundry.id"
-                                   class="w-full px-5 py-4 rounded-2xl bg-[#F2F3FF] border-2 border-transparent 
-                                          text-sm text-[#1A1743] placeholder:text-[#9895C8]
-                                          focus:outline-none focus:border-[#BFF138] focus:bg-white
-                                          transition-all">
-                        </div>
-
-                        <!-- Kata sandi -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label for="password" class="block text-sm font-bold text-[#1A1743]">Kata Sandi</label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" 
-                                       class="text-xs font-bold text-[#1A1743] hover:text-[#A7D717] transition">
-                                        Lupa kata sandi?
-                                    </a>
-                                @endif
-                            </div>
-                            <div class="relative">
-                                <input id="password" 
-                                       :type="showPassword ? 'text' : 'password'" 
-                                       name="password" 
-                                       required 
-                                       autocomplete="current-password"
-                                       placeholder="Kata Sandi"
-                                       class="w-full px-5 py-4 pr-12 rounded-2xl bg-[#F2F3FF] border-2 border-transparent 
-                                              text-sm text-[#1A1743] placeholder:text-[#9895C8]
-                                              focus:outline-none focus:border-[#BFF138] focus:bg-white
-                                              transition-all">
-                                <button type="button"
-                                        @click="showPassword = !showPassword"
-                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-[#47464E] hover:text-[#1A1743] transition">
-                                    <svg x-show="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                    <svg x-show="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Remember Me -->
-                        <div class="flex items-center">
-                            <input id="remember_me" 
-                                   type="checkbox" 
-                                   name="remember"
-                                   class="w-5 h-5 rounded border-2 border-[#E2E7FF] text-[#1A1743] 
-                                          focus:ring-0 focus:ring-offset-0 cursor-pointer
-                                          checked:bg-[#1A1743] checked:border-[#1A1743]">
-                            <label for="remember_me" class="ml-3 text-sm text-[#47464E] cursor-pointer select-none">
-                                Ingat saya
-                            </label>
-                        </div>
-
-                        <!-- Tombol Masuk -->
-                        <button type="submit"
-                                class="w-full px-6 py-4 bg-[#1A1743] text-white font-bold rounded-2xl
-                                       flex items-center justify-center gap-2
-                                       transition-all duration-300 ease-out
-                                       hover:bg-[#2F2D59]
-                                       hover:shadow-[0_15px_35px_-8px_rgba(26,23,67,0.5)]
-                                       hover:-translate-y-0.5
-                                       active:translate-y-0">
-                            Masuk
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                            </svg>
-                        </button>
-                    </form>
-
-                    <!-- Register Link -->
-                    <p class="text-center text-sm text-[#47464E] mt-10 mb-4">
-                        Belum memiliki akun?
-                        <a href="{{ route('register') }}" class="font-bold text-[#1A1743] underline hover:text-[#A7D717] transition">
-                            Daftar
-                        </a>
-                    </p>
+            <!-- Brand Logo Centered -->
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                 </div>
+                <span class="text-lg font-extrabold tracking-tight text-[#1A1743]">Rodeo<span class="text-[#8FB300]">.</span>Laundry</span>
             </div>
+
+            <!-- Header Titles -->
+            <h1 class="text-2xl md:text-3xl font-black text-[#1A1743] text-center mb-2 tracking-tight">Masuk ke Akun</h1>
+            <p class="text-xs text-[#717082] text-center max-w-xs mx-auto mb-6 leading-relaxed">
+                Masukkan email dan kata sandi Anda untuk mengakses portal manajemen Rodeo Laundry.
+            </p>
+
+            <!-- Error Alerts -->
+            @if($errors->any())
+                <div class="mb-4 p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Status message -->
+            @if(session('status'))
+                <div class="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-semibold">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                @csrf
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-xs font-bold text-[#1A1743] mb-1.5">Alamat Email</label>
+                    <input id="email" 
+                           type="email" 
+                           name="email" 
+                           value="{{ old('email') }}" 
+                           required 
+                           autofocus 
+                           autocomplete="username"
+                           placeholder="nama@rodeolaundry.id"
+                           class="w-full px-4 py-3 rounded-xl bg-[#F2F3FF] border border-transparent 
+                                  text-sm text-[#1A1743] placeholder-[#9895C8]
+                                  focus:outline-none focus:border-[#1A1743] focus:bg-white
+                                  transition">
+                </div>
+
+                <!-- Kata Sandi -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="password" class="block text-xs font-bold text-[#1A1743]">Kata Sandi</label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" 
+                               class="text-xs font-bold text-[#3D3A7A] hover:underline transition">
+                                Lupa kata sandi?
+                            </a>
+                        @endif
+                    </div>
+                    <div class="relative">
+                        <input id="password" 
+                               :type="showPassword ? 'text' : 'password'" 
+                               name="password" 
+                               required 
+                               autocomplete="current-password"
+                               placeholder="••••••••••••"
+                               class="w-full px-4 py-3 pr-11 rounded-xl bg-[#F2F3FF] border border-transparent 
+                                      text-sm text-[#1A1743] placeholder-[#9895C8]
+                                      focus:outline-none focus:border-[#1A1743] focus:bg-white
+                                      transition">
+                        <button type="button"
+                                @click="showPassword = !showPassword"
+                                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#717082] hover:text-[#1A1743] transition">
+                            <i :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center pt-0.5">
+                    <input id="remember_me" 
+                           type="checkbox" 
+                           name="remember"
+                           class="w-4 h-4 rounded border-2 border-[#CAD2FF] text-[#1A1743] 
+                                  focus:ring-0 focus:ring-offset-0 cursor-pointer">
+                    <label for="remember_me" class="ml-2.5 text-xs text-[#47464E] cursor-pointer select-none">
+                        Ingat sesi saya di perangkat ini
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="w-full mt-2 py-3.5 bg-[#28264E] hover:bg-[#1E1C3C] text-white font-bold rounded-full
+                               flex items-center justify-center gap-2 text-sm shadow-sm transition hover:shadow-md">
+                    <span>Masuk</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-5 text-center">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#E2E7FF]"></div></div>
+                <span class="relative bg-white px-3 text-[10px] uppercase font-bold tracking-wider text-[#9895C8]">
+                    ATAU MASUK DENGAN
+                </span>
+            </div>
+
+            <!-- Google Login Button -->
+            <button type="button"
+                    class="w-full py-3 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] font-bold text-xs rounded-full flex items-center justify-center gap-2.5 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Akun Google</span>
+            </button>
+
+            <!-- Register Link -->
+            <p class="text-center text-xs text-[#717082] mt-6">
+                Belum memiliki akun?
+                <a href="{{ route('register') }}" class="font-extrabold text-[#1A1743] underline hover:text-[#8FB300] transition ml-0.5">
+                    Daftar
+                </a>
+            </p>
         </div>
     </div>
 
@@ -188,12 +206,8 @@
                 showConfirmButton: false,
                 timer: 3500,
                 timerProgressBar: true,
-                showClass: {
-                    popup: 'pop-down' 
-                },
-                hideClass: {
-                    popup: 'pop-up'
-                },
+                showClass: { popup: 'pop-down' },
+                hideClass: { popup: 'pop-up' },
                 didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
                     toast.addEventListener('mouseleave', Swal.resumeTimer)
