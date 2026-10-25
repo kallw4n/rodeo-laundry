@@ -23,15 +23,30 @@ class CustomerSeeder extends Seeder
         $users = User::where('role', 'customer')->orderBy('id')->get();
         
         foreach ($users as $index => $user) {
+            $customerName = $customerNames[$index] ?? $faker->name;
+            $phone = '08' . $faker->numerify('##########');
+            $streetAddress = 'Jl. ' . $faker->streetName . ' No. ' . $faker->buildingNumber . ', Malang';
+            $city = 'Kota Malang';
+
             Customer::create([
                 'user_id' => $user->id,
-                'name' => $customerNames[$index] ?? $faker->name,
+                'name' => $customerName,
                 'email' => $user->email,
-                'phone' => '08' . $faker->numerify('##########'),
-                'address' => 'Jl. ' . $faker->streetName . ' No. ' . $faker->buildingNumber . ', Malang',
-                'city' => 'Kota Malang',
+                'phone' => $phone,
+                'address' => $streetAddress,
+                'city' => $city,
                 'loyalty_points' => $faker->numberBetween(10, 80),
                 'total_spent' => 0,
+            ]);
+
+            \App\Models\Address::create([
+                'user_id' => $user->id,
+                'label' => 'Rumah',
+                'recipient_name' => $customerName,
+                'phone' => $phone,
+                'address' => $streetAddress,
+                'city' => $city,
+                'is_default' => true,
             ]);
         }
 

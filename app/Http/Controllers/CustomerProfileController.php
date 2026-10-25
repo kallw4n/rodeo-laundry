@@ -34,7 +34,16 @@ class CustomerProfileController extends Controller
             'phone'   => 'required|string|max:20',
         ]);
 
-        $customer = Customer::where('user_id', Auth::id())->first();
+        $customer = Customer::firstOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'name'    => $request->name,
+                'phone'   => $request->phone,
+                'email'   => Auth::user()->email,
+                'address' => '',
+                'city'    => '',
+            ]
+        );
         
         $customer->update([
             'name'    => $request->name,

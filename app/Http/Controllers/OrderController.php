@@ -98,8 +98,22 @@ class OrderController extends Controller
             ['name' => $user->username, 'email' => $user->email]
         );
 
-        if (!empty($data['address']) && empty($customer->address)) {
-            $customer->update(['address' => $data['address']]);
+        if (!empty($data['address'])) {
+            if (empty($customer->address)) {
+                $customer->update(['address' => $data['address']]);
+            }
+
+            if (!\App\Models\Address::where('user_id', $user->id)->exists()) {
+                \App\Models\Address::create([
+                    'user_id'        => $user->id,
+                    'label'          => 'Utama',
+                    'recipient_name' => $customer->name ?? $user->username,
+                    'phone'          => $customer->phone ?? '',
+                    'address'        => $data['address'],
+                    'city'           => $customer->city ?? 'Kota Malang',
+                    'is_default'     => true,
+                ]);
+            }
         }
 
         DB::transaction(function () use ($data, $customer) {
