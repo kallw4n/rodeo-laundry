@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengiriman - Rodeo Laundry Malang</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
@@ -34,7 +36,6 @@
         selectedAddress: null,
         get addresses() {
             if (!this.userAddresses || this.userAddresses.length === 0) {
-                // Fallback kalau user belum punya alamat di tabel addresses
                 const cust = this.customerData || {};
                 return [{
                     id: 0,
@@ -46,7 +47,6 @@
                     detail: cust.city || '-',
                 }];
             }
-            // Mapping dari database addresses
             return this.userAddresses.map(a => ({
                 id: a.id,
                 label: a.label,
@@ -61,7 +61,6 @@
         init() {
             if (this.addresses.length > 0) {
                 const defaultAddr = this.addresses.find(a => a.isDefault) || this.addresses[0];
-                
                 this.selectedAddress = defaultAddr.id;
                 this.cartAddress = defaultAddr.address + ', ' + defaultAddr.detail;
             }
@@ -122,7 +121,7 @@
                     <div class="text-base md:text-lg font-semibold leading-none">
                         Rodeo Laundry<span class="text-[#bff108ff]">.</span>
                     </div>
-                    <div class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Malang</div>
+                    <div class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Batu</div>
                 </div>
             </a>
 
@@ -140,11 +139,11 @@
                 </a>
 
                 @auth
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('profile.edit') }}" class="w-8 h-8 md:w-9 md:h-9 bg-[#1A1743] hover:bg-[#2F2D59] text-white rounded-full flex items-center justify-center transition shadow-sm shrink-0" title="{{ Auth::user()->username }}">
-                            <i class="fa-regular fa-user text-xs md:text-sm"></i>
-                        </a>
-                    </div>
+                    <a href="{{ route('profile.edit') }}" 
+                    class="w-8 h-8 md:w-9 md:h-9 bg-[#1A1743] hover:bg-[#2F2D59] text-white rounded-full flex items-center justify-center transition shadow-sm shrink-0" 
+                    title="Profil Saya">
+                        <i class="fa-regular fa-user text-xs md:text-sm"></i>
+                    </a>
                 @else
                     <a href="{{ route('login') }}" class="px-4 md:px-5 py-2 bg-[#1A1743] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#2F2D59] shadow-sm transition">
                         Masuk
@@ -194,56 +193,54 @@
 
     <main class="pt-24 md:pt-28 max-w-[1440px] mx-auto px-4 md:px-6">
 
-        <!-- ================= HERO + STEPPER (Figma Exact) ================= -->
+        <!-- ================= HERO + STEPPER ================= -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 mb-6 md:mb-8">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#BFF108]/20 border border-[#BFF108]/40 text-[#4E6700] rounded-full text-[11px] font-bold uppercase tracking-wider mb-2">
-                    <span class="w-2 h-2 rounded-full bg-[#84CC16]"></span>
-                    LAYANAN ON-DEMAND MALANG
-                </div>
-                <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2">Pesan Layanan Laundry</h1>
-                <p class="text-xs md:text-base text-[#47464E] max-w-xl">Pilih paket cucian & treatment pakaian dengan jaminan higienis 1 drum 1 pelanggan serta antar-jemput tepat waktu.</p>
+                <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2 md:mb-3">Jadwal & Pengiriman</h1>
+                <p class="text-xs md:text-base text-[#47464E] max-w-lg">Pilih alamat, metode penjemputan, dan cara pengantaran cucian Anda.</p>
             </div>
 
             <!-- Stepper -->
-            <div class="flex items-center gap-2 md:gap-3 bg-white p-1.5 md:p-2 rounded-full shadow-sm border border-[#E2E7FF]/60 self-start md:self-auto">
-                <a href="{{ route('pemesanan') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-[#47464E] hover:bg-[#F2F3FF] transition">
-                    <span class="w-5 h-5 rounded-full bg-[#1A1743] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-check text-[9px]"></i>
-                    </span>
-                    <span class="text-xs md:text-sm font-semibold">Pilih Layanan</span>
+            <div class="flex items-center gap-1.5 md:gap-3 bg-white p-1.5 md:p-2 rounded-full shadow-sm border border-[#E2E7FF]/60 self-start md:self-auto">
+                <a href="{{ route('pemesanan') }}" class="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-full hover:bg-[#F2F3FF] transition">
+                    <div class="w-5 h-5 bg-[#1A1743] rounded-full flex items-center justify-center shrink-0 text-white text-[10px]">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span class="hidden md:inline text-sm font-semibold text-[#47464E]">Pilih Layanan</span>
                 </a>
-                <div class="w-4 md:w-6 h-px bg-[#E2E7FF]"></div>
-                <div class="flex items-center gap-2 px-3.5 py-1.5 bg-[#1A1743] text-white rounded-full shadow-sm">
-                    <span class="w-5 h-5 rounded-full bg-[#BFF108] text-[#131B2E] text-[11px] font-extrabold flex items-center justify-center shrink-0">2</span>
+                <div class="w-3 md:w-6 h-px bg-[#E2E7FF]"></div>
+                <div class="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-[#1A1743] text-white rounded-full">
+                    <div class="w-4 h-4 bg-[#BFF138] rounded-full shrink-0 flex items-center justify-center">
+                        <span class="w-5 h-5 rounded-full bg-[#BFF138] text-[#131B2E] text-[11px] font-extrabold flex items-center justify-center shrink-0">2</span>
+                    </div>
                     <span class="text-xs md:text-sm font-bold">Pengiriman</span>
                 </div>
-                <div class="w-4 md:w-6 h-px bg-[#E2E7FF]"></div>
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full text-[#47464E]">
-                    <span class="text-xs md:text-sm font-semibold">3</span>
-                    <span class="text-xs md:text-sm font-semibold">Pembayaran</span>
+                <div class="w-3 md:w-6 h-px bg-[#E2E7FF]"></div>
+                <div class="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-full">
+                    <span class="w-5 h-5 rounded-full bg-[#F2F3FF] text-[#47464E] text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+                    <span class="hidden md:inline text-sm font-semibold text-[#47464E]">Pembayaran</span>
                 </div>
             </div>
         </div>
 
-        <!-- ================= SECTION 1: ALAMAT PENJEMPUTAN ================= -->
-        <div class="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-8 shadow-sm border border-[#E2E7FF]/70 mb-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-5">
+        <!-- ================= SECTION 1: ALAMAT ================= -->
+        <div class="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-8 shadow-sm border border-[#E2E7FF]/60 mb-4 md:mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
                 <div class="flex gap-3 md:gap-4 items-start">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-2xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
                         <i class="fa-solid fa-location-dot text-base md:text-lg"></i>
                     </div>
                     <div>
-                        <h2 class="text-base md:text-lg font-bold text-[#1A1743]">Alamat Penjemputan</h2>
-                        <p class="text-xs md:text-sm text-[#47464E]">Pilih alamat kurir menjemput cucian kotor Anda</p>
+                        <h2 class="text-base md:text-lg font-bold">Alamat Penjemputan</h2>
+                        <p class="text-xs md:text-sm text-[#47464E]">Pilih alamat penjemputan cucian Anda</p>
                     </div>
                 </div>
-                <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs md:text-sm font-bold transition self-start sm:self-auto flex items-center gap-1.5 shadow-sm">
+                <a href="{{ route('profile.edit') }}" class="px-3 md:px-4 py-2 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs md:text-sm font-bold transition self-start sm:self-auto flex items-center gap-1.5">
                     <i class="fa-solid fa-plus text-xs"></i> Alamat Baru
                 </a>
             </div>
 
-            <div class="space-y-3.5">
+            <div class="space-y-3">
                 <template x-for="addr in addresses" :key="addr.id">
                     <label class="block cursor-pointer">
                         <input type="radio" name="address" class="sr-only" 
@@ -252,246 +249,188 @@
                                x-model="selectedAddress" 
                                @change="chooseAddress(addr)">
                         <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
-                             :class="selectedAddress === addr.id ? 'border-[#BFF108] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                             :class="selectedAddress === addr.id ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
                             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
-                                <div class="flex gap-3.5 flex-1 min-w-0 items-start">
-                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                         :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="flex gap-3 flex-1 min-w-0 items-center">
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                                        :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
                                         <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
                                              :class="selectedAddress === addr.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                                            <span class="px-2.5 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] md:text-xs font-bold text-[#1A1743]" x-text="addr.label"></span>
+                                        <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                            <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] md:text-xs font-bold text-[#1A1743]" x-text="addr.label"></span>
                                             <template x-if="addr.isDefault">
-                                                <div class="flex items-center gap-1.5">
-                                                    <span class="px-2.5 py-0.5 bg-[#C2F43B] rounded-full text-[10px] font-bold text-[#4E6700] uppercase">Utama</span>
-                                                    <span class="px-2 py-0.5 bg-gray-100 rounded-full text-[10px] font-semibold text-gray-600">Default</span>
-                                                </div>
+                                                <span class="px-2 md:px-2.5 py-0.5 bg-[#C2F43B] rounded-full text-[10px] font-bold text-[#4E6700] uppercase">Utama</span>
                                             </template>
                                         </div>
-                                        <h3 class="text-sm md:text-base font-bold mb-1 text-[#1A1743]" x-text="addr.address"></h3>
-                                        <p class="text-xs text-[#47464E] mb-2" x-text="addr.detail"></p>
-                                        <div class="flex flex-wrap items-center gap-4 text-xs text-[#47464E]">
+                                        <h3 class="text-sm md:text-base font-bold mb-1" x-text="addr.address"></h3>
+                                        <p class="text-[10px] md:text-xs text-[#47464E] mb-2" x-text="addr.detail"></p>
+                                        <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fa-regular fa-user text-xs text-[#9895C8]"></i>
+                                                <i class="fa-regular fa-user text-xs"></i>
                                                 <span x-text="addr.name"></span>
                                             </span>
-                                            <span>•</span>
                                             <span class="flex items-center gap-1.5">
-                                                <i class="fa-solid fa-phone text-xs text-[#9895C8]"></i>
+                                                <i class="fa-solid fa-phone text-xs"></i>
                                                 <span x-text="addr.phone"></span>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('profile.edit') }}" @click.stop class="text-xs font-bold text-[#1A1743] hover:underline shrink-0 self-start mt-0.5">
-                                    Ubah Alamat
+                                <a href="{{ route('profile.edit') }}" @click.stop class="px-3 py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-bold transition shrink-0 self-start">
+                                    Edit Alamat
                                 </a>
                             </div>
                         </div>
                     </label>
                 </template>
             </div>
-
-            <!-- Bottom Banner Strip -->
-            <div class="mt-4 p-3.5 bg-[#F2F3FF] rounded-2xl flex items-center justify-between text-xs text-[#1A1743]">
-                <div class="flex items-center gap-2 font-medium">
-                    <i class="fa-solid fa-location-crosshairs text-[#9895C8]"></i>
-                    <span>Punya lokasi kost, apartemen, atau vila lain di Malang?</span>
-                </div>
-                <a href="{{ route('profile.edit') }}" class="font-bold text-[#1A1743] hover:underline flex items-center gap-1">
-                    Tambahkan <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                </a>
-            </div>
         </div>
 
         <!-- ================= SECTION 2: METODE PENJEMPUTAN ================= -->
-        <div class="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-8 shadow-sm border border-[#E2E7FF]/70 mb-6">
-            <div class="flex gap-3 md:gap-4 items-start mb-5">
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-2xl flex items-center justify-center shrink-0 text-[#1A1743]">
+        <div class="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-8 shadow-sm border border-[#E2E7FF]/60 mb-4 md:mb-6">
+            <div class="flex gap-3 md:gap-4 items-start mb-4 md:mb-6">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
                     <i class="fa-solid fa-motorcycle text-base md:text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-base md:text-lg font-bold text-[#1A1743]">Metode Penjemputan</h2>
+                    <h2 class="text-base md:text-lg font-bold">Metode Penjemputan</h2>
                     <p class="text-xs md:text-sm text-[#47464E]">Pilih cara penyerahan pakaian kotor Anda ke Rodeo</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Dijemput Kurir Rodeo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <!-- Dijemput Kurir -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="pickup" value="courier" class="sr-only" x-model="pickupMethod">
-                    <div class="p-5 rounded-2xl border-2 h-full flex flex-col justify-between transition-all duration-200"
-                         :class="pickupMethod === 'courier' ? 'border-[#BFF108] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div>
-                            <div class="flex justify-between items-start mb-3 gap-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-10 h-10 bg-[#BFF108] rounded-xl flex items-center justify-center shrink-0 text-[#131B2E]">
-                                        <i class="fa-solid fa-motorcycle text-base"></i>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="px-2.5 py-0.5 bg-[#1A1743] text-white rounded-full text-[10px] font-bold">Populer</span>
-                                        <span class="px-2 py-0.5 bg-[#C2F43B] text-[#4E6700] rounded-full text-[10px] font-bold">Gratis</span>
-                                    </div>
-                                </div>
-                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                     :class="pickupMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="pickupMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                                </div>
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                         :class="pickupMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                <i class="fa-solid fa-motorcycle text-sm md:text-base"></i>
                             </div>
-                            <h3 class="text-sm md:text-base font-bold mb-1.5 text-[#1A1743]">Dijemput Kurir Rodeo</h3>
-                            <p class="text-xs text-[#47464E] leading-relaxed mb-4">Estimasi tiba 20–30 menit. Kurir kami membawa laundry bag steril khusus anti-kontaminasi langsung ke pintu Anda.</p>
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="pickupMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="pickupMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/70 text-xs">
-                            <span class="flex items-center gap-1.5 text-[#4E6700] font-bold">
-                                <i class="fa-solid fa-bolt text-xs"></i> Respons Cepat
-                            </span>
-                            <span class="font-bold text-[#1A1743]">Rp 0 (Radius &lt;5km)</span>
-                        </div>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Dijemput Kurir</h3>
+                        <p class="text-xs text-[#47464E] mb-1">Estimasi tiba 20-30 menit. Kurir kami membawa laundry bag steril khusus anti-kontaminasi langsung ke pintu Anda.</p>
                     </div>
                 </label>
 
-                <!-- Antar Sendiri ke Outlet -->
+                <!-- Antar Sendiri -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="pickup" value="self" class="sr-only" x-model="pickupMethod">
-                    <div class="p-5 rounded-2xl border-2 h-full flex flex-col justify-between transition-all duration-200"
-                         :class="pickupMethod === 'self' ? 'border-[#BFF108] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div>
-                            <div class="flex justify-between items-start mb-3 gap-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-10 h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                        <i class="fa-solid fa-store text-base"></i>
-                                    </div>
-                                    <span class="px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold">Drop &amp; Go</span>
-                                </div>
-                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                     :class="pickupMethod === 'self' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="pickupMethod === 'self' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                                </div>
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                         :class="pickupMethod === 'self' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                <i class="fa-solid fa-store text-sm md:text-base"></i>
                             </div>
-                            <h3 class="text-sm md:text-base font-bold mb-1.5 text-[#1A1743]">Antar Sendiri ke Outlet</h3>
-                            <p class="text-xs text-[#47464E] leading-relaxed mb-4">Bawa ke Outlet Hub Soekarno-Hatta (07.00 - 21.00 WIB). Tanpa antre, cukup scan QR order di loker kasir express.</p>
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="pickupMethod === 'self' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="pickupMethod === 'self' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/70 text-xs">
-                            <span class="text-[#47464E]">Lokasi Outlet Utama</span>
-                            <span class="font-bold text-[#4E6700]">Gratis Ongkir</span>
-                        </div>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Antar Sendiri</h3>
+                        <p class="text-xs text-[#47464E] mb-1">Bawa ke Outlet Kami (07.00 - 21.00 WIB). cukup serahkan ke kasir.</p>
                     </div>
                 </label>
             </div>
         </div>
 
         <!-- ================= SECTION 3: METODE PENGANTARAN ================= -->
-        <div class="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-8 shadow-sm border border-[#E2E7FF]/70 mb-6">
-            <div class="flex gap-3 md:gap-4 items-start mb-5">
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-2xl flex items-center justify-center shrink-0 text-[#1A1743]">
+        <div class="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-8 shadow-sm border border-[#E2E7FF]/60 mb-4 md:mb-6">
+            <div class="flex gap-3 md:gap-4 items-start mb-4 md:mb-6">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
                     <i class="fa-solid fa-box-open text-base md:text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-base md:text-lg font-bold text-[#1A1743]">Metode Pengantaran</h2>
-                    <p class="text-xs md:text-sm text-[#47464E]">Bagaimana cucian yang telah bersih &amp; wangi dikembalikan?</p>
+                    <h2 class="text-base md:text-lg font-bold">Metode Pengantaran</h2>
+                    <p class="text-xs md:text-sm text-[#47464E]">Bagaimana cucian yang telah bersih & wangi dikembalikan?</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Diantar Kurir Rodeo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <!-- Diantar Kurir -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="delivery" value="courier" class="sr-only" x-model="deliveryMethod">
-                    <div class="p-5 rounded-2xl border-2 h-full flex flex-col justify-between transition-all duration-200"
-                         :class="deliveryMethod === 'courier' ? 'border-[#BFF108] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div>
-                            <div class="flex justify-between items-start mb-3 gap-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-10 h-10 bg-[#BFF108] rounded-xl flex items-center justify-center shrink-0 text-[#131B2E]">
-                                        <i class="fa-solid fa-truck-fast text-base"></i>
-                                    </div>
-                                    <span class="px-2.5 py-0.5 bg-[#1A1743] text-white rounded-full text-[10px] font-bold">Rekomendasi</span>
-                                </div>
-                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                     :class="deliveryMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="deliveryMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                                </div>
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                         :class="deliveryMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                <i class="fa-solid fa-truck-fast text-sm md:text-base"></i>
                             </div>
-                            <h3 class="text-sm md:text-base font-bold mb-1.5 text-[#1A1743]">Diantar Kurir Rodeo</h3>
-                            <p class="text-xs text-[#47464E] leading-relaxed mb-4">Pakaian diantar rapi, wangi, berstandar boutique dalam garment bag waterproof steril langsung ke alamat utama.</p>
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="deliveryMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="deliveryMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/70 text-xs">
-                            <span class="font-bold text-[#4E6700]">Garansi Sampai Rapi</span>
-                            <span class="font-bold text-[#1A1743]">Gratis Ongkir</span>
-                        </div>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Diantar Kurir</h3>
+                        <p class="text-xs text-[#47464E] mb-1">Pakaian diantar rapi, wangi, berstandar boutique dalam garment bag waterproof steril langsung ke alamat utama.</p>
                     </div>
                 </label>
 
-                <!-- Ambil Mandiri di Smart Locker -->
+                <!-- Ambil Sendiri -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="delivery" value="locker" class="sr-only" x-model="deliveryMethod">
-                    <div class="p-5 rounded-2xl border-2 h-full flex flex-col justify-between transition-all duration-200"
-                         :class="deliveryMethod === 'locker' ? 'border-[#BFF108] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div>
-                            <div class="flex justify-between items-start mb-3 gap-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-10 h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                        <i class="fa-solid fa-boxes-stacked text-base"></i>
-                                    </div>
-                                    <span class="px-2.5 py-0.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] font-bold">24 Jam</span>
-                                </div>
-                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                     :class="deliveryMethod === 'locker' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="deliveryMethod === 'locker' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                                </div>
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                         :class="deliveryMethod === 'locker' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                <i class="fa-solid fa-boxes-stacked text-sm md:text-base"></i>
                             </div>
-                            <h3 class="text-sm md:text-base font-bold mb-1.5 text-[#1A1743]">Ambil Mandiri di Smart Locker</h3>
-                            <p class="text-xs text-[#47464E] leading-relaxed mb-4">Ambil kapan pun di Smart Locker Outlet Soekarno-Hatta menggunakan kode OTP SMS/WhatsApp tanpa antre.</p>
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                 :class="deliveryMethod === 'locker' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                     :class="deliveryMethod === 'locker' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-[#E2E7FF]/70 text-xs">
-                            <span class="text-[#47464E]">Akses Fleksibel 24/7</span>
-                            <span class="font-bold text-[#4E6700]">Bebas Biaya</span>
-                        </div>
+                        <h3 class="text-sm md:text-base font-bold mb-1">Ambil Sendiri</h3>
+                        <p class="text-xs text-[#47464E] mb-1">Ambil kapan pun di Outlet Kami (07.00 - 21.00 WIB).</p>
                     </div>
                 </label>
             </div>
         </div>
 
-        <!-- ================= SECTION 4: CATATAN UNTUK KURIR ================= -->
-        <div class="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-8 shadow-sm border border-[#E2E7FF]/70 mb-12 md:mb-16">
-            <div class="flex justify-between items-start mb-4 gap-2">
-                <div class="flex gap-3 md:gap-4 items-start">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-2xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                        <i class="fa-solid fa-pen-to-square text-base md:text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base md:text-lg font-bold text-[#1A1743]">Catatan untuk Kurir <span class="text-xs md:text-sm font-normal text-[#47464E]">(Opsional)</span></h2>
-                        <p class="text-xs md:text-sm text-[#47464E]">Beri panduan patokan rumah atau instruksi serah terima cucian</p>
-                    </div>
+        <!-- ================= SECTION 4: CATATAN KURIR ================= -->
+        <div class="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-8 shadow-sm border border-[#E2E7FF]/60 mb-12 md:mb-16">
+            <div class="flex gap-3 md:gap-4 items-start mb-3 md:mb-4">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                    <i class="fa-solid fa-pen-to-square text-base md:text-lg"></i>
                 </div>
-                <div class="text-xs font-semibold text-[#47464E]">
-                    <span x-text="courierNotes.length"></span> / 200
+                <div>
+                    <h2 class="text-base md:text-lg font-bold">Catatan untuk Kurir <span class="text-xs md:text-sm font-normal text-[#47464E]">(Opsional)</span></h2>
+                    <p class="text-xs md:text-sm text-[#47464E]">Beri panduan patokan rumah atau instruksi pada proses pengantaran maupun penjemputan</p>
                 </div>
             </div>
 
             <div class="relative">
                 <textarea x-model="courierNotes"
                           maxlength="200"
-                          rows="3"
+                          rows="4"
                           placeholder="Titip ke pos satpam cluster depan ruko, rumah pagar hitam No. 45, hubungi WA jika sudah sampai."
-                          class="w-full px-4 py-3 rounded-2xl border-2 border-[#E2E7FF] 
+                          class="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl border-2 border-[#E2E7FF] 
                                  bg-[#FAF8FF] text-xs md:text-sm text-[#1A1743]
                                  placeholder:text-[#9895C8]
-                                 focus:outline-none focus:border-[#BFF108] focus:bg-white
+                                 focus:outline-none focus:border-[#BFF138] focus:bg-white
                                  transition-all resize-none"></textarea>
+                <div class="absolute bottom-3 right-3 md:bottom-4 md:right-4 text-[10px] md:text-xs font-semibold text-[#47464E] bg-[#FAF8FF] px-1.5 rounded">
+                    <span x-text="courierNotes.length"></span> / 200
+                </div>
             </div>
 
-            <div class="mt-3.5 flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-semibold text-[#47464E]">Instruksi Cepat:</span>
+            <div class="mt-3 md:mt-4 flex items-center gap-2 flex-wrap">
+                <span class="text-[10px] md:text-xs font-semibold text-[#47464E] w-full md:w-auto mb-1 md:mb-0">Instruksi Cepat:</span>
                 <template x-for="chip in quickNotes" :key="chip">
                     <button type="button" @click="addQuickNote(chip)"
-                            class="px-3 py-1 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs font-medium transition shadow-sm">
-                        <span x-text="'+ ' + chip"></span>
+                            class="px-2.5 md:px-3 py-1 md:py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-semibold transition">
+                        <span x-text="chip"></span>
                     </button>
                 </template>
             </div>
@@ -502,16 +441,27 @@
     <footer class="bg-white border-t border-[#E2E7FF]/70 mt-12 md:mt-16">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
-                <div class="sm:col-span-2">
+                <div>
                     <div class="flex items-center gap-2.5 mb-4">
                         <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
                         </div>
                         <span class="text-lg md:text-xl font-bold tracking-tight text-[#1A1743]">Rodeo Laundry</span>
                     </div>
-                    <p class="text-[#47464E] text-xs md:text-sm mb-4 max-w-sm leading-relaxed">
-                        Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.
+                    <p class="text-[#47464E] text-xs md:text-sm mb-5 leading-relaxed">
+                        Laundry profesional, cepat, bersih, dan wangi di Batu. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda.
                     </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Sitemap</h4>
+                    <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
+                        <li><a href="{{ url('/') }}" class="hover:text-[#1A1743] transition">Beranda</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Layanan</a></li>
+                        <li><a href="{{ route('pesanan.index') }}" class="hover:text-[#1A1743] transition">Pesanan Saya</a></li>
+                        <li><a href="#" class="hover:text-[#1A1743] transition">Pertanyaan Umum (FAQ)</a></li>
+                        <li><a href="#" class="hover:text-[#1A1743] transition">Syarat & Ketentuan</a></li>
+                    </ul>
                 </div>
 
                 <div>
@@ -526,37 +476,31 @@
                 </div>
 
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area & Bantuan</h4>
-                    <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
-                        <li>Lowokwaru & Soekarno Hatta</li>
-                        <li>Klojen & Sekitar Kampus UB/UM</li>
-                        <li>Blimbing & Sukun</li>
-                        <li>Pertanyaan Umum (FAQ)</li>
-                        <li>Syarat & Ketentuan Garansi</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mb-10 md:mb-12 pt-6 border-t border-[#E2E7FF]/50">
-                <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional & Kontak</h4>
-                <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
-                    <p class="flex items-start gap-2.5">
-                        <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
-                        <span>Jl. Soekarno Hatta No. 45, Mojolangu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65142</span>
-                    </p>
-                    <p class="flex items-center gap-2.5">
-                        <i class="fa-regular fa-clock text-[#9895C8] shrink-0"></i>
-                        <span>Buka Setiap Hari: 07.00 - 21.00 WIB</span>
-                    </p>
-                    <p class="flex items-center gap-2.5">
-                        <i class="fa-brands fa-whatsapp text-[#25D366] shrink-0"></i>
-                        <span>WhatsApp: 0812-3456-7890</span>
-                    </p>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Kontak & Area</h4>
+                    <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
+                        <p class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
+                            <span>Gg. Rodeo, RT.04/RW.10, Sumberejo, Kec. Batu, Kota Batu, Jawa Timur 65318</span>
+                        </p>
+                        <p class="flex items-center gap-2.5">
+                            <i class="fa-regular fa-clock text-[#9895C8] shrink-0"></i>
+                            <span>Buka Setiap Hari: 07.00 - 21.00 WIB</span>
+                        </p>
+                        <p class="flex items-center gap-2.5">
+                            <i class="fa-brands fa-whatsapp text-[#25D366] shrink-0"></i>
+                            <span>WhatsApp: +62 813-5805-5257</span>
+                        </p>
+                        <p class="flex items-start gap-2.5 mt-3 pt-3 border-t border-[#E2E7FF]/60">
+                            <i class="fa-solid fa-truck-fast text-[#9895C8] mt-1 shrink-0"></i>
+                            <span class="font-semibold text-[#1A1743]">Area Penjemputan:</span>
+                        </p>
+                        <p class="text-xs">Khusus melayani Area Kota Batu dan sekitarnya.</p>
+                    </div>
                 </div>
             </div>
 
             <div class="pt-6 border-t border-[#E2E7FF]/60 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
-                <p class="text-center md:text-left">© 2025 Rodeo Laundry Malang. Hak Cipta Dilindungi Undang-Undang.</p>
+                <p class="text-center md:text-left">© 2025 Rodeo Laundry. Hak Cipta Dilindungi Undang-Undang.</p>
                 <div class="flex gap-4 sm:gap-6 flex-wrap justify-center">
                     <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
                         <i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis

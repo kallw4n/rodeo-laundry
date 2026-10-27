@@ -1,0 +1,17 @@
+[33ma4bf224[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD@{1}
+[33m60d5972[m HEAD@{1}: commit: nambah database addresses, sama buat profile
+[33ma4bf224[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{2}: commit: nambah notif kalau belum login
+[33m9da0c23[m HEAD@{3}: commit: update untuk login dan register, sama update FE pelanggan sikit
+[33md9df322[m HEAD@{4}: commit: update untuk login dan register, sama update FE pelanggan sikit
+[33m65ca600[m HEAD@{5}: commit: Update frontpage pelanggann
+[33m5cbfcfc[m HEAD@{6}: pull --tags origin main: Fast-forward
+[33m5a01a81[m HEAD@{7}: commit: update frontend pelanggan, tambah login-register
+[33m7bee709[m HEAD@{8}: pull origin main: Fast-forward
+[33mf9e27c9[m HEAD@{9}: commit: INI PAKAI DATA DUMMY, BELUM KE DB
+[33m30bd197[m HEAD@{10}: commit: update route untuk page pelanggan
+[33m304f69e[m HEAD@{11}: commit: INI PAKAI DATA DUMMY, BELUM KE DB
+[33m5988b06[m HEAD@{12}: pull origin main --allow-unrelated-histories: Merge made by the 'ort' strategy.
+[33me751ff7[m HEAD@{13}: commit: update route untuk page pelanggan
+[33m74de6b9[m HEAD@{14}: commit (amend): page pesanannya masih ngebug
+[33m45ca59f[m HEAD@{15}: commit: ini file untuk frontend pelanggan, page pesanannya masih ngebug si
+[33mf5f076f[m HEAD@{16}: clone: from https://github.com/kallw4n/rodeo-laundry

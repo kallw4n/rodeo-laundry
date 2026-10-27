@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rodeo Laundry Malang — Bersih, Higienis & Antar Jemput Tepat Waktu</title>
+    <title>Rodeo Laundry Batu — Bersih, Higienis & Antar Jemput Tepat Waktu</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
@@ -29,7 +32,7 @@
                     <div class="text-base md:text-lg font-semibold leading-none">
                         Rodeo Laundry<span class="text-[#bff108ff]">.</span>
                     </div>
-                    <div class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Malang</div>
+                    <div class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-[#47464E] mt-1">Batu</div>
                 </div>
             </a>
 
@@ -112,8 +115,9 @@
                         Cucian Numpuk?<br>
                         Biar Kami yang Urus<span class="text-[#bff108ff]">.</span>
                     </h1>
+                    <!-- UBAH TEKS JADI BATU -->
                     <p class="text-[#47464E] text-sm sm:text-base md:text-lg max-w-lg leading-relaxed">
-                        Layanan laundry profesional, cepat, bersih, dan wangi. Siap jemput dan antar langsung ke depan pintu Anda di seluruh Malang Raya.
+                        Layanan laundry profesional, cepat, bersih, dan wangi. Siap jemput dan antar langsung ke depan pintu Anda di seluruh Area Kota Batu.
                     </p>
                     <div class="mt-2 md:mt-4">
                         <a href="{{ route('pemesanan') }}" class="inline-flex items-center gap-2.5 px-7 md:px-9 py-3 md:py-3.5 bg-[#2F2D59] hover:bg-[#1A1743] text-white rounded-full font-semibold text-sm md:text-base shadow-[0_12px_28px_-8px_rgba(47,45,89,0.35)] transition-all duration-300 ease-out hover:shadow-[0_15px_35px_-8px_rgba(47,45,89,0.5)] hover:-translate-y-1">
@@ -145,7 +149,8 @@
                     </div>
                     <div class="min-w-0">
                         <div class="text-sm font-bold text-[#1A1743]">Gratis Antar Jemput</div>
-                        <div class="text-xs text-[#47464E]">Seluruh area Kota Malang</div>
+                        <!-- UBAH TEKS JADI BATU -->
+                        <div class="text-xs text-[#47464E]">Seluruh area Kota Batu</div>
                     </div>
                 </div>
 
@@ -163,7 +168,7 @@
                 <!-- Fitur 3 -->
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 bg-[#BFF108] rounded-full flex items-center justify-center shrink-0 shadow-sm text-[#131B2E]">
-                        <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                        <i class="fa-solid fa-spray-can-sparkles text-lg"></i>
                     </div>
                     <div class="min-w-0">
                         <div class="text-sm font-bold text-[#1A1743]">Bersih & Wangi Tahan Lama</div>
@@ -192,24 +197,20 @@
                 <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8">
                     <div class="flex-1">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#BFF108] text-[#131B2E] text-[10px] md:text-xs font-extrabold uppercase rounded-full mb-3 md:mb-4 shadow-sm">
-                            <i class="fa-solid fa-tag text-xs"></i>
-                            PROMO KHUSUS PELANGGAN BARU
+                            <i class="fa-solid fa-star text-xs"></i>
+                            Tidak perlu pusing cari tempat laundry lagi
                         </span>
                         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight mb-2 md:mb-3">
                             Siap Mencoba Layanan Kami?
                         </h2>
                         <p class="text-[#B9B6E5] text-xs sm:text-sm md:text-base max-w-xl leading-relaxed">
-                            Dapatkan diskon 20% untuk pesanan pertama Anda. Kurir kami siap menjemput cucian sekarang juga ke lokasi Anda!
+                            Kami akan mengurus cucian Anda dengan profesional sampai bersih, rapi dan wangi. Kurir kami siap menjemput cucian sekarang juga ke lokasi Anda!
                         </p>
                     </div>
                     <div class="flex flex-col gap-3 w-full md:w-auto md:min-w-[280px]">
-                        <a href="{{ route('pemesanan') }}" class="flex items-center justify-center gap-2 px-6 md:px-8 py-3.5 bg-[#BFF108] text-[#131B2E] font-bold rounded-full text-sm md:text-base transition-all duration-300 ease-out hover:shadow-[0_15px_35px_rgba(191,241,8,0.45)] hover:-translate-y-1 hover:brightness-105">
-                            <i class="fa-solid fa-cart-shopping text-sm"></i>
-                            <span>Pesan Jasa Laundry Sekarang</span>
-                        </a>
-                        <a href="https://wa.me/6281234567890" target="_blank" class="flex items-center justify-center gap-2 px-6 md:px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold rounded-full text-sm md:text-base backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1">
-                            <i class="fa-brands fa-whatsapp text-base text-[#25D366]"></i>
-                            <span>Hubungi CS WhatsApp</span>
+                        <a href="{{ route('pemesanan') }}" class="flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-3.5 bg-[#BFF108] text-[#131B2E] font-bold rounded-full text-sm md:text-base transition-all duration-300 ease-out hover:shadow-[0_15px_35px_rgba(191,241,8,0.45)] hover:-translate-y-1 hover:brightness-105">
+                            <i class="fa-solid fa-basket-shopping text-sm"></i>
+                            Pesan Jasa Laundry Sekarang
                         </a>
                     </div>
                 </div>
@@ -224,7 +225,7 @@
                 <p class="text-xs sm:text-sm md:text-base text-[#47464E] max-w-xl mx-auto">Semua kebutuhan laundry pakaian & perlengkapan Anda dalam satu tempat dengan penanganan standar hotel bintang lima.</p>
             </div>
 
-            <!-- Grid Layanan Dinamis (Figma Consistent) -->
+            <!-- Grid Layanan Dinamis -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
                 @forelse($services as $service)
                     @php
@@ -235,21 +236,10 @@
                         $isBoneka = str_contains($lname, 'boneka') || str_contains($lname, 'bantal');
                         $isTas = str_contains($lname, 'tas') || str_contains($lname, 'ransel');
                         $isBed = str_contains($lname, 'bed') || str_contains($lname, 'sprei') || str_contains($lname, 'selimut');
-
-                        $badgeLabel = match(true) {
-                            $isKiloan => '24–48 Jam',
-                            $isShoe => 'Treatment Khusus',
-                            $isPremium => 'Garansi Bahan',
-                            $isBoneka => 'Hypoallergenic',
-                            $isTas => 'Deep Cleaning',
-                            $isBed => 'Hygienic Dry',
-                            default => 'Layanan Kilat',
-                        };
                     @endphp
 
                     <a href="{{ route('pemesanan', ['service' => $service->id]) }}"
-                        class="group bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] 
-                               {{ $isShoe ? 'border-2 border-[#BFF108] shadow-md' : 'border border-[#E2E7FF]/70' }} 
+                        class="group bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-[#E2E7FF]/70 
                                flex flex-col justify-between 
                                transition-all duration-300 ease-out
                                hover:border-[#BFF108] hover:shadow-xl hover:-translate-y-1.5
@@ -260,15 +250,27 @@
                                     @if($isShoe)
                                         <i class="fa-solid fa-shoe-prints text-base"></i>
                                     @elseif($isKiloan)
-                                        <i class="fa-solid fa-weight-hanging text-base"></i>
+                                        <!-- SVG MESIN CUCI DIBERI UKURAN & WARNA -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 256 256">
+                                            <rect width="256" height="256" fill="none"/>
+                                            <path d="M201,40H179.35L165.66,26.34A8,8,0,0,0,160,24H96a8,8,0,0,0-5.66,2.34L76.65,40H55A15,15,0,0,0,40,55V209a15,15,0,0,0,15,15h61a4,4,0,0,0,4-4V104.27A8.18,8.18,0,0,1,127.47,96a8,8,0,0,1,8.53,8V220a4,4,0,0,0,4,4h61a15,15,0,0,0,15-15V55A15,15,0,0,0,201,40ZM86.54,107.08A4,4,0,0,1,80,104V59.31L95.24,44.07l23.47,35.21ZM128,80h0v0Zm48,24a4,4,0,0,1-2.3,3.63,3.93,3.93,0,0,1-4.21-.51l-32.2-27.82,23.47-35.21L176,59.31Z" fill="currentColor"/>
+                                        </svg>
                                     @elseif($isPremium)
                                         <i class="fa-solid fa-shirt text-base"></i>
                                     @elseif($isBoneka)
-                                        <i class="fa-solid fa-mattress-pillow text-base"></i>
+                                        <!-- SVG BONEKA DIBERI UKURAN -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 256 256">
+                                            <rect width="256" height="256" fill="none"/>
+                                            <circle cx="212" cy="108" r="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/>
+                                            <circle cx="44" cy="108" r="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/>
+                                            <circle cx="92" cy="60" r="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/>
+                                            <circle cx="164" cy="60" r="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/>
+                                            <path d="M128,104A36,36,0,0,0,93.43,130a43.49,43.49,0,0,1-20.67,25.9,32,32,0,0,0,27.73,57.62,72.49,72.49,0,0,1,55,0,32,32,0,0,0,27.73-57.62A43.46,43.46,0,0,1,162.57,130,36,36,0,0,0,128,104Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/>
+                                        </svg>
                                     @elseif($isTas)
                                         <i class="fa-solid fa-bag-shopping text-base"></i>
                                     @elseif($isBed)
-                                        <i class="fa-solid fa-rug text-base"></i>
+                                        <i class="fa-solid fa-bed text-base"></i>
                                     @else
                                         <i class="fa-solid fa-jug-detergent text-base"></i>
                                     @endif
@@ -281,10 +283,7 @@
                             <h3 class="text-base md:text-lg font-bold mb-2 text-[#1A1743]">{{ $service->name }}</h3>
                             <p class="text-xs md:text-sm text-[#47464E] leading-relaxed mb-4 md:mb-6 line-clamp-2">{{ $service->description }}</p>
                         </div>
-                        <div class="pt-3.5 md:pt-4 border-t border-[#E2E7FF]/70 flex justify-between items-center">
-                            <span class="px-2.5 py-1 bg-[#F2F3FF] text-[#1A1743] rounded-full text-[11px] font-bold">
-                                {{ $badgeLabel }}
-                            </span>
+                        <div class="pt-3.5 md:pt-4 border-t border-[#E2E7FF]/70 flex justify-between items-center">   
                             <span class="text-xs md:text-sm font-bold flex items-center gap-1.5 transition-transform duration-300 group-hover:translate-x-1 text-[#1A1743]">
                                 <span>Pilih Layanan</span>
                                 <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -352,7 +351,8 @@
                             </div>
                         </div>
                         <h3 class="text-base md:text-lg font-bold text-white mb-2">Dijemput Kurir</h3>
-                        <p class="text-xs md:text-sm text-[#B9B6E5] leading-relaxed">Kurir ramah kami mengambil cucian langsung di lokasi Anda di seluruh Malang dengan penimbangan digital transparan di tempat.</p>
+                        <!-- UBAH TEKS JADI BATU -->
+                        <p class="text-xs md:text-sm text-[#B9B6E5] leading-relaxed">Kurir ramah kami mengambil cucian langsung di lokasi Anda di seluruh Area Batu dengan penimbangan digital transparan di tempat.</p>
                     </div>
 
                     <!-- Step 04 -->
@@ -375,8 +375,7 @@
     <!-- ================= FOOTER ================= -->
     <footer class="bg-white border-t border-[#E2E7FF]/70 mt-12 md:mt-16">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-10 md:mb-12">
-                <!-- Col 1: Brand Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
                         <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
@@ -384,46 +383,39 @@
                         </div>
                         <span class="text-lg md:text-xl font-bold tracking-tight text-[#1A1743]">Rodeo Laundry</span>
                     </div>
-                    <p class="text-[#47464E] text-xs md:text-sm mb-4 leading-relaxed">
-                        Laundry profesional, cepat, bersih, dan wangi di Malang. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda setiap hari.
+                    <p class="text-[#47464E] text-xs md:text-sm mb-5 leading-relaxed">
+                        Laundry profesional, cepat, bersih, dan wangi di Batu. Layanan antar-jemput ekspres untuk kenyamanan pakaian higienis Anda.
                     </p>
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#EAEDFF] text-[#1A1743] rounded-full text-xs font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-[#BFF108]"></span>
-                        <span>Outlet Soekarno Hatta Malang</span>
-                    </div>
                 </div>
 
-                <!-- Col 2: Layanan Kami -->
+                <div>
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Sitemap</h4>
+                    <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
+                        <li><a href="{{ url('/') }}" class="hover:text-[#1A1743] transition">Beranda</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Layanan</a></li>
+                        <li><a href="{{ route('pesanan.index') }}" class="hover:text-[#1A1743] transition">Pesanan Saya</a></li>
+                        <li><a href="#" class="hover:text-[#1A1743] transition">Pertanyaan Umum (FAQ)</a></li>
+                        <li><a href="#" class="hover:text-[#1A1743] transition">Syarat & Ketentuan</a></li>
+                    </ul>
+                </div>
+
                 <div>
                     <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Layanan Kami</h4>
-                    <ul class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Kiloan Premium</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Dry Cleaning Satuan</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu & Tas</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Bed Cover & Karpet</a></li>
-                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Express 3 Jam</a></li>
+                    <ul class="space-y-2 text-xs md:text-sm text-[#47464E]">
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Setrika Kiloan</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Gorden</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Boneka & Bantal</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Sepatu Premium</a></li>
+                        <li><a href="{{ route('pemesanan') }}" class="hover:text-[#1A1743] transition">Cuci Tas & Ransel</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Area & Bantuan -->
                 <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Area & Bantuan</h4>
-                    <ul class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
-                        <li>Lowokwaru & Soekarno Hatta</li>
-                        <li>Klojen & Sekitar Kampus UB/UM</li>
-                        <li>Blimbing & Sukun</li>
-                        <li>Pertanyaan Umum (FAQ)</li>
-                        <li>Syarat & Ketentuan Garansi</li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Operasional & Kontak -->
-                <div>
-                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Operasional & Kontak</h4>
-                    <div class="space-y-3 text-xs md:text-sm text-[#47464E]">
+                    <h4 class="font-bold text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4 text-[#1A1743]">Kontak & Area</h4>
+                    <div class="space-y-2.5 text-xs md:text-sm text-[#47464E]">
                         <p class="flex items-start gap-2.5">
                             <i class="fa-solid fa-location-dot text-[#9895C8] mt-1 shrink-0"></i>
-                            <span>Jl. Soekarno Hatta No. 45, Mojolangu, Kec. Lowokwaru, Kota Malang, Jawa Timur 65142</span>
+                            <span>Gg. Rodeo, RT.04/RW.10, Sumberejo, Kec. Batu, Kota Batu, Jawa Timur 65318</span>
                         </p>
                         <p class="flex items-center gap-2.5">
                             <i class="fa-regular fa-clock text-[#9895C8] shrink-0"></i>
@@ -431,20 +423,22 @@
                         </p>
                         <p class="flex items-center gap-2.5">
                             <i class="fa-brands fa-whatsapp text-[#25D366] shrink-0"></i>
-                            <span>WhatsApp: 0812-3456-7890</span>
+                            <span>WhatsApp: +62 813-5805-5257</span>
                         </p>
+                        <p class="flex items-start gap-2.5 mt-3 pt-3 border-t border-[#E2E7FF]/60">
+                            <i class="fa-solid fa-truck-fast text-[#9895C8] mt-1 shrink-0"></i>
+                            <span class="font-semibold text-[#1A1743]">Area Penjemputan:</span>
+                        </p>
+                        <p class="text-xs">Khusus melayani Area Kota Batu dan sekitarnya.</p>
                     </div>
                 </div>
             </div>
 
             <div class="pt-6 border-t border-[#E2E7FF]/60 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
-                <p class="text-center md:text-left">© 2025 Rodeo Laundry Malang. Hak Cipta Dilindungi Undang-Undang.</p>
+                <p class="text-center md:text-left">© 2025 Rodeo Laundry. Hak Cipta Dilindungi Undang-Undang.</p>
                 <div class="flex gap-4 sm:gap-6 flex-wrap justify-center">
                     <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
                         <i class="fa-solid fa-shield-halved text-[#4E6700]"></i> Garansi Bersih Higienis
-                    </span>
-                    <span class="flex items-center gap-1.5 font-bold text-[#1A1743]">
-                        <i class="fa-solid fa-bolt text-[#4E6700]"></i> 1 Mesin 1 Pelanggan
                     </span>
                 </div>
             </div>
