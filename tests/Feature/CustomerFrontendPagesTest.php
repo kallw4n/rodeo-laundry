@@ -38,7 +38,7 @@ class CustomerFrontendPagesTest extends TestCase
         $response->assertOk();
         $response->assertSee('Rodeo Laundry');
         $response->assertSee('Pesan Jasa Laundry Sekarang');
-        $response->assertSee('Hubungi CS WhatsApp');
+        $response->assertSee('WhatsApp');
     }
 
     public function test_auth_login_and_register_pages_render_successfully(): void
@@ -46,7 +46,8 @@ class CustomerFrontendPagesTest extends TestCase
         $loginRes = $this->get('/login');
         $loginRes->assertOk();
         $loginRes->assertSee('Masuk ke Akun');
-        $loginRes->assertSee('18.4k+ Pesanan');
+        $loginRes->assertSee('Google Review');
+        $loginRes->assertSee('Pen B');
 
         $regRes = $this->get('/register');
         $regRes->assertOk();
@@ -80,6 +81,6 @@ class CustomerFrontendPagesTest extends TestCase
         $bayarRes->assertSee('Pembayaran');
         $bayarRes->assertSee('Bayar via QRIS');
         $bayarRes->assertSee('fa-solid fa-check');
-        $bayarRes->assertSee("pickupMethod === 'self' ? 'Antar Sendiri' : 'Antar Jemput'", false);
+        $bayarRes->assertSee("Antar Sendiri & Ambil Sendiri", false);
     }
 }

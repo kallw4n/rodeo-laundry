@@ -356,17 +356,42 @@
 
                     <!-- Ringkasan Info Pengiriman jika ada -->
                     <template x-if="cartAddress || pickupMethod">
-                        <div class="mt-4 pt-3 border-t border-[#E2E7FF]/70 bg-[#FAF8FF] p-3 md:p-4 rounded-xl border border-[#E2E7FF]/60 flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-[#EAEDFF] text-[#1A1743] flex items-center justify-center shrink-0 mt-0.5">
-                                <i class="fa-solid fa-truck text-xs"></i>
-                            </div>
-                            <div class="min-w-0 flex-1 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-[#1A1743]" x-text="pickupMethod === 'courier' ? 'Dijemput & Diantar Kurir' : 'Antar Sendiri & Ambil Sendiri'"></span>
+                        <div class="mt-4 pt-3 border-t border-[#E2E7FF]/70 bg-[#FAF8FF] p-3 md:p-4 rounded-xl border border-[#E2E7FF]/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="flex items-start gap-3 min-w-0 flex-1">
+                                <div class="w-8 h-8 rounded-lg bg-[#EAEDFF] text-[#1A1743] flex items-center justify-center shrink-0 mt-0.5">
+                                    <i :class="pickupMethod === 'courier' ? 'fa-solid fa-truck text-xs' : 'fa-solid fa-store text-xs'"></i>
                                 </div>
-                                <p class="text-[#47464E] mt-1 text-[11px]" x-show="cartAddress" x-text="'Alamat: ' + cartAddress"></p>
-                                <p class="text-[#47464E] mt-0.5 text-[11px]" x-show="courierNotes" x-text="'Catatan Kurir: ' + courierNotes"></p>
+                                <div class="min-w-0 flex-1 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-[#1A1743]" x-text="pickupMethod === 'courier' ? 'Dijemput & Diantar Kurir' : 'Antar Sendiri & Ambil Sendiri'"></span>
+                                    </div>
+                                    <template x-if="pickupMethod !== 'courier'">
+                                        <p class="text-[#47464E] text-[11px] leading-relaxed mt-0.5">
+                                            <span class="font-semibold text-[#1A1743]">Outlet:</span> Gg. Rodeo, RT.04/RW.10, Sumberejo, Kec. Batu, Kota Batu, Jawa Timur 65318
+                                        </p>
+                                    </template>
+                                    <template x-if="pickupMethod === 'courier'">
+                                        <div>
+                                            <p class="text-[#47464E] mt-1 text-[11px]" x-show="cartAddress" x-text="'Alamat: ' + cartAddress"></p>
+                                            <p class="text-[#47464E] mt-0.5 text-[11px]" x-show="courierNotes" x-text="'Catatan Kurir: ' + courierNotes"></p>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
+
+                            <!-- Tombol Navigasi di Ujung Kanan Card -->
+                            <template x-if="pickupMethod !== 'courier'">
+                                <div class="shrink-0 sm:self-center pl-11 sm:pl-0">
+                                    <a href="https://maps.app.goo.gl/VNZ24TUTkq7HTJbp9" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#CAD2FF] hover:border-[#1A1743] hover:bg-[#EAEDFF]/50 text-[#1A1743] rounded-full text-xs font-bold shadow-2xs transition">
+                                        <i class="fa-solid fa-diamond-turn-right text-emerald-600 text-xs"></i>
+                                        <span>Buka Maps</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-[#717082]"></i>
+                                    </a>
+                                </div>
+                            </template>
                         </div>
                     </template>
 

@@ -263,9 +263,23 @@
 
                         <div>
                             <h4 class="text-xs font-bold uppercase tracking-wider text-[#47464E] mb-3">Alamat / Lokasi</h4>
-                            <div class="flex items-start gap-2">
-                                <i class="fa-solid fa-location-dot text-[#1A1743] mt-0.5 shrink-0 text-sm"></i>
-                                <p class="text-xs md:text-sm text-[#47464E]" x-text="order.address"></p>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div class="flex items-start gap-2 min-w-0 flex-1">
+                                    <i class="fa-solid fa-location-dot text-[#1A1743] mt-0.5 shrink-0 text-sm"></i>
+                                    <p class="text-xs md:text-sm text-[#47464E]" x-text="order.address"></p>
+                                </div>
+                                <template x-if="order.address && (order.address.toLowerCase().includes('outlet') || order.address.toLowerCase().includes('rodeo') || order.address.toLowerCase().includes('ambil'))">
+                                    <div class="shrink-0 pl-6 sm:pl-0">
+                                        <a href="https://maps.app.goo.gl/VNZ24TUTkq7HTJbp9" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EAEDFF] hover:bg-[#dfe4ff] text-[#1A1743] rounded-full text-xs font-bold transition shadow-2xs">
+                                            <i class="fa-solid fa-diamond-turn-right text-emerald-600 text-xs"></i>
+                                            <span>Buka Maps</span>
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-[#717082]"></i>
+                                        </a>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>

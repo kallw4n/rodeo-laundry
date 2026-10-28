@@ -37,27 +37,47 @@
                  class="absolute inset-0 w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#1A1743]/70 via-black/10 to-transparent"></div>
 
-            <!-- Floating Testimonial Card -->
-            <div class="relative bg-white/95 backdrop-blur-md rounded-2xl md:rounded-[24px] p-5 md:p-6 shadow-xl border border-white/60">
+            <!-- Floating Testimonial Card terintegrasi Google Maps -->
+            <a href="https://maps.app.goo.gl/wmjcRPh3bXiQhHbL8" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               title="Buka ulasan ini di Google Maps"
+               class="group relative bg-white/95 backdrop-blur-md rounded-2xl md:rounded-[24px] p-5 md:p-6 shadow-xl border border-white/60 block hover:bg-white hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
                 <div class="flex items-center justify-between gap-3 mb-2.5">
-                    <div class="flex items-center gap-1.5 text-emerald-700 text-xs md:text-sm font-black">
-                        <div class="flex text-emerald-600 text-xs gap-0.5">
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
-                            <i class="fa-solid fa-star"></i>
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-full bg-[#FAF8FF] border border-[#E2E7FF] flex items-center justify-center shrink-0 shadow-2xs">
+                            <i class="fa-brands fa-google text-[#4285F4] text-xs"></i>
+                        </span>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="flex gap-0.5 text-xs text-amber-400">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <span class="text-[#1A1743] ml-1 font-extrabold text-xs">5.0</span>
+                            </div>
+                            <div class="text-[11px] font-bold text-[#1A1743] flex items-center gap-1">
+                                <span>Pen B</span>
+                                <span class="text-[#717082] font-normal text-[10px]">• Google Review</span>
+                            </div>
                         </div>
-                        <span class="text-[#1A1743] ml-1 font-extrabold text-xs">4.9/5.0</span>
                     </div>
-                    <span class="px-2.5 py-1 bg-[#EAEDFF] text-[#1A1743] font-extrabold text-[11px] rounded-full">
-                        18.4k+ Pesanan
+                </div>
+                <p class="text-xs md:text-sm text-[#3A3852] font-medium leading-relaxed italic">
+                    “Pelayanan luar biasa dari keluarga yang ramah. Kami menggunakan jasa Rodeo beberapa kali. Mereka berhasil menghilangkan noda dari celana favorit saya yang tidak bisa saya hilangkan sendiri 😊”
+                </p>
+                <div class="mt-3 pt-2.5 border-t border-[#E2E7FF]/60 flex items-center justify-between text-[11px] font-semibold text-[#1A1743] group-hover:text-blue-600 transition">
+                    <span class="flex items-center gap-1 text-[#717082] group-hover:text-blue-600">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i> Terverifikasi di Google Maps
+                    </span>
+                    <span class="flex items-center gap-1 font-bold text-[#1A1743] group-hover:text-blue-600">
+                        Buka Ulasan <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
                     </span>
                 </div>
-                <p class="text-xs md:text-sm text-[#3A3852] font-medium leading-relaxed">
-                    “Layanan cuci &amp; garment care premium terpercaya di Malang. Menjaga kelembutan pakaian dan keharuman tahan lama sejak 2021.”
-                </p>
-            </div>
+            </a>
         </div>
 
         <!-- ================= KANAN: FORM LOGIN ================= -->
