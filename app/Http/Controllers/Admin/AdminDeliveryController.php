@@ -63,13 +63,21 @@ class AdminDeliveryController extends Controller
             'notes'          => 'nullable|string',
         ]);
 
-        Delivery::create([
+        $delivery = Delivery::create([
             'order_id'       => $request->order_id,
             'type'           => 'delivery',
             'address'        => $request->address,
             'status'         => $request->status,
             'scheduled_date' => $request->scheduled_date ?? now(),
         ]);
+
+        if ($delivery->order) {
+            if ($request->status === 'on-way') {
+                $delivery->order->update(['status' => 'ready']);
+            } elseif ($request->status === 'completed') {
+                $delivery->order->update(['status' => 'completed']);
+            }
+        }
 
         return redirect()->route('admin.deliveries.index')->with('success', 'Jadwal pengantaran untuk Nota #' . $request->order_id . ' berhasil ditambahkan!');
     }
@@ -88,6 +96,16 @@ class AdminDeliveryController extends Controller
             'scheduled_date' => $request->scheduled_date ?? $delivery->scheduled_date,
         ]);
 
+        if ($delivery->order) {
+            if ($request->status === 'on-way' && in_array($delivery->order->status, ['pending', 'processing'])) {
+                $delivery->order->update(['status' => 'ready']);
+            } elseif ($request->status === 'completed') {
+                $delivery->order->update(['status' => 'completed']);
+            } elseif ($request->status === 'scheduled' && $delivery->order->status === 'ready') {
+                $delivery->order->update(['status' => 'processing']);
+            }
+        }
+
         return redirect()->route('admin.deliveries.index')->with('success', 'Data pengantaran Nota #' . $delivery->order_id . ' berhasil diperbarui!');
     }
 
@@ -98,6 +116,16 @@ class AdminDeliveryController extends Controller
         ]);
 
         $delivery->update(['status' => $request->status]);
+
+        if ($delivery->order) {
+            if ($request->status === 'on-way' && in_array($delivery->order->status, ['pending', 'processing'])) {
+                $delivery->order->update(['status' => 'ready']);
+            } elseif ($request->status === 'completed') {
+                $delivery->order->update(['status' => 'completed']);
+            } elseif ($request->status === 'scheduled' && $delivery->order->status === 'ready') {
+                $delivery->order->update(['status' => 'processing']);
+            }
+        }
 
         $statusText = match ($request->status) {
             'on-way'    => 'Sedang di Antar oleh Driver',

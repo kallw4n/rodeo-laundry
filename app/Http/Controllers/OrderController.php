@@ -32,7 +32,7 @@ class OrderController extends Controller
             'cancelled'  => 'Dibatalkan',
         ];
 
-        $formattedOrders = $orders->map(function ($order) use ($statusLabels) {
+        $formattedOrders = $orders->map(function ($order) {
             $payment = $order->payment;
             $paymentStatus = $payment->status ?? 'pending';
 
@@ -43,13 +43,36 @@ class OrderController extends Controller
                 $order->status = 'processing';
             }
 
+            // Sinkronisasi otomatis Delivery:
+            // Jika status pengiriman kurir sudah 'on-way', otomatis sinkronkan status pesanan ke 'ready' (Sedang Diantar)
+            if ($order->delivery && $order->delivery->status === 'on-way' && in_array($order->status, ['pending', 'processing'])) {
+                $order->update(['status' => 'ready']);
+                $order->status = 'ready';
+            }
+
+            // Jika status pengiriman kurir sudah 'completed', sinkronkan status pesanan ke 'completed'
+            if ($order->delivery && $order->delivery->status === 'completed' && !in_array($order->status, ['completed', 'cancelled'])) {
+                $order->update(['status' => 'completed']);
+                $order->status = 'completed';
+            }
+
+            $isSelf = ($order->delivery->type ?? '') === 'pickup';
+
+            $currentStatusLabel = match ($order->status) {
+                'pending'    => 'Menunggu Konfirmasi',
+                'processing' => 'Sedang Dicuci',
+                'ready'      => $isSelf ? 'Siap Diambil di Outlet' : 'Sedang Diantar Kurir',
+                'completed'  => 'Selesai',
+                'cancelled'  => 'Dibatalkan',
+                default      => ucfirst($order->status),
+            };
+
             $paymentStatusLabels = [
                 'pending'   => 'Menunggu Pembayaran',
                 'completed' => 'Lunas',
                 'failed'    => 'Gagal',
             ];
 
-            $isSelf = ($order->delivery->type ?? '') === 'pickup';
             $paymentMethodLabels = [
                 'cash'        => $isSelf ? 'Bayar di Outlet (Pasca-Timbang)' : 'Jemput Dulu & Bayar Nanti (COD)',
                 'transfer'    => 'Transfer Bank (VA)',
@@ -62,7 +85,8 @@ class OrderController extends Controller
                 'raw_id'               => $order->id,
                 'date'                 => $order->created_at ? $order->created_at->translatedFormat('d F Y, H:i') : '-',
                 'status'               => $order->status,
-                'statusLabel'          => $statusLabels[$order->status] ?? ucfirst($order->status),
+                'statusLabel'          => $currentStatusLabel,
+                'isSelf'               => $isSelf,
                 'payment_status'       => $paymentStatus,
                 'payment_status_label' => $paymentStatusLabels[$paymentStatus] ?? ucfirst($paymentStatus),
                 'payment_method'       => $payment->method ?? '-',

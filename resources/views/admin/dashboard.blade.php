@@ -277,8 +277,11 @@
                                             <form method="POST" action="{{ route('admin.orders.updateStatus', $order) }}">
                                                 @csrf @method('PATCH')
                                                 <div class="px-4 pb-2 flex gap-1.5">
+                                                    @php
+                                                        $readyLabel = ($order->delivery && $order->delivery->type === 'delivery') ? 'Diantar Kurir' : 'Siap Ambil';
+                                                    @endphp
                                                     <select name="status" class="flex-1 text-xs border border-[#E9ECF4] rounded-xl px-2 py-1.5 text-[#1E1B4B] bg-[#F8F9FD] focus:outline-none focus:border-[#4338CA]">
-                                                        @foreach(['pending' => 'Antrian', 'processing' => 'Dicuci', 'ready' => 'Siap Ambil', 'completed' => 'Selesai', 'cancelled' => 'Batal'] as $val => $lbl)
+                                                        @foreach(['pending' => 'Antrian', 'processing' => 'Dicuci', 'ready' => $readyLabel, 'completed' => 'Selesai', 'cancelled' => 'Batal'] as $val => $lbl)
                                                             <option value="{{ $val }}" {{ $order->status === $val ? 'selected' : '' }}>{{ $lbl }}</option>
                                                         @endforeach
                                                     </select>

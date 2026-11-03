@@ -94,6 +94,16 @@ class AdminDashboardController extends Controller
 
         $order->update(['status' => $request->status]);
 
+        if ($order->delivery) {
+            if ($request->status === 'ready') {
+                $order->delivery->update(['status' => 'on-way']);
+            } elseif ($request->status === 'completed') {
+                $order->delivery->update(['status' => 'completed']);
+            } elseif (in_array($request->status, ['pending', 'processing'])) {
+                $order->delivery->update(['status' => 'scheduled']);
+            }
+        }
+
         return back()->with('success', 'Status pesanan #RD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' diperbarui.');
     }
 

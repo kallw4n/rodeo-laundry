@@ -255,9 +255,10 @@
                                 <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
                                     <div class="w-6 h-6 rounded-full flex items-center justify-center transition-colors text-[10px]"
                                          :class="stepIndex(order.status) >= 2 ? 'bg-[#BFF138] text-[#1A1743]' : 'bg-white border-2 border-[#E2E7FF] text-transparent'">
-                                        <i class="fa-solid fa-truck-fast"></i>
+                                        <i class="fa-solid" :class="order.isSelf ? 'fa-store' : 'fa-truck-fast'"></i>
                                     </div>
-                                    <span class="text-[10px] md:text-xs font-bold" :class="stepIndex(order.status) >= 2 ? 'text-[#1A1743]' : 'text-[#9895C8]'">Diantar</span>
+                                    <span class="text-[10px] md:text-xs font-bold" :class="stepIndex(order.status) >= 2 ? 'text-[#1A1743]' : 'text-[#9895C8]'"
+                                          x-text="order.isSelf ? 'Siap Ambil' : 'Diantar'"></span>
                                 </div>
 
                                 <div class="flex flex-col items-center gap-2 z-10" style="min-width: 60px;">
