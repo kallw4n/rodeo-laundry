@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\ServiceType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminPaymentController extends Controller
 {
@@ -66,21 +68,49 @@ class AdminPaymentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'amount'   => 'required|numeric|min:0',
-            'method'   => 'required|in:cash,transfer,e-wallet,credit_card',
-            'status'   => 'required|in:pending,completed,failed',
+            'order_id'         => 'required|exists:orders,id',
+            'amount'           => 'required|numeric|min:0',
+            'method'           => 'required|in:cash,transfer,e-wallet,credit_card',
+            'status'           => 'required|in:pending,completed,failed',
+            'items'            => 'nullable|array',
+            'items.*.id'       => 'required_with:items|exists:order_items,id',
+            'items.*.quantity' => 'required_with:items|numeric|min:0.01',
         ]);
 
-        $payment = Payment::create([
-            'order_id' => $request->order_id,
-            'amount'   => $request->amount,
-            'method'   => $request->method,
-            'status'   => $request->status,
-        ]);
+        $payment = DB::transaction(function () use ($request) {
+            $order = Order::find($request->order_id);
 
-        if ($request->status === 'completed' && $payment->order && $payment->order->status === 'pending') {
-            $payment->order->update(['status' => 'processing']);
+            if ($request->has('items') && is_array($request->items)) {
+                foreach ($request->items as $row) {
+                    $orderItem = OrderItem::where('order_id', $request->order_id)
+                        ->where('id', $row['id'])
+                        ->first();
+                    if ($orderItem) {
+                        $orderItem->update(['quantity' => (float) $row['quantity']]);
+                    }
+                }
+            }
+
+            if ($order) {
+                $order->update(['total_price' => (float) $request->amount]);
+            }
+
+            $payment = Payment::create([
+                'order_id' => $request->order_id,
+                'amount'   => (float) $request->amount,
+                'method'   => $request->method,
+                'status'   => $request->status,
+            ]);
+
+            if ($request->status === 'completed' && $order && $order->status === 'pending') {
+                $order->update(['status' => 'processing']);
+            }
+
+            return $payment;
+        });
+
+        if ($request->input('submit_action') === 'print') {
+            session()->flash('print_receipt_order_id', $payment->order_id);
         }
 
         return redirect()->route('admin.payments.index')->with('success', 'Penerimaan pembayaran Nota #' . $request->order_id . ' berhasil dicatat!');
@@ -89,22 +119,48 @@ class AdminPaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0',
-            'method' => 'required|in:cash,transfer,e-wallet,credit_card',
-            'status' => 'required|in:pending,completed,failed',
+            'amount'           => 'required|numeric|min:0',
+            'method'           => 'required|in:cash,transfer,e-wallet,credit_card',
+            'status'           => 'required|in:pending,completed,failed',
+            'items'            => 'nullable|array',
+            'items.*.id'       => 'required_with:items|exists:order_items,id',
+            'items.*.quantity' => 'required_with:items|numeric|min:0.01',
         ]);
 
-        $payment->update([
-            'amount' => $request->amount,
-            'method' => $request->method,
-            'status' => $request->status,
-        ]);
+        DB::transaction(function () use ($request, $payment) {
+            if ($request->has('items') && is_array($request->items)) {
+                foreach ($request->items as $row) {
+                    $orderItem = OrderItem::where('order_id', $payment->order_id)
+                        ->where('id', $row['id'])
+                        ->first();
+                    if ($orderItem) {
+                        $orderItem->update(['quantity' => (float) $row['quantity']]);
+                    }
+                }
+            }
 
-        if ($request->status === 'completed' && $payment->order && $payment->order->status === 'pending') {
-            $payment->order->update(['status' => 'processing']);
+            if ($payment->order) {
+                $payment->order->update([
+                    'total_price' => (float) $request->amount,
+                ]);
+            }
+
+            $payment->update([
+                'amount' => (float) $request->amount,
+                'method' => $request->method,
+                'status' => $request->status,
+            ]);
+
+            if ($request->status === 'completed' && $payment->order && $payment->order->status === 'pending') {
+                $payment->order->update(['status' => 'processing']);
+            }
+        });
+
+        if ($request->input('submit_action') === 'print') {
+            session()->flash('print_receipt_order_id', $payment->order_id);
         }
 
-        return redirect()->route('admin.payments.index')->with('success', 'Status pembayaran Nota #' . $payment->order_id . ' berhasil diperbarui!');
+        return redirect()->route('admin.payments.index')->with('success', 'Status & rincian pembayaran Nota #' . $payment->order_id . ' berhasil diperbarui!');
     }
 
     public function destroy(Payment $payment)

@@ -89,10 +89,13 @@
                             @php
                                 $customerName = $item->order->customer->name ?? 'Pelanggan Walk-in';
                                 $items = $item->order->items ?? collect();
-                                $serviceName = $items->first()->service->name ?? 'Paket Reguler';
+                                $serviceName = $items->count() > 1 
+                                    ? ($items->first()->service->name ?? 'Layanan') . ' (+' . ($items->count() - 1) . ' item)'
+                                    : ($items->first()->service->name ?? 'Paket Reguler');
                                 $weight = $items->sum('quantity');
-                                if ($weight == 0) $weight = 2;
-                                $unit = str_contains(strtolower($serviceName), 'kiloan') ? 'kg' : 'pcs';
+                                $unit = $items->first() && $items->first()->service 
+                                    ? \App\Models\ServiceType::resolveUnit($items->first()->service->name) 
+                                    : 'kg';
                                 $isPaid = $item->status === 'completed';
                             @endphp
                             <tr class="hover:bg-indigo-50/40 transition">
@@ -106,7 +109,7 @@
                                     {{ $serviceName }}
                                 </td>
                                 <td class="py-4 px-6 text-[#64748B]">
-                                    {{ $weight }} {{ $unit }}
+                                    {{ $weight + 0 }} {{ $unit }}
                                 </td>
                                 <td class="py-4 px-6">
                                     <span class="inline-block px-3.5 py-1.5 bg-[#EEF2FF] text-[#1E1B4B] font-extrabold rounded-full text-xs">
@@ -197,7 +200,7 @@
              style="display: none;">
 
             <div @click.away="showModal = false"
-                 class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-300/80 space-y-6 relative">
+                 class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-300/80 space-y-5 relative">
 
                 <!-- Header Modal -->
                 <div class="flex items-start justify-between gap-4">
@@ -271,27 +274,68 @@
                         </div>
                     </div>
 
-                    <!-- Row 2: Layanan & Berat -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-[#1E1B4B]">Jenis Layanan</label>
-                            <input type="text"
-                                   x-model="formData.serviceName"
-                                   placeholder="Pencucian Reguler / Kiloan"
-                                   class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+                    <!-- Row 2: Rincian Layanan & Penimbangan Berat Fisik Outlet -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-[#1E1B4B] flex items-center gap-1.5">
+                                <i class="fa-solid fa-scale-balanced text-indigo-600"></i>
+                                <span>Rincian Layanan & Penimbangan Berat</span>
+                            </label>
+                            <template x-if="formData.items && formData.items.length > 0">
+                                <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <span x-text="formData.items.length + ' Item'"></span> &bull; Total <span x-text="totalWeight() + ' kg'"></span>
+                                </span>
+                            </template>
                         </div>
 
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-[#1E1B4B]">Berat Cucian / Jumlah</label>
-                            <div class="flex items-center">
-                                <input type="number"
-                                       x-model="formData.weight"
-                                       step="0.1"
-                                       placeholder="2.0"
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300/80 rounded-l-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-[#1E1B4B]">
-                                <span class="px-3.5 py-2.5 bg-slate-100 border border-l-0 border-slate-300/80 rounded-r-2xl text-xs font-bold text-slate-700">kg</span>
+                        <!-- Jika ada rincian item layanan -->
+                        <template x-if="formData.items && formData.items.length > 0">
+                            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                                <template x-for="(item, idx) in formData.items" :key="item.id || idx">
+                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-indigo-300 transition">
+                                        <!-- Item Info & Tarif -->
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="font-extrabold text-xs text-[#1E1B4B] truncate" x-text="item.name"></span>
+                                                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-700" x-text="item.unit"></span>
+                                            </div>
+                                            <div class="text-[11px] text-[#64748B] mt-0.5">
+                                                Tarif: <span class="font-bold text-[#1E1B4B]" x-text="'Rp ' + formatRupiah(item.price) + ' / ' + item.unit"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Hidden Input ID untuk pengiriman ke controller -->
+                                        <input type="hidden" :name="'items[' + idx + '][id]'" :value="item.id">
+
+                                        <!-- Input Timbangan & Subtotal -->
+                                        <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                                            <div class="flex items-center">
+                                                <input type="number"
+                                                       :name="'items[' + idx + '][quantity]'"
+                                                       x-model.number="item.quantity"
+                                                       @input="recalculateTotals()"
+                                                       step="0.1"
+                                                       min="0.1"
+                                                       required
+                                                       class="w-20 px-2 py-1.5 bg-white border border-slate-300 rounded-l-xl text-xs font-extrabold text-center text-[#1E1B4B] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
+                                                <span class="px-2.5 py-1.5 bg-slate-100 border border-l-0 border-slate-300 rounded-r-xl text-[11px] font-extrabold text-slate-600" x-text="item.unit"></span>
+                                            </div>
+                                            <div class="text-right min-w-[80px]">
+                                                <div class="text-[9px] uppercase font-bold text-slate-400">Subtotal</div>
+                                                <div class="text-xs font-extrabold text-[#1E1B4B]" x-text="'Rp ' + formatRupiah((item.quantity || 0) * (item.price || 0))"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
-                        </div>
+                        </template>
+
+                        <!-- Fallback jika nota belum ada rincian item -->
+                        <template x-if="!formData.items || formData.items.length === 0">
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-500 text-center">
+                                Tidak ada rincian item terpisah pada nota ini. Anda dapat langsung mengedit Total Tagihan di bawah.
+                            </div>
+                        </template>
                     </div>
 
                     <!-- Row 3: Total Tagihan & Status Pills -->
@@ -387,10 +431,10 @@
                             Batal
                         </button>
                         <div class="flex items-center gap-2">
-                            <button type="submit" class="px-4 py-2.5 rounded-2xl bg-[#F1F3FA] hover:bg-[#E2E6F2] text-[#1E1B4B] text-xs font-bold transition">
+                            <button type="submit" name="submit_action" value="save" class="px-4 py-2.5 rounded-2xl bg-[#F1F3FA] hover:bg-[#E2E6F2] text-[#1E1B4B] text-xs font-bold transition">
                                 Simpan Tanpa Cetak
                             </button>
-                            <button type="submit" class="px-5 py-2.5 rounded-2xl bg-[#1E1B4B] hover:bg-[#2A2663] text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+                            <button type="submit" name="submit_action" value="print" class="px-5 py-2.5 rounded-2xl bg-[#1E1B4B] hover:bg-[#2A2663] text-white text-xs font-bold shadow transition flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-[#BFF108]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                                 <span>Simpan & Cetak Bukti</span>
                             </button>
@@ -403,6 +447,14 @@
 
     </div>
 
+    @if(session('print_receipt_order_id'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                window.open('/admin/orders/{{ session('print_receipt_order_id') }}/receipt', '_blank', 'width=450,height=650');
+            });
+        </script>
+    @endif
+
     <script>
         function paymentManager() {
             return {
@@ -410,27 +462,26 @@
                 isEdit: false,
                 editId: null,
                 cashReceived: 50000,
+                unpaidOrders: @json($unpaidOrders),
                 formData: {
                     order_id: '',
-                    customerName: 'Zahra',
-                    serviceName: 'Pencucian Cepat 1 Hari',
-                    weight: 2.0,
-                    amount: 30000,
-                    method: 'e-wallet',
+                    customerName: '',
+                    items: [],
+                    amount: 0,
+                    method: 'cash',
                     status: 'completed'
                 },
 
                 openAddModal() {
                     this.isEdit = false;
                     this.editId = null;
-                    this.cashReceived = 50000;
+                    this.cashReceived = 0;
                     this.formData = {
                         order_id: '',
                         customerName: 'Pilih Nota Terlebih Dahulu',
-                        serviceName: 'Pencucian Cepat 1 Hari',
-                        weight: 2.0,
-                        amount: 30000,
-                        method: 'e-wallet',
+                        items: [],
+                        amount: 0,
+                        method: 'cash',
                         status: 'completed'
                     };
                     this.showModal = true;
@@ -439,13 +490,26 @@
                 openEditModal(item) {
                     this.isEdit = true;
                     this.editId = item.id;
-                    this.cashReceived = Number(item.amount);
+                    this.cashReceived = Number(item.amount) || 0;
+
+                    const rawItems = (item.order && item.order.items) ? item.order.items : [];
+                    const orderItems = rawItems.map(it => {
+                        const unitName = it.unit || (it.service && it.service.unit) || (it.service && it.service.name && it.service.name.toLowerCase().includes('kiloan') ? 'kg' : 'pcs');
+                        return {
+                            id: it.id,
+                            service_id: it.service_id,
+                            name: (it.service && it.service.name) ? it.service.name : 'Layanan Laundry',
+                            price: Number(it.price) || (it.service ? Number(it.service.price) : 0),
+                            quantity: Number(it.quantity) || 1,
+                            unit: unitName
+                        };
+                    });
+
                     this.formData = {
                         order_id: item.order_id,
                         customerName: item.order && item.order.customer ? item.order.customer.name : 'Pelanggan Walk-in',
-                        serviceName: 'Layanan Rodeo',
-                        weight: 2.0,
-                        amount: Number(item.amount),
+                        items: orderItems,
+                        amount: Number(item.amount) || 0,
                         method: item.method || 'cash',
                         status: item.status || 'completed'
                     };
@@ -453,22 +517,55 @@
                 },
 
                 onOrderSelected(orderId) {
-                    const select = document.querySelector('select[name="order_id"]');
-                    const opt = select.options[select.selectedIndex];
-                    if (opt && opt.value) {
-                        this.formData.customerName = opt.getAttribute('data-customer') || 'Pelanggan Rodeo';
-                        this.formData.amount = Number(opt.getAttribute('data-amount')) || 30000;
-                        this.cashReceived = this.formData.amount;
+                    const selected = this.unpaidOrders.find(o => String(o.id) === String(orderId));
+                    if (selected) {
+                        this.formData.customerName = (selected.customer && selected.customer.name) ? selected.customer.name : 'Pelanggan Rodeo';
+                        const rawItems = selected.items || [];
+                        this.formData.items = rawItems.map(it => {
+                            const unitName = it.unit || (it.service && it.service.unit) || (it.service && it.service.name && it.service.name.toLowerCase().includes('kiloan') ? 'kg' : 'pcs');
+                            return {
+                                id: it.id,
+                                service_id: it.service_id,
+                                name: (it.service && it.service.name) ? it.service.name : 'Layanan Laundry',
+                                price: Number(it.price) || (it.service ? Number(it.service.price) : 0),
+                                quantity: Number(it.quantity) || 1,
+                                unit: unitName
+                            };
+                        });
+                        this.recalculateTotals();
                     }
                 },
 
+                recalculateTotals() {
+                    if (this.formData.items && this.formData.items.length > 0) {
+                        let sum = 0;
+                        this.formData.items.forEach(it => {
+                            const q = Number(it.quantity) || 0;
+                            const p = Number(it.price) || 0;
+                            sum += (q * p);
+                        });
+                        this.formData.amount = Math.round(sum);
+                        if (this.formData.method === 'cash') {
+                            if (!this.cashReceived || this.cashReceived < this.formData.amount) {
+                                this.cashReceived = this.formData.amount;
+                            }
+                        }
+                    }
+                },
+
+                totalWeight() {
+                    if (!this.formData.items || this.formData.items.length === 0) return 0;
+                    const w = this.formData.items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
+                    return Math.round(w * 100) / 100;
+                },
+
                 calculateChange() {
-                    const c = this.cashReceived - (this.formData.amount || 0);
+                    const c = (this.cashReceived || 0) - (this.formData.amount || 0);
                     return c > 0 ? c : 0;
                 },
 
                 formatRupiah(number) {
-                    return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    return Math.round(number || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 }
             };
         }
