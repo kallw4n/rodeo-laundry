@@ -31,7 +31,10 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        Customer::create($request->validate($this->rules()));
+        $data = $request->validate($this->rules());
+        $data['loyalty_points'] = $data['loyalty_points'] ?? 0;
+        $data['total_spent'] = $data['total_spent'] ?? 0.00;
+        Customer::create($data);
         return redirect()->route('customers.index')->with('success', 'Data disimpan.');
     }
 

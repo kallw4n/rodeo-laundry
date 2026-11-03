@@ -78,6 +78,9 @@ class AdminCustomerController extends Controller
             $validated['city'] = 'Kota Malang';
         }
 
+        $validated['loyalty_points'] = $validated['loyalty_points'] ?? 0;
+        $validated['total_spent'] = $validated['total_spent'] ?? 0.00;
+
         Customer::create($validated);
 
         return redirect()->route('admin.customers.index')->with('success', 'Pelanggan baru "' . $validated['name'] . '" berhasil ditambahkan!');
