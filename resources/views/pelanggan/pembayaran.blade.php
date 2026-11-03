@@ -64,7 +64,16 @@
             return `${m} : ${s}`;
         },
 
+        init() {
+            if (this.hasKiloan) {
+                this.paymentMethod = 'cod';
+            }
+        },
+
         handleConfirmPayment() {
+            if (this.hasKiloan) {
+                this.paymentMethod = 'cod';
+            }
             if (this.paymentMethod === 'qris') {
                 this.startTimer();
                 this.showQrisModal = true;
@@ -168,9 +177,13 @@
             return count;
         },
         get hasAnySelected() { return (Number(this.kiloan) || 0) > 0 || this.selectedServices.length > 0; },
+        get hasKiloan() {
+            if ((Number(this.kiloan) || 0) > 0) return true;
+            return this.selectedServices.some(s => s.unit === 'kg');
+        },
         formatRp(n) { 
             const val = Number(n) || 0;
-            return 'Rp ' + val.toLocaleString('id-ID'); 
+            return 'Rp ' + Math.round(val).toLocaleString('id-ID'); 
         }
     }">
 
@@ -511,26 +524,33 @@
                 </label>
 
                 <!-- 2. QRIS -->
-                <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="qris" class="sr-only" x-model="paymentMethod">
+                <label :class="hasKiloan ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'" class="block">
+                    <input type="radio" name="payment" value="qris" class="sr-only" x-model="paymentMethod" :disabled="hasKiloan">
                     <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
-                         :class="paymentMethod === 'qris' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                         :class="hasKiloan ? 'border-dashed border-slate-300 bg-slate-50' : (paymentMethod === 'qris' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]')">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
                                 <!-- Radio Button Circle -->
                                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
-                                     :class="paymentMethod === 'qris' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                     :class="hasKiloan ? 'border-slate-300 bg-slate-200' : (paymentMethod === 'qris' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white')">
                                     <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="paymentMethod === 'qris' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                         :class="paymentMethod === 'qris' && !hasKiloan ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
-                                <div class="w-10 h-10 md:w-11 md:h-11 bg-[#1A1743] text-[#BFF138] rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                                <div class="w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                                     :class="hasKiloan ? 'bg-slate-200 text-slate-400' : 'bg-[#1A1743] text-[#BFF138]'">
                                     <i class="fa-solid fa-qrcode text-lg"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 flex-wrap mb-1">
                                         <span class="font-bold text-[#1A1743] text-sm md:text-base">QRIS (Semua E-Wallet &amp; M-Banking)</span>
+                                        <template x-if="hasKiloan">
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shrink-0">
+                                                <i class="fa-solid fa-lock text-[9px]"></i> Terkunci untuk Kiloan
+                                            </span>
+                                        </template>
                                     </div>
-                                    <p class="text-xs text-[#47464E]">BCA Mobile, Livin' by Mandiri, Wondr by BNI, BRImo, GoPay, OVO, ShopeePay, DANA (Bayar sekarang estimasi awal)</p>
+                                    <p class="text-xs text-[#47464E]"
+                                       x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'BCA Mobile, Livin\' by Mandiri, Wondr by BNI, BRImo, GoPay, OVO, ShopeePay, DANA'"></p>
                                 </div>
                             </div>
                             <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">
@@ -541,26 +561,33 @@
                 </label>
 
                 <!-- 3. Transfer Bank / VA -->
-                <label class="cursor-pointer block">
-                    <input type="radio" name="payment" value="va" class="sr-only" x-model="paymentMethod">
+                <label :class="hasKiloan ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'" class="block">
+                    <input type="radio" name="payment" value="va" class="sr-only" x-model="paymentMethod" :disabled="hasKiloan">
                     <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
-                         :class="paymentMethod === 'va' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                         :class="hasKiloan ? 'border-dashed border-slate-300 bg-slate-50' : (paymentMethod === 'va' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]')">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
                                 <!-- Radio Button Circle -->
                                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
-                                     :class="paymentMethod === 'va' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                     :class="hasKiloan ? 'border-slate-300 bg-slate-200' : (paymentMethod === 'va' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white')">
                                     <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                         :class="paymentMethod === 'va' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                         :class="paymentMethod === 'va' && !hasKiloan ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                 </div>
-                                <div class="w-10 h-10 md:w-11 md:h-11 bg-[#EAEDFF] text-[#1A1743] rounded-xl flex items-center justify-center shrink-0">
+                                <div class="w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center shrink-0"
+                                     :class="hasKiloan ? 'bg-slate-200 text-slate-400' : 'bg-[#EAEDFF] text-[#1A1743]'">
                                     <i class="fa-solid fa-building-columns text-base md:text-lg"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 flex-wrap mb-1">
                                         <p class="font-bold text-[#1A1743] text-sm md:text-base">Transfer Bank / Virtual Account</p>
+                                        <template x-if="hasKiloan">
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shrink-0">
+                                                <i class="fa-solid fa-lock text-[9px]"></i> Terkunci untuk Kiloan
+                                            </span>
+                                        </template>
                                     </div>
-                                    <p class="text-xs text-[#47464E]">BCA Virtual Account, Mandiri, BNI, BRI, Permata Bank</p>
+                                    <p class="text-xs text-[#47464E]"
+                                       x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'BCA Virtual Account, Mandiri, BNI, BRI, Permata Bank'"></p>
                                 </div>
                             </div>
                             <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">

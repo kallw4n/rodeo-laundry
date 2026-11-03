@@ -151,7 +151,7 @@
                     <div class="bold">{{ $item->service->name ?? 'Layanan Laundry' }}</div>
                     <div class="flex-between" style="color: #475569;">
                         <span>@ Rp {{ number_format($item->price, 0, ',', '.') }}</span>
-                        <span class="text-center">{{ $item->quantity }} {{ str_contains(strtolower($item->service->name ?? ''), 'kiloan') ? 'kg' : 'pcs' }}</span>
+                        <span class="text-center">{{ $item->quantity + 0 }} {{ $item->service->unit ?? \App\Models\ServiceType::resolveUnit($item->service->name ?? '') }}</span>
                         <span class="text-right bold" style="color: #111827;">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
                     </div>
                 </div>

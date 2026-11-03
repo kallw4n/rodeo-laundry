@@ -114,6 +114,17 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
+        $serviceIds = collect($data['items'])->pluck('id');
+        $hasKiloanService = ServiceType::whereIn('id', $serviceIds)->get()->contains(function ($svc) {
+            return $svc->unit === 'kg';
+        });
+
+        if ($hasKiloanService && $data['payment_method'] !== 'cod') {
+            return response()->json([
+                'message' => 'Layanan kiloan wajib menggunakan metode Bayar Nanti (COD / Pasca-Timbang) karena berat pakaian harus dipastikan melalui timbangan resmi outlet.',
+            ], 422);
+        }
+
         $user = $request->user();
         $customer = Customer::firstOrCreate(
             ['user_id' => $user->id],

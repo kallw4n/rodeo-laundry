@@ -15,7 +15,7 @@ class CustomerCheckoutTest extends TestCase
     public function test_customer_checkout_creates_order_payment_and_delivery(): void
     {
         $user = User::factory()->create();
-        $svc = ServiceType::create(['name' => 'Cuci Kiloan', 'price' => 8000, 'description' => 'x']);
+        $svc = ServiceType::create(['name' => 'Cuci Bedcover Satuan', 'price' => 25000, 'description' => 'x']);
 
         $this->actingAs($user)->postJson('/pesan', [
             'items' => [['id' => $svc->id, 'qty' => 3]],
@@ -26,7 +26,7 @@ class CustomerCheckoutTest extends TestCase
         ])->assertOk()->assertJsonStructure(['redirect']);
 
         $order = Order::with(['payment', 'delivery', 'customer'])->first();
-        $this->assertEquals(24000, $order->total_price);
+        $this->assertEquals(75000, $order->total_price);
         $this->assertEquals($user->id, $order->customer->user_id);
         $this->assertEquals('e-wallet', $order->payment->method);
         $this->assertEquals('pending', $order->payment->status);
@@ -37,7 +37,7 @@ class CustomerCheckoutTest extends TestCase
     public function test_customer_orders_page_displays_payment_status_and_advances_on_admin_approval(): void
     {
         $user = User::factory()->create();
-        $svc = ServiceType::create(['name' => 'Cuci Kiloan', 'price' => 8000, 'description' => 'x']);
+        $svc = ServiceType::create(['name' => 'Cuci Bedcover Satuan', 'price' => 25000, 'description' => 'x']);
 
         $this->actingAs($user)->postJson('/pesan', [
             'items' => [['id' => $svc->id, 'qty' => 2]],
@@ -57,7 +57,7 @@ class CustomerCheckoutTest extends TestCase
         // Admin menyetujui pembayaran menjadi 'completed' (Lunas)
         $admin = User::factory()->admin()->create();
         $this->actingAs($admin)->put("/admin/payments/{$order->payment->id}", [
-            'amount' => 16000,
+            'amount' => 50000,
             'method' => 'e-wallet',
             'status' => 'completed',
         ])->assertRedirect('/admin/payments');
@@ -103,5 +103,46 @@ class CustomerCheckoutTest extends TestCase
         $response->assertOk();
         $response->assertSee('Jemput Dulu', false);
         $response->assertSee('Bayar di Outlet', false);
+    }
+
+    public function test_kiloan_order_cannot_use_upfront_payment_methods(): void
+    {
+        $user = User::factory()->create();
+        $svc = ServiceType::create(['name' => 'Cuci Kiloan Reguler', 'price' => 5000, 'description' => 'x']);
+
+        $response = $this->actingAs($user)->postJson('/pesan', [
+            'items' => [['id' => $svc->id, 'qty' => 3]],
+            'payment_method' => 'qris',
+            'pickup' => 'courier',
+            'address' => 'Jl. Veteran No. 1',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonFragment([
+                'message' => 'Layanan kiloan wajib menggunakan metode Bayar Nanti (COD / Pasca-Timbang) karena berat pakaian harus dipastikan melalui timbangan resmi outlet.',
+            ]);
+    }
+
+    public function test_kiloan_order_supports_decimal_weight_and_calculates_correct_price(): void
+    {
+        $user = User::factory()->create();
+        $svc = ServiceType::create(['name' => 'Cuci Kiloan Reguler', 'price' => 5000, 'description' => 'x']);
+
+        // Pelanggan memesan 2.7 kg
+        $response = $this->actingAs($user)->postJson('/pesan', [
+            'items' => [['id' => $svc->id, 'qty' => 2.7]],
+            'payment_method' => 'cod',
+            'pickup' => 'courier',
+            'address' => 'Jl. Soekarno Hatta No. 9',
+        ]);
+
+        $response->assertOk();
+
+        $order = Order::with('items')->first();
+        $this->assertNotNull($order);
+        $this->assertEquals(1, $order->items->count());
+        $this->assertEquals(2.7, (float) $order->items->first()->quantity);
+        // 5000 * 2.7 = 13500
+        $this->assertEquals(13500, $order->total_price);
     }
 }
