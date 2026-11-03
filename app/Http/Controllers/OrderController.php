@@ -49,8 +49,9 @@ class OrderController extends Controller
                 'failed'    => 'Gagal',
             ];
 
+            $isSelf = ($order->delivery->type ?? '') === 'pickup';
             $paymentMethodLabels = [
-                'cash'        => 'Tunai (COD)',
+                'cash'        => $isSelf ? 'Bayar di Outlet (Pasca-Timbang)' : 'Jemput Dulu & Bayar Nanti (COD)',
                 'transfer'    => 'Transfer Bank (VA)',
                 'e-wallet'    => 'QRIS / E-Wallet',
                 'credit_card' => 'Kartu Kredit',

@@ -292,6 +292,12 @@
                                           class="w-full pl-8 pr-3 py-2 text-xs md:text-sm rounded-xl border border-[#E2E7FF] bg-[#FAF8FF] focus:bg-white focus:border-[#BFF138] outline-none transition-all resize-none"></textarea>
                             </div>
                         </div>
+
+                        <!-- Catatan Edukasi Timbangan Kiloan -->
+                        <div class="mt-3 px-3.5 py-2.5 rounded-xl bg-indigo-50/70 border border-indigo-100/80 flex items-center gap-2.5 text-[11px] text-[#1A1743]">
+                            <i class="fa-solid fa-scale-balanced text-indigo-600 shrink-0"></i>
+                            <span><span class="font-bold">Info Berat:</span> Masukkan perkiraan berat pakaian Anda. Berat riil akan ditimbang ulang di outlet atau di hadapan Anda di kasir.</span>
+                        </div>
                     </div>
                 </template>
 
@@ -564,7 +570,7 @@
                 <!-- Kanan: Total + Button -->
                 <div class="flex items-center gap-3 md:gap-6 shrink-0">
                     <div class="text-right">
-                        <div class="text-[10px] md:text-xs text-[#47464E]">Total</div>
+                        <div class="text-[10px] md:text-xs text-[#47464E]">Estimasi Biaya</div>
                         <div class="text-base md:text-2xl font-extrabold" x-text="formatRp(subtotal)"></div>
                     </div>
 

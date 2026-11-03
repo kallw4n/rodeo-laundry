@@ -37,7 +37,7 @@
         cartAddress: $persist('').as('cart_address'),
         
         summaryOpen: true,
-        paymentMethod: 'qris',
+        paymentMethod: 'cod',
         submitting: false,
         error: '',
         
@@ -432,8 +432,29 @@
 
                     <!-- Total Baris -->
                     <div class="border-t border-[#E2E7FF] pt-4 mt-4 flex justify-between items-center gap-3">
-                        <span class="text-base md:text-lg font-bold text-[#1A1743]">Total Pembayaran</span>
+                        <div>
+                            <span class="text-base md:text-lg font-bold text-[#1A1743]">Estimasi Total Biaya</span>
+                            <span class="block text-[11px] text-[#717082]">*Tagihan final disesuaikan dengan hasil timbangan riil di outlet</span>
+                        </div>
                         <span class="text-xl md:text-2xl font-extrabold text-[#1A1743] shrink-0" x-text="formatRp(totalBayar)"></span>
+                    </div>
+
+                    <!-- Notice Penimbangan & Estimasi Biaya -->
+                    <div class="mt-4 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/80 flex items-start gap-3.5 text-xs text-[#78350F] leading-relaxed shadow-xs">
+                        <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                            <i class="fa-solid fa-scale-balanced text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-amber-900 text-xs md:text-sm mb-0.5 flex items-center gap-1.5">
+                                <span>Informasi Penimbangan Pakaian</span>
+                            </div>
+                            <p class="text-[11px] md:text-xs text-amber-800 leading-relaxed">
+                                Total di atas adalah <span class="font-bold">estimasi awal</span>. Berat pakaian sebenarnya akan ditimbang secara presisi oleh tim kami saat pakaian tiba di outlet (atau saat Anda serahkan langsung ke kasir).
+                                <span class="block mt-1">
+                                    💡 <span class="font-semibold">Solusi Praktis:</span> Anda dapat memilih opsi <span class="font-bold underline" x-text="pickupMethod === 'courier' ? 'Jemput Dulu & Bayar Nanti' : 'Antar Sendiri & Bayar di Outlet'"></span> di bawah agar tagihan final menyesuaikan berat timbangan pasti tanpa selisih pembayaran di awal.
+                                </span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -451,7 +472,45 @@
 
             <div class="space-y-3">
 
-                <!-- 1. QRIS -->
+                <!-- 1. OPSI BAYAR NANTI (COD / PASCA-TIMBANG) -->
+                <label class="cursor-pointer block">
+                    <input type="radio" name="payment" value="cod" class="sr-only" x-model="paymentMethod">
+                    <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                         :class="paymentMethod === 'cod' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
+                                <!-- Radio Button Circle -->
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all duration-200"
+                                     :class="paymentMethod === 'cod' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="paymentMethod === 'cod' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                </div>
+                                <div class="w-10 h-10 md:w-11 md:h-11 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100">
+                                    <i :class="pickupMethod === 'courier' ? 'fa-solid fa-truck-ramp-box text-base md:text-lg' : 'fa-solid fa-store text-base md:text-lg'"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap mb-1">
+                                        <span class="font-bold text-[#1A1743] text-sm md:text-base"
+                                              x-text="pickupMethod === 'courier' ? 'Jemput Dulu & Bayar Nanti (COD / Pasca-Timbang)' : 'Antar Sendiri & Bayar di Outlet (Pasca-Timbang)'"></span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#BFF138] text-[#131B2E]">
+                                            Rekomendasi
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-[#47464E] leading-relaxed"
+                                       x-text="pickupMethod === 'courier' 
+                                            ? 'Kurir akan menjemput pakaian Anda terlebih dahulu. Pembayaran (Tunai/QRIS) dilakukan setelah cucian ditimbang di outlet atau saat pakaian bersih diantar kembali.' 
+                                            : 'Bawa pakaian Anda langsung ke outlet Rodeo Laundry. Berat akan ditimbang bersama Anda di kasir, dan pembayaran dapat langsung dilakukan di tempat (Tunai/QRIS) sesuai berat pasti.'"></p>
+                                </div>
+                            </div>
+                            <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-800 shrink-0 bg-emerald-50/60">
+                                <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
+                                <span x-text="pickupMethod === 'courier' ? 'COD / Bayar Nanti' : 'Bayar di Outlet'"></span>
+                            </span>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- 2. QRIS -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="payment" value="qris" class="sr-only" x-model="paymentMethod">
                     <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
@@ -471,7 +530,7 @@
                                     <div class="flex items-center gap-2 flex-wrap mb-1">
                                         <span class="font-bold text-[#1A1743] text-sm md:text-base">QRIS (Semua E-Wallet &amp; M-Banking)</span>
                                     </div>
-                                    <p class="text-xs text-[#47464E]">BCA Mobile, Livin' by Mandiri, Wondr by BNI, BRImo, GoPay, OVO, ShopeePay, DANA,</p>
+                                    <p class="text-xs text-[#47464E]">BCA Mobile, Livin' by Mandiri, Wondr by BNI, BRImo, GoPay, OVO, ShopeePay, DANA (Bayar sekarang estimasi awal)</p>
                                 </div>
                             </div>
                             <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">
@@ -481,7 +540,7 @@
                     </div>
                 </label>
 
-                <!-- 2. Transfer Bank / VA -->
+                <!-- 3. Transfer Bank / VA -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="payment" value="va" class="sr-only" x-model="paymentMethod">
                     <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
@@ -538,7 +597,7 @@
                     <template x-if="!submitting">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-lock text-sm"></i>
-                            Konfirmasi &amp; Bayar Sekarang
+                            <span x-text="paymentMethod === 'cod' ? (pickupMethod === 'courier' ? 'Konfirmasi Jemput & Bayar Nanti' : 'Konfirmasi Antar Sendiri & Bayar di Outlet') : 'Konfirmasi & Bayar Sekarang'"></span>
                         </span>
                     </template>
                 </span>

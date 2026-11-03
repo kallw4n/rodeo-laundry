@@ -560,7 +560,7 @@
 
                 <div class="flex items-center gap-3 md:gap-6 shrink-0">
                     <div class="text-right">
-                        <div class="text-[10px] md:text-xs text-[#47464E]">Total</div>
+                        <div class="text-[10px] md:text-xs text-[#47464E]">Estimasi Biaya</div>
                         <div class="text-base md:text-2xl font-extrabold" x-text="formatRp(subtotal)"></div>
                     </div>
 

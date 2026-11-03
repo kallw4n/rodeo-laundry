@@ -78,4 +78,30 @@ class CustomerCheckoutTest extends TestCase
     {
         $this->postJson('/pesan', [])->assertUnauthorized();
     }
+
+    public function test_customer_can_checkout_with_cod_and_view_pasca_timbang_labels(): void
+    {
+        $user = User::factory()->create();
+        $svc = ServiceType::create(['name' => 'Cuci Setrika Kiloan', 'price' => 8000, 'description' => 'x']);
+
+        // 1. Kurir jemput & COD
+        $this->actingAs($user)->postJson('/pesan', [
+            'items' => [['id' => $svc->id, 'qty' => 4]],
+            'payment_method' => 'cod',
+            'pickup' => 'courier',
+            'address' => 'Jl. Bunga Melati No. 5',
+        ])->assertOk();
+
+        // 2. Antar sendiri & bayar di outlet
+        $this->actingAs($user)->postJson('/pesan', [
+            'items' => [['id' => $svc->id, 'qty' => 2]],
+            'payment_method' => 'cod',
+            'pickup' => 'self',
+        ])->assertOk();
+
+        $response = $this->actingAs($user)->get('/pesanan');
+        $response->assertOk();
+        $response->assertSee('Jemput Dulu', false);
+        $response->assertSee('Bayar di Outlet', false);
+    }
 }
