@@ -362,6 +362,28 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="mx-6 md:mx-8 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold"
+                     x-data="{ show: true }" x-show="show">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-rose-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <div class="font-bold">Terdapat kesalahan pada input formulir:</div>
+                                <ul class="list-disc list-inside mt-1 space-y-0.5 text-xs text-rose-700">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <button @click="show = false" class="text-rose-600 hover:text-rose-900 font-bold text-lg leading-none">&times;</button>
+                    </div>
+                </div>
+            @endif
+
             <!-- ================= BODY CONTENT ================= -->
             <main class="flex-1 p-6 md:p-8">
                 {{ $slot }}

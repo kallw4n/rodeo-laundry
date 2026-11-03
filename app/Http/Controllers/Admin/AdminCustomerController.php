@@ -54,13 +54,29 @@ class AdminCustomerController extends Controller
         $validated = $request->validate([
             'name'    => ['required', 'string', 'max:100', 'regex:/^[\pL\s\.\,\'\-]+$/u'],
             'email'   => 'nullable|email|max:100',
-            'phone'   => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
-            'city'    => 'required|string|max:50',
-            'address' => 'required|string',
+            'phone'   => ['nullable', 'string', 'max:30', 'regex:/^[\+0-9\s\-]+$/'],
+            'city'    => 'nullable|string|max:50',
+            'address' => 'nullable|string|max:500',
         ], [
-            'name.regex'  => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
-            'phone.regex' => 'Nomor telepon hanya boleh berisi angka.',
+            'name.regex'  => 'Nama hanya boleh berisi huruf, spasi, titik, koma, tanda petik, atau tanda hubung.',
+            'phone.regex' => 'Nomor telepon hanya boleh berisi angka, tanda plus (+), spasi, atau tanda hubung (-).',
         ]);
+
+        if (!empty($validated['phone'])) {
+            $phone = preg_replace('/[^\d+]/', '', $validated['phone']);
+            if (str_starts_with($phone, '+62')) {
+                $phone = '0' . substr($phone, 3);
+            } elseif (str_starts_with($phone, '62')) {
+                $phone = '0' . substr($phone, 2);
+            } elseif (str_starts_with($phone, '8')) {
+                $phone = '0' . $phone;
+            }
+            $validated['phone'] = $phone;
+        }
+
+        if (empty($validated['city'])) {
+            $validated['city'] = 'Kota Malang';
+        }
 
         Customer::create($validated);
 
@@ -72,13 +88,29 @@ class AdminCustomerController extends Controller
         $validated = $request->validate([
             'name'    => ['required', 'string', 'max:100', 'regex:/^[\pL\s\.\,\'\-]+$/u'],
             'email'   => 'nullable|email|max:100',
-            'phone'   => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
-            'city'    => 'required|string|max:50',
-            'address' => 'required|string',
+            'phone'   => ['nullable', 'string', 'max:30', 'regex:/^[\+0-9\s\-]+$/'],
+            'city'    => 'nullable|string|max:50',
+            'address' => 'nullable|string|max:500',
         ], [
-            'name.regex'  => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
-            'phone.regex' => 'Nomor telepon hanya boleh berisi angka.',
+            'name.regex'  => 'Nama hanya boleh berisi huruf, spasi, titik, koma, tanda petik, atau tanda hubung.',
+            'phone.regex' => 'Nomor telepon hanya boleh berisi angka, tanda plus (+), spasi, atau tanda hubung (-).',
         ]);
+
+        if (!empty($validated['phone'])) {
+            $phone = preg_replace('/[^\d+]/', '', $validated['phone']);
+            if (str_starts_with($phone, '+62')) {
+                $phone = '0' . substr($phone, 3);
+            } elseif (str_starts_with($phone, '62')) {
+                $phone = '0' . substr($phone, 2);
+            } elseif (str_starts_with($phone, '8')) {
+                $phone = '0' . $phone;
+            }
+            $validated['phone'] = $phone;
+        }
+
+        if (empty($validated['city'])) {
+            $validated['city'] = 'Kota Malang';
+        }
 
         $customer->update($validated);
 

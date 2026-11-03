@@ -208,6 +208,8 @@
                 <!-- Form -->
                 <form :action="isEdit ? '{{ url('admin/customers') }}/' + editId : '{{ route('admin.customers.store') }}'" method="POST" class="space-y-4">
                     @csrf
+                    <input type="hidden" name="customer_id" :value="editId">
+                    <input type="hidden" name="customer_code" :value="formCode">
                     <template x-if="isEdit">
                         <input type="hidden" name="_method" value="PUT">
                     </template>
@@ -223,9 +225,6 @@
                                 <input type="text"
                                        name="name"
                                        x-model="formData.name"
-                                       @input="formData.name = formData.name.replace(/[^a-zA-Z\s]/g, '')"
-                                       pattern="[a-zA-Z\s]+"
-                                       title="Nama hanya boleh berisi huruf dan spasi"
                                        required
                                        placeholder="Contoh: Bambang Setyawan"
                                        class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
@@ -250,18 +249,16 @@
                     <!-- Row 2: Telepon & Kota -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-[#1E1B4B]">Nomor Telepon / WhatsApp <span class="text-rose-500">*</span></label>
-                            <div class="flex items-center">
-                                <span class="px-3 py-2.5 bg-slate-100 border border-r-0 border-slate-300/80 rounded-l-2xl text-xs font-bold text-slate-700">+62</span>
-                                <input type="text"
+                            <label class="text-xs font-bold text-[#1E1B4B]">Nomor Telepon / WhatsApp <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                </div>
+                                <input type="tel"
                                        name="phone"
                                        x-model="formData.phone"
-                                       @input="formData.phone = formData.phone.replace(/[^0-9]/g, '')"
-                                       pattern="[0-9]+"
-                                       title="Nomor telepon hanya boleh berisi angka"
-                                       required
-                                       placeholder="87811239081"
-                                       class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300/80 rounded-r-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+                                       placeholder="Contoh: 08123456789 atau +6281..."
+                                       class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
                             </div>
                         </div>
 
@@ -286,13 +283,12 @@
                     <!-- Row 3: Alamat -->
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <label class="text-xs font-bold text-[#1E1B4B]">Alamat Lengkap / Catatan Pengantaran <span class="text-rose-500">*</span></label>
+                            <label class="text-xs font-bold text-[#1E1B4B]">Alamat Lengkap / Catatan Pengantaran <span class="text-slate-400 font-normal">(Opsional)</span></label>
                             <span class="text-[11px] text-slate-400">Untuk pickup & delivery</span>
                         </div>
                         <textarea name="address"
                                   x-model="formData.address"
                                   rows="3"
-                                  required
                                   placeholder="Nama jalan, nomor rumah, RT/RW, nama kos/perumahan, atau patokan driver..."
                                   class="w-full p-3.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition"></textarea>
                     </div>
@@ -331,16 +327,16 @@
     <script>
         function customerManager() {
             return {
-                showModal: false,
-                isEdit: false,
-                editId: null,
-                formCode: '{{ $nextCustomerCode }}',
+                showModal: {{ $errors->any() ? 'true' : 'false' }},
+                isEdit: {{ old('_method') === 'PUT' || old('customer_id') ? 'true' : 'false' }},
+                editId: '{{ old('customer_id') }}',
+                formCode: '{{ old('customer_code', $nextCustomerCode) }}',
                 formData: {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    city: 'Kota Malang',
-                    address: ''
+                    name: @js(old('name', '')),
+                    email: @js(old('email', '')),
+                    phone: @js(old('phone', '')),
+                    city: @js(old('city', 'Kota Malang')),
+                    address: @js(old('address', ''))
                 },
 
                 openAddModal() {
@@ -364,7 +360,7 @@
                     this.formData = {
                         name: item.name || '',
                         email: item.email || '',
-                        phone: (item.phone || '').replace(/^\+62/, ''),
+                        phone: item.phone || '',
                         city: item.city || 'Kota Malang',
                         address: item.address || ''
                     };
