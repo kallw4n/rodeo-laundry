@@ -11,18 +11,12 @@ use Illuminate\Support\Facades\Route;
 // ==========================================
 Route::get('/', function () {
     $services = ServiceType::take(6)->get()->map(function ($s) {
-        $name = strtolower($s->name);
-        $unit = 'pcs';
-        if (str_contains($name, 'kiloan')) $unit = 'kg';
-        elseif (str_contains($name, 'sepatu')) $unit = 'psg';
-        elseif (str_contains($name, 'gorden')) $unit = 'meter';
-
         return (object) [
             'id'          => $s->id,
             'name'        => $s->name,
             'price'       => (int) $s->price,
             'description' => $s->description,
-            'unit'        => $unit,
+            'unit'        => $s->unit,
         ];
     });
 
@@ -49,23 +43,26 @@ Route::middleware('auth')->group(function () {
         }
 
         $allServices = ServiceType::all()->map(function ($s) {
-            $name = strtolower($s->name);
-            $unit = 'pcs';
-            if (str_contains($name, 'kiloan')) $unit = 'kg';
-            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
-            elseif (str_contains($name, 'gorden')) $unit = 'meter';
             return [
                 'id'          => $s->id,
                 'name'        => $s->name,
                 'price'       => (int) $s->price,
                 'description' => $s->description,
-                'unit'        => $unit,
+                'unit'        => $s->unit,
                 'tag'         => 'Layanan',
             ];
         });
 
-        $kiloanService = $allServices->firstWhere('unit', 'kg');
-        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+        // Layanan unggulan kiloan utama di top card
+        $kiloanService = $allServices->first(function ($s) {
+            $n = strtolower($s['name']);
+            return str_contains($n, 'setrika kiloan') || (str_contains($n, 'cuci') && str_contains($n, 'setrika'));
+        }) ?? $allServices->firstWhere('unit', 'kg');
+
+        // Layanan lainnya (termasuk Cuci Kering Biasa, Cuci Sepatu, Cuci Gorden, Setrika Saja)
+        $otherServices = $allServices->reject(function ($s) use ($kiloanService) {
+            return $kiloanService && $s['id'] === $kiloanService['id'];
+        })->values();
 
         $viewName = view()->exists('pelanggan.pemesanan') ? 'pelanggan.pemesanan' : 'pemesanan';
         return view($viewName, [
@@ -78,24 +75,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pengiriman', function () {
         $allServices = ServiceType::all()->map(function ($s) {
-            $name = strtolower($s->name);
-            $unit = 'pcs';
-            if (str_contains($name, 'kiloan')) $unit = 'kg';
-            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
-            elseif (str_contains($name, 'gorden')) $unit = 'meter';
-
             return [
                 'id'          => $s->id,
                 'name'        => $s->name,
                 'price'       => (int) $s->price,
                 'description' => $s->description,
-                'unit'        => $unit,
+                'unit'        => $s->unit,
                 'tag'         => 'Layanan',
             ];
         });
 
-        $kiloanService = $allServices->firstWhere('unit', 'kg');
-        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+        $kiloanService = $allServices->first(function ($s) {
+            $n = strtolower($s['name']);
+            return str_contains($n, 'setrika kiloan') || (str_contains($n, 'cuci') && str_contains($n, 'setrika'));
+        }) ?? $allServices->firstWhere('unit', 'kg');
+
+        $otherServices = $allServices->reject(function ($s) use ($kiloanService) {
+            return $kiloanService && $s['id'] === $kiloanService['id'];
+        })->values();
+
         $customer = \App\Models\Customer::where('user_id', auth()->id())->first();
         
         // Ambil alamat dari tabel addresses untuk ditampilkan di halaman checkout
@@ -112,24 +110,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pembayaran', function () {
         $allServices = ServiceType::all()->map(function ($s) {
-            $name = strtolower($s->name);
-            $unit = 'pcs';
-            if (str_contains($name, 'kiloan')) $unit = 'kg';
-            elseif (str_contains($name, 'sepatu')) $unit = 'psg';
-            elseif (str_contains($name, 'gorden')) $unit = 'meter';
-
             return [
                 'id'          => $s->id,
                 'name'        => $s->name,
                 'price'       => (int) $s->price,
                 'description' => $s->description,
-                'unit'        => $unit,
+                'unit'        => $s->unit,
                 'tag'         => 'Layanan',
             ];
         });
 
-        $kiloanService = $allServices->firstWhere('unit', 'kg');
-        $otherServices = $allServices->where('unit', '!=', 'kg')->values();
+        $kiloanService = $allServices->first(function ($s) {
+            $n = strtolower($s['name']);
+            return str_contains($n, 'setrika kiloan') || (str_contains($n, 'cuci') && str_contains($n, 'setrika'));
+        }) ?? $allServices->firstWhere('unit', 'kg');
+
+        $otherServices = $allServices->reject(function ($s) use ($kiloanService) {
+            return $kiloanService && $s['id'] === $kiloanService['id'];
+        })->values();
 
         $viewName = view()->exists('pelanggan.pembayaran') ? 'pelanggan.pembayaran' : 'pembayaran';
         return view($viewName, [

@@ -83,4 +83,37 @@ class CustomerFrontendPagesTest extends TestCase
         $bayarRes->assertSee('fa-solid fa-check');
         $bayarRes->assertSee("Antar Sendiri & Ambil Sendiri", false);
     }
+
+    public function test_service_units_and_descriptions_match_standards(): void
+    {
+        $cuciKering = ServiceType::create([
+            'name' => 'Cuci Kering Biasa',
+            'price' => 5000,
+            'description' => 'Cuci dan keringkan pakaian harian (kg)',
+        ]);
+
+        $cuciGorden = ServiceType::create([
+            'name' => 'Cuci Gorden',
+            'price' => 15000,
+            'description' => 'Cuci gorden rumahan (pcs)',
+        ]);
+
+        $setrikaSaja = ServiceType::create([
+            'name' => 'Setrika Saja',
+            'price' => 4000,
+            'description' => 'Hanya setrika pakaian harian (kg)',
+        ]);
+
+        $this->assertEquals('kg', $cuciKering->unit);
+        $this->assertEquals('pcs', $cuciGorden->unit);
+        $this->assertEquals('kg', $setrikaSaja->unit);
+
+        $response = $this->get('/');
+        $response->assertOk();
+        $response->assertSee('/ kg');
+        $response->assertSee('/ pcs');
+        $response->assertSee('Cuci dan keringkan pakaian harian (kg)');
+        $response->assertSee('Cuci gorden rumahan (pcs)');
+        $response->assertSee('Hanya setrika pakaian harian (kg)');
+    }
 }

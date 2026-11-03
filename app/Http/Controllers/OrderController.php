@@ -67,16 +67,10 @@ class OrderController extends Controller
                 'payment_method'       => $payment->method ?? '-',
                 'payment_method_label' => $paymentMethodLabels[$payment->method ?? ''] ?? ucfirst($payment->method ?? '-'),
                 'items'                => $order->items->map(function ($item) {
-                    $name = strtolower($item->service->name ?? '');
-                    $unit = 'pcs';
-                    if (str_contains($name, 'kiloan')) $unit = 'kg';
-                    elseif (str_contains($name, 'sepatu')) $unit = 'psg';
-                    elseif (str_contains($name, 'gorden')) $unit = 'meter';
-
                     return [
                         'name'  => $item->service->name ?? 'Layanan Laundry',
                         'qty'   => (float) $item->quantity,
-                        'unit'  => $unit,
+                        'unit'  => \App\Models\ServiceType::resolveUnit($item->service->name ?? ''),
                         'price' => (int) ($item->price * $item->quantity),
                     ];
                 }),
