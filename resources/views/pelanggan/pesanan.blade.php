@@ -20,21 +20,60 @@
     <script>
         window.pesananData = {
             orders: @json($orders),
+            activeOrders: @json($activeOrders ?? []),
+            completedOrders: @json($completedOrders ?? []),
+            monthlyArchives: @json($monthlyArchives ?? []),
         };
     </script>
 </head>
 <body class="bg-[#EEF1F8] text-[#1A1743] font-sans antialiased min-h-screen flex flex-col justify-between"
       x-data="{
+        activeTab: 'active', // 'active' = Sedang Diproses, 'history' = Arsip Riwayat Selesai
         orders: window.pesananData.orders || [],
+        activeOrders: window.pesananData.activeOrders || [],
+        completedOrders: window.pesananData.completedOrders || [],
+        monthlyArchives: window.pesananData.monthlyArchives || [],
+        openFolders: {}, // { 'November 2026': true }
+        selectedMonthFilter: 'all',
+
+        init() {
+            // Otomatis buka folder bulan pertama/terbaru
+            if (this.monthlyArchives && this.monthlyArchives.length > 0) {
+                this.openFolders[this.monthlyArchives[0].month_label] = true;
+            }
+        },
+
+        toggleFolder(label) {
+            this.openFolders[label] = !this.openFolders[label];
+        },
+
+        expandAllFolders() {
+            this.monthlyArchives.forEach(m => this.openFolders[m.month_label] = true);
+        },
+
+        collapseAllFolders() {
+            this.openFolders = {};
+        },
+
+        get filteredArchives() {
+            if (this.selectedMonthFilter === 'all') {
+                return this.monthlyArchives;
+            }
+            return this.monthlyArchives.filter(m => m.month_key === this.selectedMonthFilter);
+        },
+
         get hasOrders() { return this.orders.length > 0; },
-        formatRp(n) { return 'Rp ' + n.toLocaleString('id-ID'); },
+        get hasActiveOrders() { return this.activeOrders.length > 0; },
+        get hasCompletedOrders() { return this.completedOrders.length > 0; },
+
+        formatRp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); },
         statusColor(status) {
             return {
                 'pending':    { bg: 'bg-[#EAEDFF]', text: 'text-[#1A1743]', dot: 'bg-[#1A1743]' },
                 'processing': { bg: 'bg-[#EAEDFF]', text: 'text-[#1A1743]', dot: 'bg-[#1A1743]' },
                 'ready':      { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
-                'completed':  { bg: 'bg-[#C2F43B]', text: 'text-[#4E6700]', dot: 'bg-[#4E6700]' },
-                'cancelled':  { bg: 'bg-red-100',   text: 'text-red-700',   dot: 'bg-red-500' },
+                'completed':  { bg: 'bg-emerald-100', text: 'text-emerald-800', dot: 'bg-emerald-600' },
+                'cancelled':  { bg: 'bg-rose-100',   text: 'text-rose-700',   dot: 'bg-rose-500' },
             }[status] || { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' };
         },
         stepIndex(status) {
@@ -174,25 +213,79 @@
             </a>
         </div>
 
-        <!-- ================= LIST PESANAN ================= -->
-        <div class="space-y-6">
+        <!-- ================= TABS NAVIGATION ================= -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div class="inline-flex items-center p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xs max-w-md w-full">
+                <!-- Tab: Sedang Diproses -->
+                <button @click="activeTab = 'active'"
+                        type="button"
+                        class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
+                        :class="activeTab === 'active' 
+                            ? 'bg-[#1A1743] text-white shadow-md' 
+                            : 'text-slate-600 hover:text-[#1A1743] hover:bg-slate-100'">
+                    <i class="fa-solid fa-arrows-rotate text-xs" :class="activeOrders.length > 0 ? 'fa-spin' : ''"></i>
+                    <span>Sedang Diproses</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black transition-colors"
+                          :class="activeTab === 'active' ? 'bg-[#BFF138] text-[#1A1743]' : 'bg-slate-200 text-slate-700'"
+                          x-text="activeOrders.length"></span>
+                </button>
 
-            <template x-if="!hasOrders">
+                <!-- Tab: Arsip Riwayat -->
+                <button @click="activeTab = 'history'"
+                        type="button"
+                        class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
+                        :class="activeTab === 'history' 
+                            ? 'bg-[#1A1743] text-white shadow-md' 
+                            : 'text-slate-600 hover:text-[#1A1743] hover:bg-slate-100'">
+                    <i class="fa-solid fa-folder-closed text-xs"></i>
+                    <span>Arsip Riwayat</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black transition-colors"
+                          :class="activeTab === 'history' ? 'bg-[#BFF138] text-[#1A1743]' : 'bg-slate-200 text-slate-700'"
+                          x-text="completedOrders.length"></span>
+                </button>
+            </div>
+
+            <!-- Total ringkasan info -->
+            <div class="text-xs text-[#47464E] hidden sm:block">
+                <span x-show="activeTab === 'active'">
+                    Menampilkan <strong class="text-[#1A1743]" x-text="activeOrders.length"></strong> cucian yang sedang dikerjakan
+                </span>
+                <span x-show="activeTab === 'history'">
+                    Total <strong class="text-[#1A1743]" x-text="completedOrders.length"></strong> riwayat pesanan dalam <strong class="text-[#1A1743]" x-text="monthlyArchives.length"></strong> folder bulanan
+                </span>
+            </div>
+        </div>
+
+        <!-- ================= TAB 1: SEDANG DIPROSES ================= -->
+        <div x-show="activeTab === 'active'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+
+            <!-- Empty State Pesanan Aktif -->
+            <template x-if="!hasActiveOrders">
                 <div class="text-center py-16 md:py-20 bg-white rounded-[24px] md:rounded-[32px] border border-dashed border-slate-200 p-6 shadow-sm">
-                    <div class="w-16 h-16 bg-[#F2F3FF] text-[#9895C8] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-receipt"></i>
+                    <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                        <i class="fa-solid fa-circle-check"></i>
                     </div>
-                    <h3 class="text-base md:text-lg font-bold mb-1">Belum Ada Pesanan</h3>
-                    <p class="text-xs md:text-sm text-[#47464E] mb-5">Yuk mulai laundry pertama Anda sekarang!</p>
-                    <a href="{{ route('pemesanan') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[#BFF138] text-[#131B2E] font-bold rounded-full text-xs md:text-sm
-                              transition-all duration-300 hover:shadow-[0_15px_35px_rgba(204,255,70,0.5)]">
-                        Mulai Pesan Layanan
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </a>
+                    <h3 class="text-base md:text-lg font-bold mb-1">Tidak Ada Pesanan yang Sedang Diproses</h3>
+                    <p class="text-xs md:text-sm text-[#47464E] mb-6 max-w-md mx-auto">
+                        Semua cucian Anda saat ini sudah selesai diproses dan tersimpan rapi dalam arsip. Ingin mencuci pakaian lagi?
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        <a href="{{ route('pemesanan') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[#BFF138] text-[#131B2E] font-bold rounded-full text-xs md:text-sm transition-all duration-300 hover:shadow-[0_15px_35px_rgba(204,255,70,0.5)]">
+                            Mulai Pesan Layanan
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                        <template x-if="hasCompletedOrders">
+                            <button @click="activeTab = 'history'" type="button" class="inline-flex items-center gap-2 px-6 py-3 bg-[#EAEDFF] hover:bg-[#dfe4ff] text-[#1A1743] font-bold rounded-full text-xs md:text-sm transition cursor-pointer">
+                                <i class="fa-solid fa-folder-open text-amber-500"></i>
+                                <span>Buka Arsip Riwayat (<span x-text="completedOrders.length"></span>)</span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </template>
 
-            <template x-for="order in orders" :key="order.id">
+            <!-- List Pesanan Aktif -->
+            <template x-for="order in activeOrders" :key="order.id">
                 <div class="bg-white rounded-[24px] md:rounded-[28px] border border-slate-300/80 overflow-hidden shadow-[0_10px_30px_-5px_rgba(26,23,67,0.08),0_4px_12px_rgba(0,0,0,0.03)]
                             transition-all duration-300 hover:shadow-[0_20px_45px_-12px_rgba(26,23,67,0.16)] hover:-translate-y-0.5">
 
@@ -272,14 +365,6 @@
                         </div>
                     </template>
 
-                    <!-- Info Dibatalkan -->
-                    <template x-if="order.status === 'cancelled'">
-                        <div class="px-4 md:px-8 py-3 bg-red-50 border-b border-red-100 flex items-center gap-2 text-xs text-red-700 font-semibold">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                            <span>Pesanan ini telah dibatalkan.</span>
-                        </div>
-                    </template>
-
                     <!-- Body Kartu -->
                     <div class="px-4 md:px-8 py-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div>
@@ -334,19 +419,201 @@
 
                         <div class="flex flex-wrap items-center gap-2">
                             <template x-if="order.canCancel">
-                                <button @click="cancelOrder(order.raw_id)" class="px-3 md:px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                <button @click="cancelOrder(order.raw_id)" class="px-3 md:px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                                     <i class="fa-solid fa-xmark"></i>
                                     Batalkan Pesanan
                                 </button>
                             </template>
 
-                            <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Rodeo%20Laundry,%20saya%20ingin%20menanyakan%20pesanan%20nomor%20"
+                            <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin menanyakan pesanan #' + order.id)"
                                target="_blank"
                                class="px-3 md:px-4 py-2 bg-[#EAEDFF] hover:bg-[#dfe4ff] text-[#1A1743] rounded-full text-xs font-bold transition flex items-center gap-1.5">
                                 <i class="fa-brands fa-whatsapp text-[#25D366]"></i>
                                 Tanya Admin
                             </a>
                         </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- ================= TAB 2: ARSIP RIWAYAT (FOLDER BULANAN) ================= -->
+        <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+
+            <!-- Empty State Riwayat Selesai -->
+            <template x-if="!hasCompletedOrders">
+                <div class="text-center py-16 md:py-20 bg-white rounded-[24px] md:rounded-[32px] border border-dashed border-slate-200 p-6 shadow-sm">
+                    <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h3 class="text-base md:text-lg font-bold mb-1">Belum Ada Riwayat Pesanan Selesai</h3>
+                    <p class="text-xs md:text-sm text-[#47464E] mb-6 max-w-md mx-auto">
+                        Pesanan Anda yang sudah selesai dicuci dan diterima akan otomatis diarsipkan di folder bulanan di sini agar tidak menumpuk.
+                    </p>
+                    <button @click="activeTab = 'active'" type="button" class="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1743] text-white font-bold rounded-full text-xs md:text-sm transition hover:bg-[#2A2655]">
+                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                        <span>Lihat Pesanan yang Sedang Diproses</span>
+                    </button>
+                </div>
+            </template>
+
+            <!-- Kontrol & Filter Arsip Bulanan -->
+            <template x-if="hasCompletedOrders">
+                <div class="space-y-6">
+                    <!-- Filter Toolbar -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/70 p-3.5 rounded-2xl border border-slate-200/80">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-bold text-[#47464E] flex items-center gap-1.5 mr-1">
+                                <i class="fa-solid fa-filter text-[#1A1743]"></i> Filter Bulan:
+                            </span>
+                            <select x-model="selectedMonthFilter"
+                                    class="text-xs font-bold bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[#1A1743] focus:ring-2 focus:ring-[#1A1743] focus:outline-hidden">
+                                <option value="all">Semua Bulan</option>
+                                <template x-for="m in monthlyArchives" :key="m.month_key">
+                                    <option :value="m.month_key" x-text="m.month_label + ' (' + m.total_orders + ')'"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button @click="expandAllFolders()" type="button" class="text-[11px] font-bold text-[#1A1743] hover:underline cursor-pointer px-2 py-1">
+                                <i class="fa-solid fa-chevron-down mr-1"></i> Buka Semua
+                            </button>
+                            <span class="text-slate-300">|</span>
+                            <button @click="collapseAllFolders()" type="button" class="text-[11px] font-bold text-[#1A1743] hover:underline cursor-pointer px-2 py-1">
+                                <i class="fa-solid fa-chevron-up mr-1"></i> Tutup Semua
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Folder Bulanan -->
+                    <div class="space-y-4">
+                        <template x-for="archive in filteredArchives" :key="archive.month_label">
+                            <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-xs transition-all duration-200">
+
+                                <!-- Header Folder (Clickable Accordion) -->
+                                <button @click="toggleFolder(archive.month_label)"
+                                        type="button"
+                                        class="w-full text-left px-5 md:px-8 py-4.5 flex items-center justify-between gap-4 transition-colors duration-150 cursor-pointer"
+                                        :class="openFolders[archive.month_label] ? 'bg-amber-50/60 border-b border-amber-100' : 'hover:bg-slate-50/80'">
+                                    
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <!-- Folder Icon -->
+                                        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs"
+                                             :class="openFolders[archive.month_label] ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-amber-500'">
+                                            <i class="fa-solid text-lg" :class="openFolders[archive.month_label] ? 'fa-folder-open' : 'fa-folder'"></i>
+                                        </div>
+
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <h3 class="text-base md:text-lg font-black text-[#1A1743]" x-text="archive.month_label"></h3>
+                                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#1A1743] text-white"
+                                                      x-text="archive.total_orders + ' Pesanan'"></span>
+                                            </div>
+                                            <p class="text-[11px] md:text-xs text-[#47464E] mt-0.5">
+                                                Total belanja: <strong class="text-[#1A1743]" x-text="formatRp(archive.total_amount)"></strong>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chevron Indicator -->
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-xs font-bold text-slate-500 hidden sm:inline"
+                                              x-text="openFolders[archive.month_label] ? 'Tutup Folder' : 'Buka Folder'"></span>
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 transition-transform duration-300"
+                                             :class="openFolders[archive.month_label] ? 'rotate-180 bg-amber-200 text-amber-800' : ''">
+                                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <!-- Isi Folder (Daftar Pesanan di Bulan Ini) -->
+                                <div x-show="openFolders[archive.month_label]" 
+                                     x-transition:enter="transition ease-out duration-200" 
+                                     x-transition:enter-start="opacity-0 -translate-y-2" 
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     class="p-4 md:p-6 bg-slate-50/50 space-y-4">
+
+                                    <template x-for="order in archive.orders" :key="order.id">
+                                        <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-2xs hover:shadow-md transition">
+
+                                            <!-- Header Item Pesanan Arsip -->
+                                            <div class="px-4 md:px-6 py-3.5 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="font-bold text-sm text-[#1A1743]" x-text="'#' + order.id"></span>
+                                                    <span class="text-[10px] md:text-xs text-[#717082]" x-text="order.date"></span>
+                                                </div>
+
+                                                <div class="flex items-center gap-2">
+                                                    <!-- Badge Pembayaran -->
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                                                          :class="order.payment_status === 'completed'
+                                                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                              : 'bg-slate-100 text-slate-600'">
+                                                        <span x-text="order.payment_status_label || (order.payment_status === 'completed' ? 'Lunas' : 'Menunggu Pembayaran')"></span>
+                                                    </span>
+
+                                                    <!-- Badge Status Selesai / Dibatalkan -->
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1.5"
+                                                          :class="statusColor(order.status).bg + ' ' + statusColor(order.status).text">
+                                                        <span class="w-1.5 h-1.5 rounded-full" :class="statusColor(order.status).dot"></span>
+                                                        <span x-text="order.statusLabel"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Rincian Layanan & Alamat -->
+                                            <div class="px-4 md:px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                                <div>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#717082] block mb-1.5">Layanan Selesai</span>
+                                                    <div class="space-y-1.5">
+                                                        <template x-for="item in order.items" :key="item.name">
+                                                            <div class="flex justify-between items-center text-xs">
+                                                                <span class="font-semibold text-[#1A1743]" x-text="item.name + ' (' + item.qty + ' ' + item.unit + ')'"></span>
+                                                                <span class="text-slate-600 font-medium" x-text="formatRp(item.price)"></span>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#717082] block mb-1.5">Lokasi / Pengambilan</span>
+                                                    <p class="text-xs text-[#47464E] flex items-start gap-1.5">
+                                                        <i class="fa-solid fa-location-dot text-[#1A1743] mt-0.5 shrink-0 text-xs"></i>
+                                                        <span x-text="order.address"></span>
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Footer Item Pesanan Arsip -->
+                                            <div class="px-4 md:px-6 py-3 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs text-[#717082]">Total Tagihan:</span>
+                                                    <strong class="text-sm font-extrabold text-[#1A1743]" x-text="formatRp(order.total)"></strong>
+                                                    <template x-if="order.payment_method_label && order.payment_method_label !== '-'">
+                                                        <span class="text-[11px] text-[#717082]" x-text="'(' + order.payment_method_label + ')'"></span>
+                                                    </template>
+                                                </div>
+
+                                                <div class="flex items-center gap-2">
+                                                    <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin menanyakan riwayat pesanan #' + order.id)"
+                                                       target="_blank"
+                                                       class="px-3 py-1.5 bg-[#EAEDFF] hover:bg-[#dfe4ff] text-[#1A1743] rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                                        <i class="fa-brands fa-whatsapp text-[#25D366]"></i>
+                                                        <span>Tanya Admin</span>
+                                                    </a>
+                                                    <a href="{{ route('pemesanan') }}" 
+                                                       class="px-3 py-1.5 bg-[#1A1743] hover:bg-[#2A2655] text-white rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                                        <i class="fa-solid fa-repeat text-[10px]"></i>
+                                                        <span>Pesan Lagi</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </template>

@@ -103,11 +103,34 @@ class OrderController extends Controller
                 'address'        => $order->delivery->address ?? ($order->customer->address ?? 'Ambil di Outlet Rodeo Malang'),
                 'canCancel'      => $order->status === 'pending' && $paymentStatus !== 'completed',
                 'canEditAddress' => in_array($order->status, ['pending', 'processing']),
+                'month_key'      => $order->created_at ? $order->created_at->format('Y-m') : 'unknown',
+                'month_label'    => $order->created_at ? $order->created_at->translatedFormat('F Y') : 'Lainnya',
+                'is_active'      => in_array($order->status, ['pending', 'processing', 'ready']),
+                'is_completed'   => in_array($order->status, ['completed', 'cancelled']),
             ];
         });
 
+        $activeOrders = $formattedOrders->filter(fn ($o) => $o['is_active'])->values();
+        $completedOrders = $formattedOrders->filter(fn ($o) => $o['is_completed'])->values();
+
+        // Mengelompokkan riwayat yang sudah selesai / dibatalkan berdasarkan bulan (Folder Bulanan)
+        $monthlyArchives = $completedOrders->groupBy('month_label')->map(function ($group, $monthLabel) {
+            return [
+                'month_label'  => $monthLabel,
+                'month_key'    => $group->first()['month_key'] ?? '',
+                'total_orders' => $group->count(),
+                'total_amount' => (int) $group->sum('total'),
+                'orders'       => $group->values(),
+            ];
+        })->values();
+
         $viewName = view()->exists('pelanggan.pesanan') ? 'pelanggan.pesanan' : 'pesanan';
-        return view($viewName, ['orders' => $formattedOrders]);
+        return view($viewName, [
+            'orders'          => $formattedOrders,
+            'activeOrders'    => $activeOrders,
+            'completedOrders' => $completedOrders,
+            'monthlyArchives' => $monthlyArchives,
+        ]);
     }
 
     public function cancelCustomerOrder(Request $request, Order $order)
