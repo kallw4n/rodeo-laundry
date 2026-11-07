@@ -174,33 +174,66 @@
                     </div>
 
                     <!-- Cart Item List -->
-                    <div class="space-y-3 max-h-56 overflow-y-auto pr-1">
+                    <div class="space-y-3.5 max-h-72 overflow-y-auto pr-1">
                         <template x-if="cart.length === 0">
-                            <div class="p-6 text-center text-xs text-slate-400">
-                                Belum ada item dipilih.<br>Klik "+ Tambah" pada katalog di samping.
+                            <div class="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                                <svg class="w-8 h-8 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                                <span>Belum ada layanan dipilih.<br>Klik "+ Tambah" pada katalog di samping.</span>
                             </div>
                         </template>
 
                         <template x-for="(item, idx) in cart" :key="item.id">
-                            <div class="p-3 bg-slate-50/90 rounded-2xl flex items-center justify-between border border-slate-200/80">
-                                <div class="flex-1 min-w-0 pr-2">
-                                    <div class="text-xs font-bold text-[#1E1B4B] truncate" x-text="item.name"></div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <input type="number"
-                                               x-model.number="item.qty"
-                                               step="0.1"
-                                               min="0.1"
-                                               class="w-16 px-2 py-0.5 bg-white border border-slate-300/80 rounded-lg text-xs font-bold text-[#1E1B4B] text-center focus:outline-none focus:border-[#1E1B4B] focus:ring-1 focus:ring-[#1E1B4B]">
-                                        <span class="text-[11px] text-slate-500 font-medium" x-text="item.unit + ' x Rp ' + formatRupiah(item.price)"></span>
+                            <div class="p-4 bg-slate-50/90 hover:bg-slate-100/70 rounded-2xl border border-slate-200/90 shadow-2xs transition">
+                                <!-- Top Row: Name and Subtotal & Trash -->
+                                <div class="flex items-start justify-between gap-2 mb-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-sm font-extrabold text-[#1E1B4B] truncate" x-text="item.name"></div>
+                                        <div class="text-xs text-slate-500 font-semibold mt-0.5" x-text="'@ Rp ' + formatRupiah(item.price) + ' / ' + item.unit"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-black text-[#1E1B4B]" x-text="'Rp ' + formatRupiah(item.qty * item.price)"></span>
+                                        <button type="button" @click="removeFromCart(idx)" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer" title="Hapus layanan">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-extrabold text-[#1E1B4B]" x-text="'Rp ' + formatRupiah(item.qty * item.price)"></span>
-                                    <button type="button" @click="removeFromCart(idx)" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
+
+                                <!-- Stepper Input Box (Lebar, Ramah Sentuh, Tombol +/- Nyaman) -->
+                                <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs">
+                                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
+                                        <span x-text="item.unit === 'kg' ? 'Berat Cucian:' : 'Jumlah Item:'"></span>
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <!-- Tombol Kurangi (-) -->
+                                        <button type="button" 
+                                                @click="stepDown(item, idx)"
+                                                class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-[#1E1B4B] font-extrabold text-base flex items-center justify-center transition shadow-2xs cursor-pointer select-none"
+                                                title="Kurangi">
+                                            −
+                                        </button>
+
+                                        <!-- Input Angka Langsung (Besar & Jelas) -->
+                                        <div class="relative">
+                                            <input type="number"
+                                                   x-model.number="item.qty"
+                                                   step="0.1"
+                                                   min="0.1"
+                                                   class="w-20 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-black text-[#1E1B4B] text-center focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/20">
+                                        </div>
+
+                                        <!-- Tombol Tambah (+) -->
+                                        <button type="button" 
+                                                @click="stepUp(item)"
+                                                class="w-8 h-8 rounded-lg bg-[#1E1B4B] hover:bg-[#2A2663] active:scale-95 text-white font-extrabold text-base flex items-center justify-center transition shadow-xs cursor-pointer select-none"
+                                                title="Tambah">
+                                            +
+                                        </button>
+
+                                        <!-- Satuan Unit Badge -->
+                                        <span class="text-xs font-bold text-[#1E1B4B] bg-slate-100 px-2.5 py-1.5 rounded-lg shrink-0" x-text="item.unit"></span>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -399,6 +432,26 @@
 
                 removeFromCart(idx) {
                     this.cart.splice(idx, 1);
+                },
+
+                stepUp(item) {
+                    const step = item.unit === 'kg' ? 0.1 : 1;
+                    item.qty = Math.round((Number(item.qty || 0) + step) * 10) / 10;
+                    if (this.cashReceived === 0 || this.cashReceived < this.totalCart) {
+                        this.cashReceived = this.totalCart;
+                    }
+                },
+
+                stepDown(item, idx) {
+                    const step = item.unit === 'kg' ? 0.1 : 1;
+                    const newQty = Math.round((Number(item.qty || 0) - step) * 10) / 10;
+                    if (newQty <= 0) {
+                        if (confirm('Hapus ' + item.name + ' dari pesanan?')) {
+                            this.removeFromCart(idx);
+                        }
+                    } else {
+                        item.qty = newQty;
+                    }
                 },
 
                 get totalCart() {

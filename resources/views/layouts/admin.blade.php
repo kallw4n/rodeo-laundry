@@ -177,7 +177,7 @@
             <!-- ================= TOPBAR ================= -->
             <header class="h-20 bg-white/95 backdrop-blur-md border-b border-slate-300/80 shadow-xs sticky top-0 z-20 px-6 md:px-8 flex items-center justify-between gap-4">
                 
-                <!-- Left: Hamburger (mobile) + Search Bar -->
+                <!-- Left: Hamburger (mobile) + Search Bar (Khusus Dashboard) -->
                 <div class="flex items-center gap-3 flex-1 max-w-xl">
                     <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 rounded-xl text-[#1E1B4B] hover:bg-slate-100">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,8 @@
                         </svg>
                     </button>
 
-                    <!-- Global Search -->
+                    @if(request()->routeIs('admin.dashboard'))
+                    <!-- Global Search (Hanya Muncul di Halaman Dashboard) -->
                     <form method="GET" action="{{ route('admin.dashboard') }}" class="relative w-full max-w-md hidden sm:block">
                         @if(request('date'))
                             <input type="hidden" name="date" value="{{ request('date') }}">
@@ -204,12 +205,21 @@
                                placeholder="Cari nota, nomor rak, pelanggan..."
                                class="w-full pl-10 pr-4 py-2.5 bg-slate-100/90 border border-slate-300/80 rounded-full text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/15 transition">
                     </form>
+                    @else
+                    <!-- Penanda Halaman pada Halaman Selain Dashboard -->
+                    <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400">
+                        <span>Admin</span>
+                        <span>/</span>
+                        <span class="text-[#1E1B4B] font-extrabold">{{ $title ?? 'Menu' }}</span>
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Right Controls -->
                 <div class="flex items-center gap-2 md:gap-3">
                     
-                    <!-- Date Pill & Picker -->
+                    @if(request()->routeIs('admin.dashboard'))
+                    <!-- Date Pill & Picker (Khusus Dashboard) -->
                     <div class="flex items-center gap-1.5">
                         <form method="GET" action="{{ route('admin.dashboard') }}" class="relative flex items-center">
                             @if(request('search'))
@@ -249,6 +259,7 @@
                             </a>
                         @endif
                     </div>
+                    @endif
 
                     <!-- Notification Bell with Interactive Dropdown Popover -->
                     <div class="relative" x-data="{ notifOpen: false }">
