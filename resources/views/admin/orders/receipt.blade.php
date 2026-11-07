@@ -126,12 +126,12 @@
             </div>
             <div class="flex-between">
                 <span>Pelanggan:</span>
-                <span class="bold">{{ $order->customer->name ?? 'Pelanggan Umum' }}</span>
+                <span class="bold">{{ $order->customer_display_name }}</span>
             </div>
-            @if($order->customer && $order->customer->phone)
+            @if(!empty($order->customer_display_phone) && $order->customer_display_phone !== '-')
             <div class="flex-between">
                 <span>No. Telp:</span>
-                <span>{{ $order->customer->phone }}</span>
+                <span>{{ $order->customer_display_phone }}</span>
             </div>
             @endif
         </div>

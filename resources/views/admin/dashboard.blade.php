@@ -239,10 +239,10 @@
                             <!-- Pelanggan -->
                             <td class="py-4 px-4">
                                 <div class="font-bold text-[#1E1B4B]">
-                                    {{ $order->customer->name ?? 'Pelanggan Umum' }}
+                                    {{ $order->customer_display_name }}
                                 </div>
                                 <div class="text-xs text-[#64748B]">
-                                    {{ $order->customer->phone ?? '0812-xxxx-xxxx' }}
+                                    {{ $order->customer_display_phone }}
                                 </div>
                             </td>
 

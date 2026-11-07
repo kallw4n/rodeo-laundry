@@ -65,6 +65,8 @@ class AdminReportController extends Controller
                     $cq->where('name', 'like', "%{$search}%")
                        ->orWhere('phone', 'like', "%{$search}%");
                 });
+                $q->orWhere('customer_name', 'like', "%{$search}%")
+                  ->orWhere('customer_phone', 'like', "%{$search}%");
             });
         }
 
@@ -199,8 +201,8 @@ class AdminReportController extends Controller
                     $index + 1,
                     '#RD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT),
                     $order->created_at ? $order->created_at->format('d/m/Y H:i') : '-',
-                    $customer ? $customer->name : 'Pelanggan Umum',
-                    $customer ? $customer->phone : '-',
+                    $order->customer_display_name,
+                    $order->customer_display_phone,
                     $itemsSummary ?: 'Layanan Reguler',
                     $totalQty,
                     $paymentMethod,

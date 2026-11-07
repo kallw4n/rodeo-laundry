@@ -27,7 +27,9 @@ class PosController extends Controller
     public function storeOrder(Request $request)
     {
         $request->validate([
-            'customer_id'    => 'required|exists:customers,id',
+            'customer_id'    => 'nullable|exists:customers,id',
+            'customer_name'  => 'nullable|string|max:255',
+            'customer_phone' => 'nullable|string|max:50',
             'items'          => 'required|array|min:1',
             'items.*.id'     => 'required|exists:service_types,id',
             'items.*.qty'    => 'required|numeric|min:0.1',
@@ -36,7 +38,14 @@ class PosController extends Controller
         ]);
 
         $order = DB::transaction(function () use ($request) {
-            $customer = Customer::findOrFail($request->customer_id);
+            $customer = null;
+            if (!empty($request->customer_id)) {
+                $customer = Customer::find($request->customer_id);
+            }
+
+            $customerName = $customer ? $customer->name : (trim($request->customer_name ?? '') !== '' ? trim($request->customer_name) : 'Pelanggan Walk-in');
+            $customerPhone = $customer ? $customer->phone : trim($request->customer_phone ?? '');
+
             $serviceMap = ServiceType::whereIn('id', collect($request->items)->pluck('id'))->get()->keyBy('id');
 
             $totalPrice = 0;
@@ -56,7 +65,9 @@ class PosController extends Controller
 
             // Create Order
             $order = Order::create([
-                'customer_id'               => $customer->id,
+                'customer_id'               => $customer?->id,
+                'customer_name'             => $customerName,
+                'customer_phone'            => $customerPhone,
                 'total_price'               => $totalPrice,
                 'status'                    => 'processing',
                 'estimated_completion_time' => Carbon::now()->addDays(2),
@@ -101,21 +112,23 @@ class PosController extends Controller
             Delivery::create([
                 'order_id'       => $order->id,
                 'type'           => $request->delivery_type === 'delivery' ? 'delivery' : 'pickup',
-                'address'        => $customer->address ?? 'Ambil di Outlet Rodeo Malang',
+                'address'        => $customer?->address ?? 'Ambil Langsung di Outlet Rodeo Batu',
                 'scheduled_date' => Carbon::now()->addDays(2),
                 'status'         => 'scheduled',
             ]);
 
-            // Update customer loyalty and total spent
-            $customer->total_spent += $totalPrice;
-            $customer->loyalty_points += (int) floor($totalPrice / 10000);
-            $customer->save();
+            // Update customer loyalty and total spent jika pelanggan terdaftar
+            if ($customer) {
+                $customer->total_spent += $totalPrice;
+                $customer->loyalty_points += (int) floor($totalPrice / 10000);
+                $customer->save();
+            }
 
             return $order;
         });
 
         return redirect()->route('admin.pos')
-            ->with('success', 'Transaksi Kasir #' . $order->id . ' berhasil disimpan & nota siap dicetak!')
+            ->with('success', 'Transaksi Kasir #' . $order->id . ' (' . ($order->customer_name ?: 'Pelanggan Walk-in') . ') berhasil disimpan & nota siap dicetak!')
             ->with('recent_order_id', $order->id);
     }
 }

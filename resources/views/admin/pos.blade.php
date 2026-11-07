@@ -37,72 +37,140 @@
             <!-- LEFT COLUMN: SEARCH + CUSTOMER + CATALOG (col-span-7 or 8) -->
             <div class="lg:col-span-7 xl:col-span-8 space-y-6">
 
-                <!-- 1. CUSTOMER SEARCH & SELECTOR -->
+                <!-- 1. CUSTOMER TYPE SELECTOR (WALK-IN LANGSUNG VS MEMBER AKUN) -->
                 <div class="bg-white rounded-3xl p-5 border border-slate-300/80 shadow-[0_10px_30px_-5px_rgba(26,23,67,0.06),0_4px_12px_rgba(0,0,0,0.03)] space-y-4">
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <!-- Search Box with autocomplete -->
-                        <div class="relative flex-1">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    <!-- Tab Toggle Switcher -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl w-fit">
+                            <button type="button"
+                                    @click="customerType = 'walkin'"
+                                    :class="customerType === 'walkin' ? 'bg-white text-[#1E1B4B] shadow-xs font-extrabold' : 'text-slate-500 hover:text-[#1E1B4B] font-medium'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
-                            </div>
-                            <input type="text"
-                                   x-ref="customerInput"
-                                   x-model="customerQuery"
-                                   @focus="customerDropdown = true"
-                                   placeholder="Ketik ID pelanggan (#RD-...) atau nama pelanggan..."
-                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-sm text-[#1E1B4B] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+                                <span>Pelanggan Walk-In (Langsung)</span>
+                            </button>
+                            <button type="button"
+                                    @click="customerType = 'member'"
+                                    :class="customerType === 'member' ? 'bg-white text-[#1E1B4B] shadow-xs font-extrabold' : 'text-slate-500 hover:text-[#1E1B4B] font-medium'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                                <span>Pilih Member Rodeo</span>
+                            </button>
+                        </div>
 
-                            <!-- Autocomplete Dropdown -->
-                            <div x-show="customerDropdown && filteredCustomers.length > 0"
-                                 @click.away="customerDropdown = false"
-                                 class="absolute z-30 left-0 right-0 mt-2 bg-white border border-slate-300/90 rounded-2xl shadow-xl max-h-60 overflow-y-auto divide-y divide-slate-100">
-                                <template x-for="c in filteredCustomers" :key="c.id">
-                                    <div @click="selectCustomer(c)"
-                                         class="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
-                                        <div>
-                                            <div class="text-sm font-bold text-[#1E1B4B]">
-                                                <span class="text-xs text-[#64748B] font-mono mr-1.5" x-text="'#RD-' + String(c.id).padStart(4, '0')"></span>
-                                                <span x-text="c.name"></span>
-                                            </div>
-                                            <div class="text-xs text-[#64748B]" x-text="(c.phone || '-') + ' • ' + (c.city || 'Malang')"></div>
-                                        </div>
-                                        <span class="text-xs text-[#BFF108] bg-[#1E1B4B] px-2.5 py-1 rounded-full font-bold">Pilih</span>
+                        <div class="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium">
+                            <span class="inline-block w-2 h-2 rounded-full" :class="customerType === 'walkin' ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-indigo-500 ring-2 ring-indigo-200'"></span>
+                            <span x-text="customerType === 'walkin' ? 'Cukup nama saja, tanpa perlu daftar akun' : 'Cari akun member untuk poin & riwayat'"></span>
+                        </div>
+                    </div>
+
+                    <!-- MODE 1: WALKIN (CUKUP INPUT NAMA & HP OPSIONAL) -->
+                    <div x-show="customerType === 'walkin'" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pelanggan Walk-In:</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
                                     </div>
-                                </template>
+                                    <input type="text"
+                                           x-model="walkinName"
+                                           placeholder="Contoh: Pak Budi / Mbak Rina (Opsional)"
+                                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-sm text-[#1E1B4B] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">*Jika kosong, otomatis tercatat "Pelanggan Walk-in".</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp (Opsional):</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                        </svg>
+                                    </div>
+                                    <input type="text"
+                                           x-model="walkinPhone"
+                                           placeholder="08xxxxxxxxxx (untuk kirim struk WA)"
+                                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-sm text-[#1E1B4B] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">*Diisi jika pelanggan ingin dikirimkan nota via WA.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Selected Customer Pill / Card -->
-                    <template x-if="selectedCustomer">
-                        <div class="bg-indigo-50/80 border border-indigo-200/90 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-11 h-11 rounded-full bg-[#1E1B4B] text-white font-extrabold flex items-center justify-center text-sm shadow">
-                                    <span x-text="getInitials(selectedCustomer.name)"></span>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-[#1E1B4B]" x-text="selectedCustomer.name"></div>
-                                    <div class="text-xs text-[#64748B]" x-text="(selectedCustomer.phone || '-') + ' • ' + (selectedCustomer.address || 'Alamat Outlet')"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 self-end sm:self-auto">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#BFF108] text-[#1E1B4B] text-xs font-bold rounded-full shadow-sm">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
-                                    </svg>
-                                    <span>Gratis Antar-Jemput Aktif</span>
-                                </span>
-                                <button type="button" @click="clearCustomer()" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-full hover:bg-white transition">
+                    <!-- MODE 2: MEMBER RODEO (SEARCH AUTOCOMPLETE) -->
+                    <div x-show="customerType === 'member'" class="space-y-3">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                     </svg>
-                                </button>
+                                </div>
+                                <input type="text"
+                                       x-ref="customerInput"
+                                       x-model="customerQuery"
+                                       @focus="customerDropdown = true"
+                                       placeholder="Ketik ID pelanggan (#RD-...) atau nama pelanggan yang punya akun..."
+                                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-sm text-[#1E1B4B] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
+
+                                <!-- Autocomplete Dropdown -->
+                                <div x-show="customerDropdown && filteredCustomers.length > 0"
+                                     @click.away="customerDropdown = false"
+                                     class="absolute z-30 left-0 right-0 mt-2 bg-white border border-slate-300/90 rounded-2xl shadow-xl max-h-60 overflow-y-auto divide-y divide-slate-100">
+                                    <template x-for="c in filteredCustomers" :key="c.id">
+                                        <div @click="selectCustomer(c)"
+                                             class="p-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
+                                            <div>
+                                                <div class="text-sm font-bold text-[#1E1B4B]">
+                                                    <span class="text-xs text-[#64748B] font-mono mr-1.5" x-text="'#RD-' + String(c.id).padStart(4, '0')"></span>
+                                                    <span x-text="c.name"></span>
+                                                </div>
+                                                <div class="text-xs text-[#64748B]" x-text="(c.phone || '-') + ' • ' + (c.city || 'Malang')"></div>
+                                            </div>
+                                            <span class="text-xs text-[#BFF108] bg-[#1E1B4B] px-2.5 py-1 rounded-full font-bold">Pilih</span>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
-                    </template>
+
+                        <!-- Selected Customer Pill / Card -->
+                        <template x-if="selectedCustomer">
+                            <div class="bg-indigo-50/80 border border-indigo-200/90 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-11 h-11 rounded-full bg-[#1E1B4B] text-white font-extrabold flex items-center justify-center text-sm shadow">
+                                        <span x-text="getInitials(selectedCustomer.name)"></span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-[#1E1B4B]" x-text="selectedCustomer.name"></div>
+                                        <div class="text-xs text-[#64748B]" x-text="(selectedCustomer.phone || '-') + ' • ' + (selectedCustomer.address || 'Alamat Outlet')"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 self-end sm:self-auto">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#BFF108] text-[#1E1B4B] text-xs font-bold rounded-full shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                                        </svg>
+                                        <span>Member Aktif</span>
+                                    </span>
+                                    <button type="button" @click="clearCustomer()" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-full hover:bg-white transition" title="Batal pilih member">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- 2. SERVICE CATALOG GRID -->
@@ -340,7 +408,9 @@
                     <!-- FORM SUBMISSION -->
                     <form method="POST" action="{{ route('admin.pos.order') }}" @submit.prevent="submitOrder()">
                         @csrf
-                        <input type="hidden" name="customer_id" :value="selectedCustomer ? selectedCustomer.id : ''">
+                        <input type="hidden" name="customer_id" :value="customerType === 'member' && selectedCustomer ? selectedCustomer.id : ''">
+                        <input type="hidden" name="customer_name" :value="customerType === 'walkin' ? (walkinName.trim() || 'Pelanggan Walk-in') : (selectedCustomer ? selectedCustomer.name : 'Pelanggan Walk-in')">
+                        <input type="hidden" name="customer_phone" :value="customerType === 'walkin' ? walkinPhone.trim() : (selectedCustomer ? selectedCustomer.phone : '')">
                         <input type="hidden" name="payment_method" :value="paymentMethod">
                         <input type="hidden" name="cash_received" :value="cashReceived">
 
@@ -353,24 +423,28 @@
                         </template>
 
                         <!-- Helper Checklist Persyaratan Transaksi -->
-                        <div x-show="!selectedCustomer || cart.length === 0"
+                        <div x-show="cart.length === 0 || (customerType === 'member' && !selectedCustomer)"
                              class="p-3 bg-amber-50/90 border border-amber-200/90 rounded-2xl text-xs space-y-1.5 transition">
                             <div class="font-bold text-amber-900 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Syarat Menyimpan Transaksi:</span>
+                                <span>Status Transaksi Kasir:</span>
                             </div>
                             <div class="flex items-center gap-2 pl-5 text-[11px]">
-                                <span :class="selectedCustomer ? 'text-emerald-700 font-bold' : 'text-amber-800 font-medium'">
+                                <span class="text-emerald-700 font-bold" x-show="customerType === 'walkin'">
+                                    ✅ Pelanggan: <span class="font-semibold" x-text="walkinName.trim() ? walkinName.trim() : 'Pelanggan Walk-in (Otomatis)'"></span>
+                                </span>
+                                <span :class="selectedCustomer ? 'text-emerald-700 font-bold' : 'text-amber-800 font-medium'" x-show="customerType === 'member'">
                                     <span x-text="selectedCustomer ? '✅' : '⏳'"></span>
-                                    1. Pelanggan: <span class="font-semibold" x-text="selectedCustomer ? selectedCustomer.name : 'Pilih di kolom atas'"></span>
+                                    1. Member: <span class="font-semibold" x-text="selectedCustomer ? selectedCustomer.name : 'Pilih member di atas'"></span>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2 pl-5 text-[11px]">
                                 <span :class="cart.length > 0 ? 'text-emerald-700 font-bold' : 'text-amber-800 font-medium'">
                                     <span x-text="cart.length > 0 ? '✅' : '⏳'"></span>
-                                    2. Layanan: <span class="font-semibold" x-text="cart.length > 0 ? cart.length + ' item cucian dipilih' : 'Klik + Tambah di katalog'"></span>
+                                    <span x-text="customerType === 'member' ? '2. Layanan:' : 'Layanan:'"></span>
+                                    <span class="font-semibold" x-text="cart.length > 0 ? cart.length + ' item cucian dipilih' : 'Pilih layanan di samping (+ Tambah)'"></span>
                                 </span>
                             </div>
                         </div>
@@ -379,7 +453,7 @@
                         <div class="space-y-2.5">
                             <button type="button"
                                     @click="submitOrder()"
-                                    :class="cart.length === 0 || !selectedCustomer ? 'bg-[#BFF108]/80 hover:bg-[#BFF108]' : 'bg-[#BFF108] hover:scale-[1.01] active:scale-[0.99] shadow-md'"
+                                    :class="cart.length === 0 ? 'bg-[#BFF108]/80 hover:bg-[#BFF108]' : 'bg-[#BFF108] hover:scale-[1.01] active:scale-[0.99] shadow-md'"
                                     class="w-full py-3.5 px-4 rounded-2xl text-[#1E1B4B] font-extrabold text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
@@ -442,11 +516,11 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-500">Pelanggan:</span>
-                            <span class="font-bold" x-text="selectedCustomer ? selectedCustomer.name : 'Tamu / Umum'"></span>
+                            <span class="font-bold" x-text="activeCustomerName"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedCustomer && selectedCustomer.phone">
+                        <div class="flex justify-between" x-show="activeCustomerPhone !== '-'">
                             <span class="text-slate-500">Telepon:</span>
-                            <span x-text="selectedCustomer ? selectedCustomer.phone : '-'"></span>
+                            <span x-text="activeCustomerPhone"></span>
                         </div>
                     </div>
 
@@ -549,6 +623,9 @@
 
             return {
                 customers: rawCustomers,
+                customerType: 'walkin',
+                walkinName: '',
+                walkinPhone: '',
                 customerQuery: '',
                 customerDropdown: false,
                 selectedCustomer: null,
@@ -557,6 +634,20 @@
                 cashReceived: 0,
                 showReceiptModal: false,
                 recentOrderId: rawRecentOrderId,
+
+                get activeCustomerName() {
+                    if (this.customerType === 'member') {
+                        return this.selectedCustomer ? this.selectedCustomer.name : 'Tamu Member';
+                    }
+                    return this.walkinName.trim() ? this.walkinName.trim() : 'Pelanggan Walk-in';
+                },
+
+                get activeCustomerPhone() {
+                    if (this.customerType === 'member') {
+                        return this.selectedCustomer ? (this.selectedCustomer.phone || '-') : '-';
+                    }
+                    return this.walkinPhone.trim() ? this.walkinPhone.trim() : '-';
+                },
 
                 get filteredCustomers() {
                     if (!this.customerQuery) return this.customers.slice(0, 6);
@@ -659,8 +750,8 @@
                 },
 
                 sendWhatsAppReceipt() {
-                    if (!this.selectedCustomer) {
-                        alert('⚠️ Silakan pilih pelanggan terlebih dahulu di kolom atas sebelum mengirim struk!');
+                    if (this.customerType === 'member' && !this.selectedCustomer) {
+                        alert('⚠️ Anda berada di mode Member Rodeo. Silakan pilih akun member di kolom pencarian atau ganti ke tab "Pelanggan Walk-In".');
                         if (this.$refs.customerInput) {
                             this.$refs.customerInput.focus();
                         }
@@ -670,16 +761,24 @@
                         alert('⚠️ Keranjang cucian masih kosong! Silakan pilih minimal 1 layanan cucian di sebelah kiri.');
                         return;
                     }
-                    const rawPhone = this.selectedCustomer.phone ? this.selectedCustomer.phone.replace(/[^0-9]/g, '') : '';
+
+                    let rawPhone = '';
+                    if (this.customerType === 'member') {
+                        rawPhone = this.selectedCustomer.phone ? this.selectedCustomer.phone.replace(/[^0-9]/g, '') : '';
+                    } else {
+                        rawPhone = this.walkinPhone ? this.walkinPhone.replace(/[^0-9]/g, '') : '';
+                    }
+
                     if (!rawPhone || rawPhone.length < 8) {
-                        alert('⚠️ Pelanggan "' + this.selectedCustomer.name + '" belum memiliki nomor telepon/WhatsApp yang valid.');
+                        alert('⚠️ Silakan masukkan nomor WhatsApp pelanggan di kolom No. WhatsApp untuk mengirim nota via WA!');
                         return;
                     }
+
                     const intlPhone = rawPhone.startsWith('0') ? '62' + rawPhone.substring(1) : (rawPhone.startsWith('62') ? rawPhone : '62' + rawPhone);
                     
                     let text = `*NOTA TRANSAKSI - RODEO LAUNDRY*\n`;
                     text += `No. Nota: #{{ $invoiceNumber }}\n`;
-                    text += `Pelanggan: ${this.selectedCustomer.name}\n`;
+                    text += `Pelanggan: ${this.activeCustomerName}\n`;
                     text += `Metode Pembayaran: ${this.paymentMethod.toUpperCase()}\n`;
                     text += `--------------------------------\n`;
                     this.cart.forEach(it => {
@@ -695,8 +794,8 @@
                 },
 
                 submitOrder() {
-                    if (!this.selectedCustomer) {
-                        alert('⚠️ Harap pilih pelanggan terlebih dahulu di kolom atas sebelum menyimpan struk!');
+                    if (this.customerType === 'member' && !this.selectedCustomer) {
+                        alert('⚠️ Anda memilih mode Member Rodeo. Harap pilih akun member di kolom pencarian atau ganti ke tab "Pelanggan Walk-In" jika pelanggan belum punya akun.');
                         if (this.$refs.customerInput) {
                             this.$refs.customerInput.focus();
                         }

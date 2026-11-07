@@ -21,8 +21,11 @@ class AdminPaymentController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('order_id', 'like', "%{$search}%")
-                  ->orWhereHas('order.customer', function ($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
+                  ->orWhereHas('order', function ($oq) use ($search) {
+                      $oq->where('customer_name', 'like', "%{$search}%")
+                         ->orWhereHas('customer', function ($cq) use ($search) {
+                             $cq->where('name', 'like', "%{$search}%");
+                         });
                   });
             });
         }

@@ -18,9 +18,13 @@ class AdminDeliveryController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('address', 'like', "%{$search}%")
                   ->orWhere('order_id', 'like', "%{$search}%")
-                  ->orWhereHas('order.customer', function ($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
+                  ->orWhereHas('order', function ($oq) use ($search) {
+                      $oq->where('customer_name', 'like', "%{$search}%")
+                         ->orWhere('customer_phone', 'like', "%{$search}%")
+                         ->orWhereHas('customer', function ($cq) use ($search) {
+                             $cq->where('name', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                         });
                   });
             });
         }

@@ -213,6 +213,47 @@ class AdminPortalTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_store_walkin_order_without_customer_account(): void
+    {
+        $service = ServiceType::create([
+            'name'        => 'Cuci Kering Walk-in',
+            'price'       => 10000,
+            'description' => 'Khusus pakaian walkin',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post('/admin/pos/order', [
+            'customer_id'    => null,
+            'customer_name'  => 'Pak Budi Santoso',
+            'customer_phone' => '081234567899',
+            'payment_method' => 'cash',
+            'cash_received'  => 20000,
+            'items'          => [
+                [
+                    'id'  => $service->id,
+                    'qty' => 2,
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect('/admin/pos');
+        $this->assertDatabaseHas('orders', [
+            'customer_id'    => null,
+            'customer_name'  => 'Pak Budi Santoso',
+            'customer_phone' => '081234567899',
+            'total_price'    => 20000,
+            'status'         => 'processing',
+        ]);
+        $this->assertDatabaseHas('payments', [
+            'amount' => 20000,
+            'method' => 'cash',
+            'status' => 'completed',
+        ]);
+
+        // Verifikasi bahwa nama walk-in muncul di dashboard admin
+        $dashboardResponse = $this->actingAs($this->admin)->get('/admin/dashboard');
+        $dashboardResponse->assertSee('Pak Budi Santoso');
+    }
+
     public function test_admin_can_manage_customers(): void
     {
         $response = $this->actingAs($this->admin)->post('/admin/customers', [

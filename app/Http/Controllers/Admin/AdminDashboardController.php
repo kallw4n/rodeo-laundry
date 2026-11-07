@@ -71,6 +71,8 @@ class AdminDashboardController extends Controller
                     $cq->where('name', 'like', "%{$search}%")
                        ->orWhere('phone', 'like', "%{$search}%");
                 });
+                $q->orWhere('customer_name', 'like', "%{$search}%")
+                  ->orWhere('customer_phone', 'like', "%{$search}%");
             });
         }
 
