@@ -116,6 +116,56 @@ class AdminPortalTest extends TestCase
         $response->assertSee('85.000');
     }
 
+    public function test_dashboard_calendar_filters_orders_by_selected_date_and_empties_when_none(): void
+    {
+        $customer = Customer::create([
+            'name' => 'Fahri Tanggal',
+            'phone' => '08129876541',
+            'city' => 'Kota Malang',
+        ]);
+
+        $orderNov1 = Order::create([
+            'customer_id' => $customer->id,
+            'total_price' => 50000,
+            'status' => 'processing',
+        ]);
+        $orderNov1->created_at = '2026-11-01 10:00:00';
+        $orderNov1->save();
+
+        $orderNov2 = Order::create([
+            'customer_id' => $customer->id,
+            'total_price' => 75000,
+            'status' => 'ready',
+        ]);
+        $orderNov2->created_at = '2026-11-02 11:00:00';
+        $orderNov2->save();
+
+        // 1. Filter tanggal 1 Nov 2026: Hanya orderNov1 yang muncul
+        $resNov1 = $this->actingAs($this->admin)->get('/admin/dashboard?date=2026-11-01');
+        $resNov1->assertStatus(200);
+        $ordersNov1 = $resNov1->viewData('recentOrders');
+        $this->assertEquals(1, $ordersNov1->total());
+        $this->assertEquals($orderNov1->id, $ordersNov1->first()->id);
+        $this->assertTrue($ordersNov1->contains('id', $orderNov1->id));
+        $this->assertFalse($ordersNov1->contains('id', $orderNov2->id));
+
+        // 2. Filter tanggal 2 Nov 2026: Hanya orderNov2 yang muncul
+        $resNov2 = $this->actingAs($this->admin)->get('/admin/dashboard?date=2026-11-02');
+        $resNov2->assertStatus(200);
+        $ordersNov2 = $resNov2->viewData('recentOrders');
+        $this->assertEquals(1, $ordersNov2->total());
+        $this->assertEquals($orderNov2->id, $ordersNov2->first()->id);
+        $this->assertTrue($ordersNov2->contains('id', $orderNov2->id));
+        $this->assertFalse($ordersNov2->contains('id', $orderNov1->id));
+
+        // 3. Filter tanggal 5 Nov 2026: Kosong (tidak ada pesanan)
+        $resNov5 = $this->actingAs($this->admin)->get('/admin/dashboard?date=2026-11-05');
+        $resNov5->assertStatus(200);
+        $ordersNov5 = $resNov5->viewData('recentOrders');
+        $this->assertEquals(0, $ordersNov5->total());
+        $resNov5->assertSee('Tidak ada pesanan pada tanggal ini');
+    }
+
     public function test_admin_can_access_pos(): void
     {
         $response = $this->actingAs($this->admin)->get('/admin/pos');

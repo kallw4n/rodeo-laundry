@@ -49,6 +49,11 @@ class AdminDashboardController extends Controller
         // Query pesanan terbaru dengan filter status jika ada
         $query = Order::with(['customer', 'items.service'])->latest();
 
+        // Filter tanggal dari widget kalender di header
+        if ($isDateFiltered) {
+            $query->whereDate('created_at', $selectedDate);
+        }
+
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }

@@ -159,6 +159,12 @@
             <!-- Filter & Export Controls -->
             <div class="flex items-center gap-2.5">
                 <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center">
+                    @if(request('date'))
+                        <input type="hidden" name="date" value="{{ request('date') }}">
+                    @endif
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
                     <select name="status" 
                             onchange="this.form.submit()" 
                             class="px-4 py-2 bg-slate-50 border border-slate-300/80 rounded-full text-xs font-bold text-slate-800 focus:outline-none focus:bg-white focus:border-[#1E1B4B] cursor-pointer shadow-xs">
@@ -181,6 +187,28 @@
                 </button>
             </div>
         </div>
+
+        @if(isset($isDateFiltered) && $isDateFiltered)
+        <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50/80 border border-indigo-200/90 px-4 md:px-5 py-3 rounded-2xl text-xs text-[#1E1B4B]">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-indigo-100 text-[#4338CA] flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-slate-600">Menampilkan pesanan yang dilakukan pada:</span>
+                    <strong class="font-bold text-[#1E1B4B] ml-1">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }}</strong>
+                    <span class="text-slate-500 ml-1">({{ $recentOrders->total() }} pesanan ditemukan)</span>
+                </div>
+            </div>
+            <a href="{{ route('admin.dashboard', request()->except('date')) }}" 
+               class="inline-flex items-center gap-1.5 font-bold text-rose-600 hover:text-rose-700 bg-white hover:bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-200 transition shadow-2xs self-start sm:self-auto cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <span>Hapus Filter Tanggal</span>
+            </a>
+        </div>
+        @endif
 
         <!-- Table Container -->
         <div class="overflow-x-auto">
@@ -306,8 +334,27 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-sm text-[#94A3B8]">
-                                Belum ada pesanan aktif saat ini.
+                            <td colspan="6" class="py-14 text-center text-sm text-[#94A3B8]">
+                                @if(isset($isDateFiltered) && $isDateFiltered)
+                                    <div class="flex flex-col items-center justify-center gap-2.5 max-w-sm mx-auto">
+                                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-700 text-sm">Tidak ada pesanan pada tanggal ini</p>
+                                            <p class="text-xs text-slate-500 mt-0.5">Tidak ditemukan transaksi yang dibuat pada tanggal {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }}.</p>
+                                        </div>
+                                        <a href="{{ route('admin.dashboard', request()->except('date')) }}" 
+                                           class="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-[#4338CA] rounded-full text-xs font-bold transition">
+                                            <span>Tampilkan Semua Pesanan</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    </div>
+                                @else
+                                    Belum ada pesanan aktif saat ini.
+                                @endif
                             </td>
                         </tr>
                     @endforelse
