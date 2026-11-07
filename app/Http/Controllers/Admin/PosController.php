@@ -114,6 +114,8 @@ class PosController extends Controller
             return $order;
         });
 
-        return redirect()->route('admin.pos')->with('success', 'Transaksi Kasir #' . $order->id . ' berhasil disimpan & nota dicetak!');
+        return redirect()->route('admin.pos')
+            ->with('success', 'Transaksi Kasir #' . $order->id . ' berhasil disimpan & nota siap dicetak!')
+            ->with('recent_order_id', $order->id);
     }
 }

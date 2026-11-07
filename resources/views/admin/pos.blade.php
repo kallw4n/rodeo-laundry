@@ -7,6 +7,30 @@
             <p class="text-sm text-[#64748B] mt-1">Input transaksi cepat, timbang cucian digital, dan cetak nota kasir.</p>
         </div>
 
+        @if(session('recent_order_id'))
+            <!-- Banner Transaksi Terbaru Siap Cetak -->
+            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-extrabold text-[#1E1B4B]">Transaksi Terakhir: #RD-{{ str_pad(session('recent_order_id'), 4, '0', STR_PAD_LEFT) }}</div>
+                        <div class="text-xs text-slate-500">Transaksi baru saja disimpan. Anda dapat langsung mencetak struk thermal resminya.</div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.orders.receipt', session('recent_order_id')) }}" target="_blank"
+                   class="px-4 py-2 bg-[#1E1B4B] hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shrink-0">
+                    <svg class="w-4 h-4 text-[#BFF108]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>Cetak Struk Resmi #RD-{{ str_pad(session('recent_order_id'), 4, '0', STR_PAD_LEFT) }}</span>
+                </a>
+            </div>
+        @endif
+
         <!-- ================= MAIN CONTENT 2-COLUMNS ================= -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
@@ -24,6 +48,7 @@
                                 </svg>
                             </div>
                             <input type="text"
+                                   x-ref="customerInput"
                                    x-model="customerQuery"
                                    @focus="customerDropdown = true"
                                    placeholder="Ketik ID pelanggan (#RD-...) atau nama pelanggan..."
@@ -327,12 +352,35 @@
                             </div>
                         </template>
 
+                        <!-- Helper Checklist Persyaratan Transaksi -->
+                        <div x-show="!selectedCustomer || cart.length === 0"
+                             class="p-3 bg-amber-50/90 border border-amber-200/90 rounded-2xl text-xs space-y-1.5 transition">
+                            <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Syarat Menyimpan Transaksi:</span>
+                            </div>
+                            <div class="flex items-center gap-2 pl-5 text-[11px]">
+                                <span :class="selectedCustomer ? 'text-emerald-700 font-bold' : 'text-amber-800 font-medium'">
+                                    <span x-text="selectedCustomer ? '✅' : '⏳'"></span>
+                                    1. Pelanggan: <span class="font-semibold" x-text="selectedCustomer ? selectedCustomer.name : 'Pilih di kolom atas'"></span>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2 pl-5 text-[11px]">
+                                <span :class="cart.length > 0 ? 'text-emerald-700 font-bold' : 'text-amber-800 font-medium'">
+                                    <span x-text="cart.length > 0 ? '✅' : '⏳'"></span>
+                                    2. Layanan: <span class="font-semibold" x-text="cart.length > 0 ? cart.length + ' item cucian dipilih' : 'Klik + Tambah di katalog'"></span>
+                                </span>
+                            </div>
+                        </div>
+
                         <!-- Actions -->
                         <div class="space-y-2.5">
-                            <button type="submit"
-                                    :disabled="cart.length === 0 || !selectedCustomer"
-                                    :class="cart.length === 0 || !selectedCustomer ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.01] active:scale-[0.99]'"
-                                    class="w-full py-3.5 px-4 rounded-2xl bg-[#BFF108] text-[#1E1B4B] font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2">
+                            <button type="button"
+                                    @click="submitOrder()"
+                                    :class="cart.length === 0 || !selectedCustomer ? 'bg-[#BFF108]/80 hover:bg-[#BFF108]' : 'bg-[#BFF108] hover:scale-[1.01] active:scale-[0.99] shadow-md'"
+                                    class="w-full py-3.5 px-4 rounded-2xl text-[#1E1B4B] font-extrabold text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                                 </svg>
@@ -341,9 +389,7 @@
 
                             <button type="button"
                                     @click="sendWhatsAppReceipt()"
-                                    :disabled="cart.length === 0 || !selectedCustomer"
-                                    :class="cart.length === 0 || !selectedCustomer ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-100'"
-                                    class="w-full py-3 px-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs transition flex items-center justify-center gap-2">
+                                    class="w-full py-3 px-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer">
                                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                 </svg>
@@ -352,12 +398,16 @@
                         </div>
                     </form>
 
-                    <!-- Hardware Status Footer -->
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-center text-xs font-semibold text-emerald-600 gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                        </svg>
-                        <span>Cetak Struk</span>
+                    <!-- Cetak Struk Action Button -->
+                    <div class="pt-3 border-t border-slate-200/80">
+                        <button type="button"
+                                @click="printReceipt()"
+                                class="w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200/90 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
+                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                            </svg>
+                            <span>Cetak Struk</span>
+                        </button>
                     </div>
 
                 </div>
@@ -365,12 +415,137 @@
 
         </div>
 
+        <!-- ================= THERMAL RECEIPT MODAL PREVIEW ================= -->
+        <div x-show="showReceiptModal"
+             x-cloak
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+             style="display: none;">
+            <div @click.away="showReceiptModal = false"
+                 class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative print:shadow-none print:border-none print:w-full print:p-0">
+                
+                <!-- Receipt Paper (Thermal Style) -->
+                <div id="thermal-receipt" class="font-mono text-xs text-slate-800 space-y-3 bg-white p-2">
+                    <div class="text-center space-y-1 pb-3 border-b border-dashed border-slate-400">
+                        <h3 class="font-extrabold text-base tracking-tight text-[#1E1B4B]">RODEO LAUNDRY</h3>
+                        <p class="text-[11px] text-slate-500">Gg. Rodeo, Sumberejo, Kota Batu</p>
+                        <p class="text-[11px] text-slate-500">WA: 0813-5805-5257</p>
+                    </div>
+
+                    <div class="text-[11px] space-y-1 py-1 border-b border-dashed border-slate-400">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">No. Nota:</span>
+                            <span class="font-bold">#{{ $invoiceNumber }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Waktu:</span>
+                            <span>{{ \Carbon\Carbon::now()->isoFormat('D MMM Y, HH:mm') }} WIB</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Pelanggan:</span>
+                            <span class="font-bold" x-text="selectedCustomer ? selectedCustomer.name : 'Tamu / Umum'"></span>
+                        </div>
+                        <div class="flex justify-between" x-show="selectedCustomer && selectedCustomer.phone">
+                            <span class="text-slate-500">Telepon:</span>
+                            <span x-text="selectedCustomer ? selectedCustomer.phone : '-'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="py-2 space-y-2 border-b border-dashed border-slate-400">
+                        <template x-for="(it, idx) in cart" :key="idx">
+                            <div class="space-y-0.5">
+                                <div class="font-bold text-slate-800" x-text="it.name"></div>
+                                <div class="flex justify-between text-[11px] text-slate-600">
+                                    <span x-text="it.qty + ' ' + it.unit + ' x Rp ' + formatRupiah(it.price)"></span>
+                                    <span class="font-bold" x-text="'Rp ' + formatRupiah(it.qty * it.price)"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Totals & Payment -->
+                    <div class="space-y-1.5 pt-1 text-[11px]">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Subtotal:</span>
+                            <span class="font-bold" x-text="'Rp ' + formatRupiah(totalCart)"></span>
+                        </div>
+                        <div class="flex justify-between text-emerald-700">
+                            <span>Antar-Jemput:</span>
+                            <span class="font-bold">GRATIS</span>
+                        </div>
+                        <div class="flex justify-between text-xs pt-1.5 border-t border-dashed border-slate-400 font-extrabold text-[#1E1B4B]">
+                            <span>TOTAL TAGIHAN:</span>
+                            <span x-text="'Rp ' + formatRupiah(totalCart)"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-600">
+                            <span>Metode Bayar:</span>
+                            <span class="uppercase font-semibold" x-text="paymentMethod"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-600" x-show="paymentMethod === 'cash'">
+                            <span>Uang Tunai:</span>
+                            <span x-text="'Rp ' + formatRupiah(cashReceived)"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-600" x-show="paymentMethod === 'cash'">
+                            <span>Kembalian:</span>
+                            <span class="font-bold text-emerald-700" x-text="'Rp ' + formatRupiah(changeAmount)"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-dashed border-slate-400 space-y-0.5">
+                        <p>Simpan nota ini sebagai bukti transaksi laundry.</p>
+                        <p class="font-semibold text-slate-700">Terima kasih atas kepercayaan Anda!</p>
+                    </div>
+                </div>
+
+                <!-- Modal Action Buttons (Hidden on Print) -->
+                <div class="mt-5 flex items-center gap-2 print:hidden">
+                    <button type="button"
+                            @click="triggerPrintThermal()"
+                            class="flex-1 py-2.5 px-4 rounded-xl bg-[#1E1B4B] text-white font-bold text-xs hover:bg-slate-800 transition flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                        <svg class="w-4 h-4 text-[#BFF108]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                        <span>Cetak ke Printer</span>
+                    </button>
+                    <button type="button"
+                            @click="showReceiptModal = false"
+                            class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Print Media Styling Khusus Kertas Thermal -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #thermal-receipt, #thermal-receipt * {
+                visibility: visible !important;
+            }
+            #thermal-receipt {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 80mm !important;
+                margin: 0 auto !important;
+                padding: 12px !important;
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
 
     <!-- Pos Controller Javascript via Alpine -->
     <script>
         function posApp() {
             const rawCustomers = @json($customers);
+            const rawRecentOrderId = @json(session('recent_order_id'));
 
             return {
                 customers: rawCustomers,
@@ -380,6 +555,8 @@
                 cart: [],
                 paymentMethod: 'cash',
                 cashReceived: 0,
+                showReceiptModal: false,
+                recentOrderId: rawRecentOrderId,
 
                 get filteredCustomers() {
                     if (!this.customerQuery) return this.customers.slice(0, 6);
@@ -467,23 +644,41 @@
                     return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 },
 
+                printReceipt() {
+                    if (this.cart.length > 0) {
+                        this.showReceiptModal = true;
+                    } else if (this.recentOrderId) {
+                        window.open('/admin/orders/' + this.recentOrderId + '/receipt', '_blank');
+                    } else {
+                        alert('⚠️ Keranjang belanja masih kosong! Silakan klik "+ Tambah" pada layanan cucian di sebelah kiri untuk mencetak struk nota kasir.');
+                    }
+                },
+
+                triggerPrintThermal() {
+                    window.print();
+                },
+
                 sendWhatsAppReceipt() {
                     if (!this.selectedCustomer) {
-                        alert('Silakan pilih pelanggan terlebih dahulu!');
+                        alert('⚠️ Silakan pilih pelanggan terlebih dahulu di kolom atas sebelum mengirim struk!');
+                        if (this.$refs.customerInput) {
+                            this.$refs.customerInput.focus();
+                        }
                         return;
                     }
                     if (this.cart.length === 0) {
-                        alert('Keranjang belanja masih kosong!');
+                        alert('⚠️ Keranjang cucian masih kosong! Silakan pilih minimal 1 layanan cucian di sebelah kiri.');
                         return;
                     }
                     const rawPhone = this.selectedCustomer.phone ? this.selectedCustomer.phone.replace(/[^0-9]/g, '') : '';
-                    if (!rawPhone) {
-                        alert('Pelanggan ini belum memiliki nomor telepon / WhatsApp!');
+                    if (!rawPhone || rawPhone.length < 8) {
+                        alert('⚠️ Pelanggan "' + this.selectedCustomer.name + '" belum memiliki nomor telepon/WhatsApp yang valid.');
                         return;
                     }
                     const intlPhone = rawPhone.startsWith('0') ? '62' + rawPhone.substring(1) : (rawPhone.startsWith('62') ? rawPhone : '62' + rawPhone);
                     
                     let text = `*NOTA TRANSAKSI - RODEO LAUNDRY*\n`;
+                    text += `No. Nota: #{{ $invoiceNumber }}\n`;
                     text += `Pelanggan: ${this.selectedCustomer.name}\n`;
                     text += `Metode Pembayaran: ${this.paymentMethod.toUpperCase()}\n`;
                     text += `--------------------------------\n`;
@@ -491,7 +686,7 @@
                         text += `• ${it.name} (${it.qty} ${it.unit}) : Rp ${this.formatRupiah(it.qty * it.price)}\n`;
                     });
                     text += `--------------------------------\n`;
-                    text += `*TOTAL HARGA: Rp ${this.formatRupiah(this.totalCart)}*\n\n`;
+                    text += `*TOTAL TAGIHAN: Rp ${this.formatRupiah(this.totalCart)}*\n\n`;
                     text += `Terima kasih telah mempercayakan pakaian Anda kepada Rodeo Laundry!\n`;
                     text += `📍 Gg. Rodeo, Sumberejo, Kota Batu | WA: +62 813-5805-5257`;
 
@@ -501,11 +696,14 @@
 
                 submitOrder() {
                     if (!this.selectedCustomer) {
-                        alert('Silakan pilih pelanggan terlebih dahulu!');
+                        alert('⚠️ Harap pilih pelanggan terlebih dahulu di kolom atas sebelum menyimpan struk!');
+                        if (this.$refs.customerInput) {
+                            this.$refs.customerInput.focus();
+                        }
                         return;
                     }
                     if (this.cart.length === 0) {
-                        alert('Keranjang belanja masih kosong!');
+                        alert('⚠️ Keranjang cucian masih kosong! Silakan klik "+ Tambah" pada katalog layanan sebelah kiri.');
                         return;
                     }
                     document.querySelector('form[action="{{ route('admin.pos.order') }}"]').submit();
