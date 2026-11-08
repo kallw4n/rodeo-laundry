@@ -193,6 +193,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // 4. Kelola Layanan
     Route::get('/services', [\App\Http\Controllers\Admin\AdminServiceController::class, 'index'])->name('services.index');
     Route::post('/services', [\App\Http\Controllers\Admin\AdminServiceController::class, 'store'])->name('services.store');
+    Route::get('/services/{service}', fn() => redirect()->route('admin.services.index'));
     Route::put('/services/{service}', [\App\Http\Controllers\Admin\AdminServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [\App\Http\Controllers\Admin\AdminServiceController::class, 'destroy'])->name('services.destroy');
 

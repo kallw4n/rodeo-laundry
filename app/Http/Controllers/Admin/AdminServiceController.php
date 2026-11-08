@@ -75,8 +75,12 @@ class AdminServiceController extends Controller
     public function destroy(ServiceType $service)
     {
         $name = $service->name;
-        $service->delete();
 
-        return redirect()->route('admin.services.index')->with('success', 'Layanan "' . $name . '" berhasil dihapus.');
+        try {
+            $service->delete();
+            return redirect()->route('admin.services.index')->with('success', 'Layanan "' . $name . '" berhasil dihapus dari katalog.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.services.index')->with('error', 'Gagal menghapus layanan "' . $name . '".');
+        }
     }
 }

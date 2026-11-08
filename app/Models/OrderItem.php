@@ -23,5 +23,5 @@ class OrderItem extends Model
     }
 
     public function order() { return $this->belongsTo(Order::class); }
-    public function service() { return $this->belongsTo(ServiceType::class, 'service_id'); }
+    public function service() { return $this->belongsTo(ServiceType::class, 'service_id')->withTrashed(); }
 }

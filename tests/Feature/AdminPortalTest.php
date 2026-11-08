@@ -284,6 +284,14 @@ class AdminPortalTest extends TestCase
             'name'  => 'Cuci Sepatu Sneakers',
             'price' => 25000,
         ]);
+
+        $service = ServiceType::where('name', 'Cuci Sepatu Sneakers')->first();
+        $delResponse = $this->actingAs($this->admin)->delete('/admin/services/' . $service->id);
+        $delResponse->assertRedirect('/admin/services');
+        $this->assertSoftDeleted('service_types', [
+            'id' => $service->id,
+        ]);
+        $this->assertNull(ServiceType::find($service->id));
     }
 
     public function test_admin_can_dispatch_delivery(): void
