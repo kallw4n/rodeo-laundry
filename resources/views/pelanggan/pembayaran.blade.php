@@ -103,6 +103,11 @@
                 }
             });
             
+            // Ambil catatan kurir dari halaman pengiriman
+            if (this.courierNotes && this.courierNotes.trim() !== '') {
+                notesArray.push(`Catatan Kurir: ${this.courierNotes.trim()}`);
+            }
+
             // Ambil catatan lama (kalau ada dari versi sebelumnya)
             if (this.notes && this.notes.trim() !== '') {
                 notesArray.push(this.notes.trim());

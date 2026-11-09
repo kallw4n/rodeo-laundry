@@ -60,6 +60,15 @@
                 this.selectedAddress = null;
                 this.cartAddress = '';
             }
+
+            if (this.courierNotes && this.courierNotes.length > 300) {
+                this.courierNotes = this.courierNotes.slice(0, 300);
+            }
+            this.$watch('courierNotes', val => {
+                if (val && val.length > 300) {
+                    this.courierNotes = val.slice(0, 300);
+                }
+            });
         },
         chooseAddress(addr) {
             this.selectedAddress = addr.id;
@@ -84,10 +93,15 @@
             'Jangan Bunyikan Bel',
         ],
         addQuickNote(text) {
-            if (this.courierNotes.length > 0 && !this.courierNotes.endsWith(' ')) {
-                this.courierNotes += ', ';
+            let current = this.courierNotes || '';
+            if (current.length > 0 && !current.endsWith(' ')) {
+                current += ', ';
             }
-            this.courierNotes += text;
+            current += text;
+            if (current.length > 300) {
+                current = current.slice(0, 300);
+            }
+            this.courierNotes = current;
         },
 
         get hargaKiloan() { return this.kiloanService?.price ?? 0; },
@@ -483,7 +497,8 @@
 
             <div class="relative">
                 <textarea x-model="courierNotes"
-                          maxlength="200"
+                          maxlength="300"
+                          @input="if (courierNotes && courierNotes.length > 300) courierNotes = courierNotes.slice(0, 300)"
                           rows="4"
                           placeholder="Titip ke pos satpam cluster depan ruko, rumah pagar hitam No. 45, hubungi WA jika sudah sampai."
                           class="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl border-2 border-[#E2E7FF] 
@@ -492,7 +507,7 @@
                                  focus:outline-none focus:border-[#BFF138] focus:bg-white
                                  transition-all resize-none"></textarea>
                 <div class="absolute bottom-3 right-3 md:bottom-4 md:right-4 text-[10px] md:text-xs font-semibold text-[#47464E] bg-[#FAF8FF] px-1.5 rounded">
-                    <span x-text="courierNotes.length"></span> / 200
+                    <span x-text="(courierNotes || '').length"></span> / 300
                 </div>
             </div>
 
