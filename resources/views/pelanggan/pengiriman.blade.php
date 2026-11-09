@@ -349,40 +349,53 @@
                 <!-- Dijemput Kurir -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="pickup" value="courier" class="sr-only" x-model="pickupMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-between"
                          :class="pickupMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-motorcycle text-sm md:text-base"></i>
+                        <div>
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-motorcycle text-sm md:text-base"></i>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                     :class="pickupMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="pickupMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                </div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                 :class="pickupMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                     :class="pickupMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <h3 class="text-sm md:text-base font-bold">Dijemput Kurir</h3>
+                                <span class="px-2 py-0.5 bg-[#C2F43B] text-[#334600] rounded-full text-[10px] font-black uppercase tracking-wider">GRATIS</span>
+                            </div>
+                            <p class="text-xs text-[#47464E] mb-2">Estimasi tiba 20-30 menit. Kurir kami membawa laundry bag steril khusus anti-kontaminasi langsung ke pintu Anda.</p>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-[#E2E7FF] flex items-start gap-2 bg-[#F6FCEB] border border-[#D5F587] rounded-xl p-2.5 text-[#244200]">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-sm mt-0.5 shrink-0"></i>
+                            <div class="text-[11px] md:text-xs leading-relaxed">
+                                <span class="font-extrabold text-[#1A1743]">GRATIS JEMPUT:</span> Khusus untuk area penjemputan <span class="font-extrabold text-[#1A1743]">Kota Malang & Kota Batu</span>.
                             </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Dijemput Kurir</h3>
-                        <p class="text-xs text-[#47464E] mb-1">Estimasi tiba 20-30 menit. Kurir kami membawa laundry bag steril khusus anti-kontaminasi langsung ke pintu Anda.</p>
                     </div>
                 </label>
 
                 <!-- Antar Sendiri -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="pickup" value="self" class="sr-only" x-model="pickupMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-between"
                          :class="pickupMethod === 'self' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-store text-sm md:text-base"></i>
+                        <div>
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-store text-sm md:text-base"></i>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                     :class="pickupMethod === 'self' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="pickupMethod === 'self' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                </div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                 :class="pickupMethod === 'self' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                     :class="pickupMethod === 'self' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                            </div>
+                            <h3 class="text-sm md:text-base font-bold mb-1">Antar Sendiri</h3>
+                            <p class="text-xs text-[#47464E] mb-1">Bawa ke Outlet Kami (07.00 - 21.00 WIB). cukup serahkan ke kasir.</p>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Antar Sendiri</h3>
-                        <p class="text-xs text-[#47464E] mb-1">Bawa ke Outlet Kami (07.00 - 21.00 WIB). cukup serahkan ke kasir.</p>
                     </div>
                 </label>
             </div>
@@ -404,40 +417,53 @@
                 <!-- Diantar Kurir -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="delivery" value="courier" class="sr-only" x-model="deliveryMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-between"
                          :class="deliveryMethod === 'courier' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-truck-fast text-sm md:text-base"></i>
+                        <div>
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#BFF138] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-truck-fast text-sm md:text-base"></i>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                     :class="deliveryMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="deliveryMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                </div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                 :class="deliveryMethod === 'courier' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                     :class="deliveryMethod === 'courier' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <h3 class="text-sm md:text-base font-bold">Diantar Kurir</h3>
+                                <span class="px-2 py-0.5 bg-[#C2F43B] text-[#334600] rounded-full text-[10px] font-black uppercase tracking-wider">GRATIS</span>
+                            </div>
+                            <p class="text-xs text-[#47464E] mb-2">Pakaian diantar rapi, wangi, berstandar boutique dalam garment bag waterproof steril langsung ke alamat Anda.</p>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-[#E2E7FF] flex items-start gap-2 bg-[#F6FCEB] border border-[#D5F587] rounded-xl p-2.5 text-[#244200]">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-sm mt-0.5 shrink-0"></i>
+                            <div class="text-[11px] md:text-xs leading-relaxed">
+                                <span class="font-extrabold text-[#1A1743]">GRATIS ONGKIR:</span> Pengantaran pakaian bersih <span class="font-bold underline decoration-[#BFF138] decoration-2">Gratis 100%</span>, hanya berlaku untuk area <span class="font-extrabold text-[#1A1743]">Kota Malang & Kota Batu</span>.
                             </div>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Diantar Kurir</h3>
-                        <p class="text-xs text-[#47464E] mb-1">Pakaian diantar rapi, wangi, berstandar boutique dalam garment bag waterproof steril langsung ke alamat utama.</p>
                     </div>
                 </label>
 
                 <!-- Ambil Sendiri -->
                 <label class="cursor-pointer block">
                     <input type="radio" name="delivery" value="locker" class="sr-only" x-model="deliveryMethod">
-                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-center"
+                    <div class="p-4 md:p-5 rounded-2xl border-2 h-full transition-all duration-200 flex flex-col justify-between"
                          :class="deliveryMethod === 'locker' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                        <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
-                                <i class="fa-solid fa-boxes-stacked text-sm md:text-base"></i>
+                        <div>
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#EAEDFF] rounded-xl flex items-center justify-center shrink-0 text-[#1A1743]">
+                                    <i class="fa-solid fa-boxes-stacked text-sm md:text-base"></i>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
+                                     :class="deliveryMethod === 'locker' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                    <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                         :class="deliveryMethod === 'locker' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
+                                </div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200"
-                                 :class="deliveryMethod === 'locker' ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                     :class="deliveryMethod === 'locker' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                            </div>
+                            <h3 class="text-sm md:text-base font-bold mb-1">Ambil Sendiri</h3>
+                            <p class="text-xs text-[#47464E] mb-1">Ambil kapan pun di Outlet Kami (07.00 - 21.00 WIB).</p>
                         </div>
-                        <h3 class="text-sm md:text-base font-bold mb-1">Ambil Sendiri</h3>
-                        <p class="text-xs text-[#47464E] mb-1">Ambil kapan pun di Outlet Kami (07.00 - 21.00 WIB).</p>
                     </div>
                 </label>
             </div>
@@ -535,9 +561,9 @@
                         </p>
                         <div class="mt-3 pt-3 border-t border-white/10">
                             <p class="flex items-center gap-2 text-white font-semibold mb-1">
-                                <i class="fa-solid fa-truck-fast text-[#BFF108]"></i> Area Penjemputan:
+                                <i class="fa-solid fa-truck-fast text-[#BFF108]"></i> Area Layanan Antar-Jemput:
                             </p>
-                            <p class="text-xs text-slate-400">Khusus melayani Area Kota Batu dan sekitarnya.</p>
+                            <p class="text-xs text-slate-400">Gratis ongkir khusus melayani Area Kota Malang & Kota Batu.</p>
                         </div>
                     </div>
                 </div>

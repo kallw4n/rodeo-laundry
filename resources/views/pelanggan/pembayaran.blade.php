@@ -791,9 +791,9 @@
                         </p>
                         <div class="mt-3 pt-3 border-t border-white/10">
                             <p class="flex items-center gap-2 text-white font-semibold mb-1">
-                                <i class="fa-solid fa-truck-fast text-[#BFF108]"></i> Area Penjemputan:
+                                <i class="fa-solid fa-truck-fast text-[#BFF108]"></i> Area Layanan Antar-Jemput:
                             </p>
-                            <p class="text-xs text-slate-400">Khusus melayani Area Kota Batu dan sekitarnya.</p>
+                            <p class="text-xs text-slate-400">Gratis ongkir khusus melayani Area Kota Malang & Kota Batu.</p>
                         </div>
                     </div>
                 </div>
