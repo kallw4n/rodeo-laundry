@@ -178,9 +178,12 @@ class OrderController extends Controller
             ['name' => $user->username, 'email' => $user->email]
         );
 
-        if (!empty($data['address'])) {
-            if (empty($customer->address)) {
-                $customer->update(['address' => $data['address']]);
+        $rawAddress = trim($data['address'] ?? '');
+        $isDummyPlaceholder = empty($rawAddress) || str_contains(strtolower($rawAddress), 'silakan tambah alamat') || str_contains(strtolower($rawAddress), 'tambah alamat di menu profil');
+
+        if (!$isDummyPlaceholder) {
+            if (empty($customer->address) || str_contains(strtolower($customer->address), 'silakan tambah alamat')) {
+                $customer->update(['address' => $rawAddress]);
             }
 
             if (!\App\Models\Address::where('user_id', $user->id)->exists()) {
@@ -189,7 +192,7 @@ class OrderController extends Controller
                     'label'          => 'Utama',
                     'recipient_name' => $customer->name ?? $user->username,
                     'phone'          => $customer->phone ?? '',
-                    'address'        => $data['address'],
+                    'address'        => $rawAddress,
                     'city'           => $customer->city ?? 'Kota Malang',
                     'is_default'     => true,
                 ]);

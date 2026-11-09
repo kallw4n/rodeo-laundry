@@ -36,38 +36,42 @@
         selectedAddress: null,
         get addresses() {
             if (!this.userAddresses || this.userAddresses.length === 0) {
-                const cust = this.customerData || {};
-                return [{
-                    id: 0,
-                    label: 'Alamat Belum Diatur',
-                    isDefault: true,
-                    name: cust.name || 'Pelanggan',
-                    phone: cust.phone || '-',
-                    address: cust.address || 'Silakan tambah alamat di menu profil',
-                    detail: cust.city || '-',
-                }];
+                return [];
             }
-            return this.userAddresses.map(a => ({
-                id: a.id,
-                label: a.label,
-                isDefault: a.is_default == 1,
-                name: a.recipient_name,
-                phone: a.phone,
-                address: a.address,
-                detail: a.city,
-            }));
+            return this.userAddresses
+                .filter(a => a && a.address && !a.address.toLowerCase().includes('tambah alamat di menu profil'))
+                .map(a => ({
+                    id: a.id,
+                    label: a.label || 'Alamat',
+                    isDefault: a.is_default == 1,
+                    name: a.recipient_name || this.customerData?.name || 'Pelanggan',
+                    phone: a.phone || this.customerData?.phone || '-',
+                    address: a.address,
+                    detail: a.city || '-',
+                }));
         },
 
         init() {
             if (this.addresses.length > 0) {
                 const defaultAddr = this.addresses.find(a => a.isDefault) || this.addresses[0];
                 this.selectedAddress = defaultAddr.id;
-                this.cartAddress = defaultAddr.address + ', ' + defaultAddr.detail;
+                this.cartAddress = defaultAddr.address + (defaultAddr.detail && defaultAddr.detail !== '-' ? ', ' + defaultAddr.detail : '');
+            } else {
+                this.selectedAddress = null;
+                this.cartAddress = '';
             }
         },
         chooseAddress(addr) {
             this.selectedAddress = addr.id;
-            this.cartAddress = addr.address + ', ' + addr.detail;
+            this.cartAddress = addr.address + (addr.detail && addr.detail !== '-' ? ', ' + addr.detail : '');
+        },
+        goToPayment(e) {
+            if ((this.pickupMethod === 'courier' || this.deliveryMethod === 'courier') && (!this.selectedAddress || this.addresses.length === 0)) {
+                if (e) e.preventDefault();
+                alert('Silakan tambahkan atau pilih alamat penjemputan/pengantaran terlebih dahulu sebelum lanjut ke pembayaran.');
+                return;
+            }
+            window.location.href = '{{ route('pembayaran') }}';
         },
 
         pickupMethod: $persist('courier').as('cart_pickup'),
@@ -262,52 +266,71 @@
                 </a>
             </div>
 
-            <div class="space-y-3">
-                <template x-for="addr in addresses" :key="addr.id">
-                    <label class="block cursor-pointer">
-                        <input type="radio" name="address" class="sr-only" 
-                               :value="addr.id" 
-                               :checked="selectedAddress === addr.id"
-                               x-model="selectedAddress" 
-                               @change="chooseAddress(addr)">
-                        <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
-                             :class="selectedAddress === addr.id ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
-                            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
-                                <div class="flex gap-3 flex-1 min-w-0 items-center">
-                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
-                                        :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
-                                        <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
-                                             :class="selectedAddress === addr.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 mb-2 flex-wrap">
-                                            <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] md:text-xs font-bold text-[#1A1743]" x-text="addr.label"></span>
-                                            <template x-if="addr.isDefault">
-                                                <span class="px-2 md:px-2.5 py-0.5 bg-[#C2F43B] rounded-full text-[10px] font-bold text-[#4E6700] uppercase">Utama</span>
-                                            </template>
+            <!-- Daftar Alamat jika ada -->
+            <template x-if="addresses.length > 0">
+                <div class="space-y-3">
+                    <template x-for="addr in addresses" :key="addr.id">
+                        <label class="block cursor-pointer">
+                            <input type="radio" name="address" class="sr-only" 
+                                   :value="addr.id" 
+                                   :checked="selectedAddress === addr.id"
+                                   x-model="selectedAddress" 
+                                   @change="chooseAddress(addr)">
+                            <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
+                                 :class="selectedAddress === addr.id ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]'">
+                                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                                    <div class="flex gap-3 flex-1 min-w-0 items-center">
+                                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                                            :class="selectedAddress === addr.id ? 'border-[#1A1743] bg-[#1A1743]' : 'border-[#CAD2FF] bg-white'">
+                                            <div class="w-2 h-2 bg-white rounded-full transition-all duration-200"
+                                                 :class="selectedAddress === addr.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"></div>
                                         </div>
-                                        <h3 class="text-sm md:text-base font-bold mb-1" x-text="addr.address"></h3>
-                                        <p class="text-[10px] md:text-xs text-[#47464E] mb-2" x-text="addr.detail"></p>
-                                        <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
-                                            <span class="flex items-center gap-1.5">
-                                                <i class="fa-regular fa-user text-xs"></i>
-                                                <span x-text="addr.name"></span>
-                                            </span>
-                                            <span class="flex items-center gap-1.5">
-                                                <i class="fa-solid fa-phone text-xs"></i>
-                                                <span x-text="addr.phone"></span>
-                                            </span>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                                <span class="px-2 md:px-2.5 py-0.5 bg-[#EAEDFF] rounded-full text-[10px] md:text-xs font-bold text-[#1A1743]" x-text="addr.label"></span>
+                                                <template x-if="addr.isDefault">
+                                                    <span class="px-2 md:px-2.5 py-0.5 bg-[#C2F43B] rounded-full text-[10px] font-bold text-[#4E6700] uppercase">Utama</span>
+                                                </template>
+                                            </div>
+                                            <h3 class="text-sm md:text-base font-bold mb-1" x-text="addr.address"></h3>
+                                            <p class="text-[10px] md:text-xs text-[#47464E] mb-2" x-text="addr.detail"></p>
+                                            <div class="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] md:text-xs text-[#47464E]">
+                                                <span class="flex items-center gap-1.5">
+                                                    <i class="fa-regular fa-user text-xs"></i>
+                                                    <span x-text="addr.name"></span>
+                                                </span>
+                                                <span class="flex items-center gap-1.5">
+                                                    <i class="fa-solid fa-phone text-xs"></i>
+                                                    <span x-text="addr.phone"></span>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <a href="{{ route('profile.edit') }}" @click.stop class="px-3 py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-bold transition shrink-0 self-start">
+                                        Edit Alamat
+                                    </a>
                                 </div>
-                                <a href="{{ route('profile.edit') }}" @click.stop class="px-3 py-1.5 bg-[#F2F3FF] hover:bg-[#EAEDFF] text-[#1A1743] rounded-full text-[10px] md:text-xs font-bold transition shrink-0 self-start">
-                                    Edit Alamat
-                                </a>
                             </div>
-                        </div>
-                    </label>
-                </template>
-            </div>
+                        </label>
+                    </template>
+                </div>
+            </template>
+
+            <!-- State jika belum ada alamat -->
+            <template x-if="addresses.length === 0">
+                <div class="p-6 md:p-8 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 flex flex-col items-center justify-center text-center">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-map-location-dot text-xl"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-[#1A1743] mb-1">Belum Ada Alamat Tersimpan</h3>
+                    <p class="text-xs md:text-sm text-slate-600 max-w-md mb-4">
+                        Anda belum menambahkan alamat untuk penjemputan/pengantaran cucian. Silakan tambahkan alamat rumah Anda terlebih dahulu.
+                    </p>
+                    <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1743] text-white hover:bg-[#2F2D59] rounded-full text-xs md:text-sm font-bold shadow-md hover:shadow-lg transition">
+                        <i class="fa-solid fa-plus text-xs"></i> Tambah Alamat Sekarang
+                    </a>
+                </div>
+            </template>
         </div>
 
         <!-- ================= SECTION 2: METODE PENJEMPUTAN ================= -->
@@ -566,6 +589,7 @@
 
                     <template x-if="hasAnySelected">
                         <a href="{{ route('pembayaran') }}" 
+                           @click.prevent="goToPayment($event)"
                            class="hidden sm:flex px-4 md:px-8 py-2.5 md:py-3.5 bg-[#BFF138] text-[#131B2E] font-bold rounded-full text-xs md:text-sm
                                   transition-all duration-300 ease-out
                                   hover:shadow-[0_15px_35px_rgba(204,255,70,0.65)]
@@ -591,6 +615,7 @@
 
             <template x-if="hasAnySelected">
                 <a href="{{ route('pembayaran') }}" 
+                   @click.prevent="goToPayment($event)"
                    class="sm:hidden mt-3 w-full py-3 bg-[#BFF138] text-[#131B2E] font-bold rounded-full text-sm
                           transition-all duration-300 ease-out
                           hover:shadow-[0_15px_35px_rgba(204,255,70,0.65)]
