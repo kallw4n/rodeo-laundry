@@ -37,16 +37,12 @@ class PosController extends Controller
             'cash_received'  => 'nullable|numeric',
         ]);
 
-        $order = DB::transaction(function () use ($request) {
-            $customer = null;
-            if (!empty($request->customer_id)) {
-                $customer = Customer::find($request->customer_id);
-            }
+        $customer = !empty($request->customer_id) ? Customer::find($request->customer_id) : null;
+        $serviceMap = ServiceType::whereIn('id', collect($request->items)->pluck('id'))->get()->keyBy('id');
 
+        $order = DB::transaction(function () use ($request, $customer, $serviceMap) {
             $customerName = $customer ? $customer->name : (trim($request->customer_name ?? '') !== '' ? trim($request->customer_name) : 'Pelanggan Walk-in');
             $customerPhone = $customer ? $customer->phone : trim($request->customer_phone ?? '');
-
-            $serviceMap = ServiceType::whereIn('id', collect($request->items)->pluck('id'))->get()->keyBy('id');
 
             $totalPrice = 0;
             $itemsData = [];

@@ -162,7 +162,8 @@ class OrderController extends Controller
         ]);
 
         $serviceIds = collect($data['items'])->pluck('id');
-        $hasKiloanService = ServiceType::whereIn('id', $serviceIds)->get()->contains(function ($svc) {
+        $services = ServiceType::whereIn('id', $serviceIds)->get()->keyBy('id');
+        $hasKiloanService = $services->contains(function ($svc) {
             return $svc->unit === 'kg';
         });
 
@@ -199,8 +200,7 @@ class OrderController extends Controller
             }
         }
 
-        DB::transaction(function () use ($data, $customer) {
-            $services = ServiceType::whereIn('id', collect($data['items'])->pluck('id'))->get()->keyBy('id');
+        DB::transaction(function () use ($data, $customer, $services) {
             $order = Order::create([
                 'customer_id' => $customer->id,
                 'total_price' => 0,

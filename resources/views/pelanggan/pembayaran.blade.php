@@ -129,7 +129,8 @@
                     }),
                 });
                 if (!res.ok) { 
-                    this.error = 'Gagal membuat pesanan, silakan coba lagi.'; 
+                    const errData = await res.json().catch(() => ({}));
+                    this.error = errData.message || 'Gagal membuat pesanan, silakan coba lagi.'; 
                     this.submitting = false; 
                     return;
                 }
