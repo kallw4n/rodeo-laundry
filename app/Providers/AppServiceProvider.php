@@ -12,9 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL'])) {
-            $this->app->useStoragePath('/tmp/storage');
-        }
+        //
     }
 
     /**
