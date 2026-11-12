@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +12,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL'])) {
+            $this->app->useStoragePath('/tmp/storage');
+        }
     }
 
     /**
@@ -19,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         \Illuminate\Support\Facades\View::addLocation(resource_path('views/pelanggan'));
     }
 }
