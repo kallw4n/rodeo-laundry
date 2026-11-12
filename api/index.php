@@ -1,5 +1,9 @@
 <?php
 
+// Vercel's Linux libpq supports SNI natively; clear PGOPTIONS to avoid pooler/endpoint mismatch
+putenv('PGOPTIONS');
+unset($_ENV['PGOPTIONS'], $_SERVER['PGOPTIONS']);
+
 // Ensure writable directories exist in Vercel's /tmp
 $tmpDirs = [
     '/tmp/storage/framework/views',
@@ -15,3 +19,4 @@ foreach ($tmpDirs as $dir) {
 }
 
 require __DIR__ . '/../public/index.php';
+
