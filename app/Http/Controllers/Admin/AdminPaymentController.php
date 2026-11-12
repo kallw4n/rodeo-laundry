@@ -71,27 +71,22 @@ class AdminPaymentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'order_id'         => 'required|exists:orders,id',
-            'amount'           => 'required|numeric|min:0',
-            'method'           => 'required|in:cash,transfer,e-wallet,credit_card',
-            'status'           => 'required|in:pending,completed,failed',
-            'items'            => 'nullable|array',
-            'items.*.id'       => 'required_with:items|exists:order_items,id',
-            'items.*.quantity' => 'required_with:items|numeric|min:0.01',
+            'order_id'           => 'required|exists:orders,id',
+            'amount'             => 'required|numeric|min:0',
+            'method'             => 'required|in:cash,transfer,e-wallet,credit_card',
+            'status'             => 'required|in:pending,completed,failed',
+            'items'              => 'nullable|array',
+            'items.*.id'         => 'nullable|exists:order_items,id',
+            'items.*.service_id' => 'required_with:items|exists:service_types,id',
+            'items.*.quantity'   => 'required_with:items|numeric|min:0.01',
         ]);
 
-        $payment = DB::transaction(function () use ($request) {
-            $order = Order::find($request->order_id);
+        $order = Order::find($request->order_id);
+        $services = ServiceType::whereIn('id', collect($request->items ?? [])->pluck('service_id')->filter())->get()->keyBy('id');
 
-            if ($request->has('items') && is_array($request->items)) {
-                foreach ($request->items as $row) {
-                    $orderItem = OrderItem::where('order_id', $request->order_id)
-                        ->where('id', $row['id'])
-                        ->first();
-                    if ($orderItem) {
-                        $orderItem->update(['quantity' => (float) $row['quantity']]);
-                    }
-                }
+        $payment = DB::transaction(function () use ($request, $order, $services) {
+            if ($order && $request->has('items') && is_array($request->items)) {
+                $this->syncOrderItems($order, $request->items, $services);
             }
 
             if ($order) {
@@ -122,28 +117,25 @@ class AdminPaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         $request->validate([
-            'amount'           => 'required|numeric|min:0',
-            'method'           => 'required|in:cash,transfer,e-wallet,credit_card',
-            'status'           => 'required|in:pending,completed,failed',
-            'items'            => 'nullable|array',
-            'items.*.id'       => 'required_with:items|exists:order_items,id',
-            'items.*.quantity' => 'required_with:items|numeric|min:0.01',
+            'amount'             => 'required|numeric|min:0',
+            'method'             => 'required|in:cash,transfer,e-wallet,credit_card',
+            'status'             => 'required|in:pending,completed,failed',
+            'items'              => 'nullable|array',
+            'items.*.id'         => 'nullable|exists:order_items,id',
+            'items.*.service_id' => 'required_with:items|exists:service_types,id',
+            'items.*.quantity'   => 'required_with:items|numeric|min:0.01',
         ]);
 
-        DB::transaction(function () use ($request, $payment) {
-            if ($request->has('items') && is_array($request->items)) {
-                foreach ($request->items as $row) {
-                    $orderItem = OrderItem::where('order_id', $payment->order_id)
-                        ->where('id', $row['id'])
-                        ->first();
-                    if ($orderItem) {
-                        $orderItem->update(['quantity' => (float) $row['quantity']]);
-                    }
-                }
+        $order = $payment->order;
+        $services = ServiceType::whereIn('id', collect($request->items ?? [])->pluck('service_id')->filter())->get()->keyBy('id');
+
+        DB::transaction(function () use ($request, $payment, $order, $services) {
+            if ($order && $request->has('items') && is_array($request->items)) {
+                $this->syncOrderItems($order, $request->items, $services);
             }
 
-            if ($payment->order) {
-                $payment->order->update([
+            if ($order) {
+                $order->update([
                     'total_price' => (float) $request->amount,
                 ]);
             }
@@ -154,8 +146,8 @@ class AdminPaymentController extends Controller
                 'status' => $request->status,
             ]);
 
-            if ($request->status === 'completed' && $payment->order && $payment->order->status === 'pending') {
-                $payment->order->update(['status' => 'processing']);
+            if ($request->status === 'completed' && $order && $order->status === 'pending') {
+                $order->update(['status' => 'processing']);
             }
         });
 
@@ -164,6 +156,31 @@ class AdminPaymentController extends Controller
         }
 
         return redirect()->route('admin.payments.index')->with('success', 'Status & rincian pembayaran Nota #' . $payment->order_id . ' berhasil diperbarui!');
+    }
+
+    private function syncOrderItems(Order $order, array $items, $services): void
+    {
+        $keptIds = collect($items)->pluck('id')->filter()->map(fn ($id) => (int) $id)->all();
+        OrderItem::where('order_id', $order->id)
+            ->when(!empty($keptIds), fn ($q) => $q->whereNotIn('id', $keptIds))
+            ->when(empty($keptIds), fn ($q) => $q)
+            ->delete();
+
+        foreach ($items as $row) {
+            if (!empty($row['id'])) {
+                OrderItem::where('order_id', $order->id)
+                    ->where('id', $row['id'])
+                    ->update(['quantity' => (float) $row['quantity']]);
+            } elseif (!empty($row['service_id']) && isset($services[$row['service_id']])) {
+                $svc = $services[$row['service_id']];
+                OrderItem::create([
+                    'order_id'   => $order->id,
+                    'service_id' => $svc->id,
+                    'quantity'   => (float) $row['quantity'],
+                    'price'      => (float) $svc->price,
+                ]);
+            }
+        }
     }
 
     public function destroy(Payment $payment)

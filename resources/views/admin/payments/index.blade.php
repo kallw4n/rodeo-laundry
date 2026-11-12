@@ -304,11 +304,12 @@
                                             </div>
                                         </div>
 
-                                        <!-- Hidden Input ID untuk pengiriman ke controller -->
-                                        <input type="hidden" :name="'items[' + idx + '][id]'" :value="item.id">
+                                        <!-- Hidden Input ID & Service ID untuk pengiriman ke controller -->
+                                        <input type="hidden" :name="'items[' + idx + '][id]'" :value="item.id || ''">
+                                        <input type="hidden" :name="'items[' + idx + '][service_id]'" :value="item.service_id">
 
-                                        <!-- Input Timbangan & Subtotal -->
-                                        <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                                        <!-- Input Timbangan, Subtotal & Hapus Item -->
+                                        <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0">
                                             <div class="flex items-center">
                                                 <input type="number"
                                                        :name="'items[' + idx + '][quantity]'"
@@ -320,10 +321,17 @@
                                                        class="w-20 px-2 py-1.5 bg-white border border-slate-300 rounded-l-xl text-xs font-extrabold text-center text-[#1E1B4B] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
                                                 <span class="px-2.5 py-1.5 bg-slate-100 border border-l-0 border-slate-300 rounded-r-xl text-[11px] font-extrabold text-slate-600" x-text="item.unit"></span>
                                             </div>
-                                            <div class="text-right min-w-[80px]">
+                                            <div class="text-right min-w-[76px]">
                                                 <div class="text-[9px] uppercase font-bold text-slate-400">Subtotal</div>
                                                 <div class="text-xs font-extrabold text-[#1E1B4B]" x-text="'Rp ' + formatRupiah((item.quantity || 0) * (item.price || 0))"></div>
                                             </div>
+                                            <button type="button"
+                                                    x-show="formData.items.length > 1"
+                                                    @click="removeServiceItem(idx)"
+                                                    title="Hapus layanan ini"
+                                                    class="w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center transition text-xs font-bold shrink-0">
+                                                ✕
+                                            </button>
                                         </div>
                                     </div>
                                 </template>
@@ -333,9 +341,27 @@
                         <!-- Fallback jika nota belum ada rincian item -->
                         <template x-if="!formData.items || formData.items.length === 0">
                             <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-500 text-center">
-                                Tidak ada rincian item terpisah pada nota ini. Anda dapat langsung mengedit Total Tagihan di bawah.
+                                Tidak ada rincian item terpisah pada nota ini. Tambahkan layanan di bawah atau langsung edit Total Tagihan.
                             </div>
                         </template>
+
+                        <!-- Opsi Tambah Layanan Susulan (Misal pelanggan bawa barang tambahan di toko) -->
+                        <div class="pt-1 flex items-center gap-2">
+                            <select x-model="newServiceId"
+                                    class="flex-1 px-3 py-2 bg-slate-50 border border-dashed border-indigo-300 rounded-2xl text-xs font-bold text-[#1E1B4B] focus:outline-none focus:bg-white focus:border-[#1E1B4B]">
+                                <option value="">+ Pilih layanan tambahan (misal: Gorden, Sepatu, dll)...</option>
+                                <template x-for="svc in allServices" :key="svc.id">
+                                    <option :value="svc.id" x-text="svc.name + ' — Rp ' + formatRupiah(svc.price) + ' / ' + (svc.unit || 'kg')"></option>
+                                </template>
+                            </select>
+                            <button type="button"
+                                    @click="addServiceItem()"
+                                    :disabled="!newServiceId"
+                                    :class="newServiceId ? 'bg-[#1E1B4B] hover:bg-[#2A2663] text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                                    class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition shrink-0 flex items-center gap-1">
+                                <span>+ Tambah</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Row 3: Total Tagihan & Status Pills -->
@@ -462,7 +488,9 @@
                 isEdit: false,
                 editId: null,
                 cashReceived: 50000,
+                newServiceId: '',
                 unpaidOrders: @json($unpaidOrders),
+                allServices: @json($allServices),
                 formData: {
                     order_id: '',
                     customerName: '',
@@ -476,6 +504,7 @@
                     this.isEdit = false;
                     this.editId = null;
                     this.cashReceived = 0;
+                    this.newServiceId = '';
                     this.formData = {
                         order_id: '',
                         customerName: 'Pilih Nota Terlebih Dahulu',
@@ -490,6 +519,7 @@
                 openEditModal(item) {
                     this.isEdit = true;
                     this.editId = item.id;
+                    this.newServiceId = '';
                     this.cashReceived = Number(item.amount) || 0;
 
                     const rawItems = (item.order && item.order.items) ? item.order.items : [];
@@ -551,6 +581,35 @@
                             }
                         }
                     }
+                },
+
+                addServiceItem() {
+                    if (!this.newServiceId) return;
+                    const svc = this.allServices.find(s => String(s.id) === String(this.newServiceId));
+                    if (!svc) return;
+
+                    const existing = this.formData.items.find(it => String(it.service_id) === String(svc.id));
+                    if (existing) {
+                        existing.quantity = Math.round(((Number(existing.quantity) || 0) + 1) * 100) / 100;
+                    } else {
+                        const unitName = svc.unit || (svc.name && svc.name.toLowerCase().includes('kiloan') ? 'kg' : 'pcs');
+                        this.formData.items.push({
+                            id: '',
+                            service_id: svc.id,
+                            name: svc.name,
+                            price: Number(svc.price) || 0,
+                            quantity: 1,
+                            unit: unitName
+                        });
+                    }
+                    this.newServiceId = '';
+                    this.recalculateTotals();
+                },
+
+                removeServiceItem(idx) {
+                    if (this.formData.items.length <= 1) return;
+                    this.formData.items.splice(idx, 1);
+                    this.recalculateTotals();
                 },
 
                 totalWeight() {
