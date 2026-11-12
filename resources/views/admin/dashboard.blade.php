@@ -211,7 +211,7 @@
         @endif
 
         <!-- Table Container -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto md:overflow-visible">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 bg-slate-100/90 border-y border-slate-200/80">
