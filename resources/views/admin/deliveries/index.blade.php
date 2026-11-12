@@ -86,15 +86,25 @@
                         @forelse($deliveries as $item)
                             @php
                                 $cust = $item->order->customer ?? null;
-                                $custName = $cust->name ?? 'Pelanggan Rodeo';
-                                $custPhone = $cust->phone ?? '0857-9912-4418';
+                                $custName = $cust->name ?? ($item->order->customer_name ?? 'Pelanggan Rodeo');
+                                $custPhone = $cust->phone ?: ($item->order->customer_phone ?: 'Belum isi No. WA');
                                 $items = $item->order->items ?? collect();
-                                $serviceName = $items->first()->service->name ?? 'Bedcover King + 8 kg Kiloan';
+                                $firstItem = $items->first();
+                                $serviceName = $firstItem && $firstItem->service
+                                    ? $firstItem->service->name . ($items->count() > 1 ? ' (+' . ($items->count() - 1) . ' layanan)' : '')
+                                    : 'Layanan Laundry';
+                                $itemsSummary = $items->map(function ($it) {
+                                    $u = $it->unit ?? ($it->service->unit ?? 'kg');
+                                    return ($it->service->name ?? 'Layanan') . ' (' . ($it->quantity + 0) . ' ' . $u . ')';
+                                })->implode(' • ');
+                                $addrParts = explode(' | ', str_replace('Catatan: Catatan ', 'Catatan ', $item->address ?? ''), 2);
+                                $cleanAddr = $addrParts[0] ?: '-';
+                                $noteSub = $addrParts[1] ?? 'Kota Malang & Kota Batu';
                                 $status = $item->status ?? 'scheduled';
                             @endphp
                             <tr class="hover:bg-indigo-50/40 transition">
                                 <td class="py-4 px-6 font-extrabold text-[#1E1B4B] text-sm">
-                                    #RD-{{ 8900 + ($item->order_id ?? $item->id) }}
+                                    #RD-{{ str_pad($item->order_id ?? $item->id, 4, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="py-4 px-6">
                                     <div class="flex items-center gap-2">
@@ -105,11 +115,11 @@
                                 </td>
                                 <td class="py-4 px-6">
                                     <div class="font-bold text-[#1E1B4B]">{{ $serviceName }}</div>
-                                    <div class="text-[11px] text-[#64748B] mt-0.5">2 Item • Bungkus Vacuum Higenis</div>
+                                    <div class="text-[11px] text-[#64748B] mt-0.5">{{ $itemsSummary ?: '-' }}</div>
                                 </td>
                                 <td class="py-4 px-6 text-[#1E1B4B] max-w-xs">
-                                    <div class="truncate font-medium">{{ $item->address }}</div>
-                                    <div class="text-[11px] text-[#94A3B8]">Malang Raya</div>
+                                    <div class="truncate font-medium">{{ $cleanAddr }}</div>
+                                    <div class="text-[11px] text-[#94A3B8] truncate">{{ $noteSub }}</div>
                                 </td>
                                 <td class="py-4 px-6">
                                     @if($status === 'scheduled')
@@ -267,17 +277,24 @@
                                         class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs font-extrabold text-[#1E1B4B] focus:outline-none focus:bg-white focus:border-[#1E1B4B]">
                                     <option value="">Pilih Nota Siap Antar</option>
                                     @foreach($readyOrders as $ro)
+                                        @php
+                                            $roSummary = $ro->items->map(function ($it) {
+                                                $u = $it->unit ?? ($it->service->unit ?? 'kg');
+                                                return '• ' . ($it->service->name ?? 'Layanan') . ' (' . ($it->quantity + 0) . ' ' . $u . ')';
+                                            })->implode("\n");
+                                        @endphp
                                         <option value="{{ $ro->id }}"
-                                                data-customer="{{ $ro->customer->name ?? '' }}"
-                                                data-phone="{{ $ro->customer->phone ?? '' }}"
-                                                data-address="{{ $ro->customer->address ?? '' }}">
-                                            #RD-{{ 8900 + $ro->id }} - {{ $ro->customer->name ?? 'Umum' }}
+                                                data-customer="{{ $ro->customer->name ?? ($ro->customer_name ?? '') }}"
+                                                data-phone="{{ $ro->customer->phone ?? ($ro->customer_phone ?? '') }}"
+                                                data-address="{{ $ro->customer->address ?? '' }}"
+                                                data-package="{{ $roSummary }}">
+                                            #RD-{{ str_pad($ro->id, 4, '0', STR_PAD_LEFT) }} - {{ $ro->customer->name ?? ($ro->customer_name ?? 'Umum') }}
                                         </option>
                                     @endforeach
                                 </select>
                             </template>
                             <template x-if="isEdit">
-                                <input type="text" :value="'#RD-' + (8900 + Number(formData.order_id))" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300/80 rounded-2xl text-xs font-extrabold text-[#1E1B4B]">
+                                <input type="text" :value="'#RD-' + String(formData.order_id || '').padStart(4, '0')" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300/80 rounded-2xl text-xs font-extrabold text-[#1E1B4B]">
                             </template>
                         </div>
 
@@ -294,8 +311,8 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-[#1E1B4B]">Rincian Cucian (Detail Paket)</label>
-                            <div class="p-3 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-[#1E1B4B] font-medium min-h-[72px]">
-                                Bedcover King + 8 kg Kiloan (2 Item, Bungkus Vacuum Higenis, Wangi Ocean Fresh)
+                            <div class="p-3 bg-slate-50 border border-slate-300/80 rounded-2xl text-xs text-[#1E1B4B] font-medium min-h-[72px] whitespace-pre-line"
+                                 x-text="formData.packageDetail || 'Pilih nota untuk melihat rincian layanan'">
                             </div>
                         </div>
 
@@ -387,8 +404,9 @@
                 editId: null,
                 formData: {
                     order_id: '',
-                    customerInfo: 'Rahmat Hidayatullah (0857-9912-4418)',
-                    address: 'Permata Jingga Blok CC-09, Tunggulwulung, Lowokwaru, Kota Malang',
+                    customerInfo: '',
+                    packageDetail: '',
+                    address: '',
                     status: 'scheduled',
                     notes: ''
                 },
@@ -399,6 +417,7 @@
                     this.formData = {
                         order_id: '',
                         customerInfo: 'Pilih Nota Cucian Siap Antar',
+                        packageDetail: 'Pilih nota untuk melihat rincian layanan',
                         address: '',
                         status: 'scheduled',
                         notes: ''
@@ -410,12 +429,27 @@
                     this.isEdit = true;
                     this.editId = item.id;
                     const cust = item.order && item.order.customer ? item.order.customer : null;
+                    const name = (cust && cust.name) || (item.order && item.order.customer_name) || 'Pelanggan';
+                    const phone = (cust && cust.phone) || (item.order && item.order.customer_phone) || '';
+                    const rawItems = (item.order && item.order.items) ? item.order.items : [];
+                    const pkgLines = rawItems.map(it => {
+                        const sName = (it.service && it.service.name) ? it.service.name : 'Layanan Laundry';
+                        const unit = it.unit || (it.service && it.service.unit) || 'kg';
+                        return `• ${sName} (${Number(it.quantity)} ${unit})`;
+                    });
+
+                    const rawAddr = String(item.address || '').replace(/Catatan:\s*Catatan\s+/i, 'Catatan ');
+                    const parts = rawAddr.split(' | ');
+                    const cleanAddress = parts[0] || '';
+                    const extractedNotes = parts.slice(1).join(' | ').replace(/^Catatan(\s*Kurir)?:\s*/i, '');
+
                     this.formData = {
                         order_id: item.order_id,
-                        customerInfo: (cust ? cust.name : 'Pelanggan') + ' (' + (cust ? cust.phone : '-') + ')',
-                        address: item.address || '',
+                        customerInfo: name + (phone ? ' (' + phone + ')' : ' (Belum isi No. WA)'),
+                        packageDetail: pkgLines.length > 0 ? pkgLines.join('\n') : 'Tidak ada rincian layanan',
+                        address: cleanAddress,
                         status: item.status || 'scheduled',
-                        notes: ''
+                        notes: extractedNotes
                     };
                     this.showModal = true;
                 },
@@ -425,9 +459,11 @@
                     const opt = select.options[select.selectedIndex];
                     if (opt && opt.value) {
                         const name = opt.getAttribute('data-customer') || 'Pelanggan';
-                        const phone = opt.getAttribute('data-phone') || '-';
-                        this.formData.customerInfo = name + ' (' + phone + ')';
-                        this.formData.address = opt.getAttribute('data-address') || 'Kota Malang';
+                        const phone = opt.getAttribute('data-phone') || '';
+                        const pkg = opt.getAttribute('data-package') || '';
+                        this.formData.customerInfo = name + (phone ? ' (' + phone + ')' : ' (Belum isi No. WA)');
+                        this.formData.packageDetail = pkg || 'Tidak ada rincian layanan';
+                        this.formData.address = opt.getAttribute('data-address') || '';
                     }
                 }
             };

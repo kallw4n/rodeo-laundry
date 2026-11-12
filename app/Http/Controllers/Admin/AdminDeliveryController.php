@@ -67,10 +67,15 @@ class AdminDeliveryController extends Controller
             'notes'          => 'nullable|string',
         ]);
 
+        $addr = trim($request->address);
+        if ($request->filled('notes')) {
+            $addr .= ' | Catatan: ' . trim($request->notes);
+        }
+
         $delivery = Delivery::create([
             'order_id'       => $request->order_id,
             'type'           => 'delivery',
-            'address'        => $request->address,
+            'address'        => $addr,
             'status'         => $request->status,
             'scheduled_date' => $request->scheduled_date ?? now(),
         ]);
@@ -92,10 +97,17 @@ class AdminDeliveryController extends Controller
             'address'        => 'required|string',
             'status'         => 'required|in:scheduled,on-way,completed,failed',
             'scheduled_date' => 'nullable|date',
+            'notes'          => 'nullable|string',
         ]);
 
+        $addr = trim($request->address);
+        if ($request->filled('notes')) {
+            $note = trim($request->notes);
+            $addr .= ' | ' . (str_starts_with(strtolower($note), 'catatan') ? $note : 'Catatan: ' . $note);
+        }
+
         $delivery->update([
-            'address'        => $request->address,
+            'address'        => $addr,
             'status'         => $request->status,
             'scheduled_date' => $request->scheduled_date ?? $delivery->scheduled_date,
         ]);

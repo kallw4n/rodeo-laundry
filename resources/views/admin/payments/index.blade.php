@@ -100,7 +100,7 @@
                             @endphp
                             <tr class="hover:bg-indigo-50/40 transition">
                                 <td class="py-4 px-6 font-extrabold text-[#1E1B4B] text-sm">
-                                    #RD-{{ 8900 + ($item->order_id ?? $item->id) }}
+                                    #RD-{{ str_pad($item->order_id ?? $item->id, 4, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="py-4 px-6">
                                     <div class="font-extrabold text-[#1E1B4B] text-sm">{{ $customerName }}</div>
@@ -246,13 +246,13 @@
                                     <option value="">Pilih Nota Cucian</option>
                                     @foreach($unpaidOrders as $uo)
                                         <option value="{{ $uo->id }}" data-customer="{{ $uo->customer->name ?? '' }}" data-amount="{{ $uo->total_price }}">
-                                            #RD-{{ 8900 + $uo->id }} ({{ $uo->customer->name ?? 'Umum' }} - Rp {{ number_format($uo->total_price, 0, ',', '.') }})
+                                            #RD-{{ str_pad($uo->id, 4, '0', STR_PAD_LEFT) }} ({{ $uo->customer->name ?? 'Umum' }} - Rp {{ number_format($uo->total_price, 0, ',', '.') }})
                                         </option>
                                     @endforeach
                                 </select>
                             </template>
                             <template x-if="isEdit">
-                                <input type="text" :value="'#RD-' + (8900 + Number(formData.order_id))" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300/80 rounded-2xl text-xs font-extrabold text-[#1E1B4B]">
+                                <input type="text" :value="'#RD-' + String(formData.order_id || '').padStart(4, '0')" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300/80 rounded-2xl text-xs font-extrabold text-[#1E1B4B]">
                             </template>
                         </div>
 

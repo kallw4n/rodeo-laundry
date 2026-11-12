@@ -81,7 +81,7 @@ class OrderController extends Controller
             ];
 
             return [
-                'id'                   => 'ROD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT),
+                'id'                   => 'RD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT),
                 'raw_id'               => $order->id,
                 'date'                 => $order->created_at ? $order->created_at->translatedFormat('d F Y, H:i') : '-',
                 'status'               => $order->status,
@@ -100,7 +100,7 @@ class OrderController extends Controller
                     ];
                 }),
                 'total'          => (int) $order->total_price,
-                'address'        => $order->delivery->address ?? ($order->customer->address ?? 'Ambil di Outlet Rodeo Malang'),
+                'address'        => str_replace('Catatan: Catatan ', 'Catatan ', $order->delivery->address ?? ($order->customer->address ?? 'Ambil di Outlet Rodeo Malang')),
                 'canCancel'      => $order->status === 'pending' && $paymentStatus !== 'completed',
                 'canEditAddress' => in_array($order->status, ['pending', 'processing']),
                 'month_key'      => $order->created_at ? $order->created_at->format('Y-m') : 'unknown',
@@ -229,11 +229,12 @@ class OrderController extends Controller
 
             $delivery = $data['pickup'] === 'courier';
             $addrText = !empty($data['address']) ? $data['address'] : ($customer->address ?? 'Alamat belum diisi');
+            $noteText = trim($data['notes'] ?? '');
             Delivery::create([
                 'order_id' => $order->id,
                 'type' => $delivery ? 'delivery' : 'pickup',
                 'address' => ($delivery ? $addrText : 'Ambil di Outlet Rodeo Malang')
-                    . ($data['notes'] ?? '' ? ' | Catatan: ' . $data['notes'] : ''),
+                    . ($noteText !== '' ? ' | ' . $noteText : ''),
                 'scheduled_date' => now()->addDays(2),
                 'status' => 'scheduled',
             ]);
