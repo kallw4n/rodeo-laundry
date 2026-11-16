@@ -25,13 +25,7 @@
             <div>
                 <!-- Brand Logo -->
                 <div class="h-20 px-6 flex items-center gap-3 border-b border-slate-200/80">
-                    <div class="w-10 h-10 rounded-xl bg-[#1E1B4B] flex items-center justify-center shadow-md">
-                        <svg class="w-5 h-5 text-[#BFF108]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"/>
-                            <circle cx="12" cy="12" r="3" fill="#BFF108"/>
-                            <path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="40" height="40" class="w-10 h-10 rounded-full object-contain shadow-md shrink-0 bg-white">
                     <div>
                         <div class="text-lg font-extrabold text-[#1E1B4B] tracking-tight">
                             Rodeo<span class="text-[#BFF108]">.</span><span class="text-[#64748B] font-semibold text-sm">Laundry</span>

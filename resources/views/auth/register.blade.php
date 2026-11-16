@@ -54,9 +54,7 @@
 
             <!-- Brand Logo Centered -->
             <div class="flex items-center justify-center gap-2 mb-4">
-                <div class="w-8 h-8 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
-                </div>
+                <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="36" height="36" class="w-9 h-9 rounded-full object-contain shadow-xs shrink-0 bg-white">
                 <span class="text-lg font-extrabold tracking-tight text-[#1A1743]">Rodeo<span class="text-[#8FB300]">.</span>Laundry</span>
             </div>
 

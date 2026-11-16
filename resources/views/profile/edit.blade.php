@@ -13,10 +13,8 @@
     <!-- HEADER -->
     <header class="fixed top-0 w-full h-16 md:h-20 bg-[#FAF8FF]/85 backdrop-blur-md shadow-sm z-50 border-b border-[#E2E7FF]/60">
         <div class="max-w-[1440px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-2">
-                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
-                </div>
+            <a href="{{ url('/') }}" class="flex items-center gap-2.5">
+                <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="44" height="44" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-contain shadow-xs shrink-0 bg-white">
                 <div>
                     <div class="text-base md:text-lg font-semibold leading-none">
                         Rodeo Laundry<span class="text-[#bff108ff]">.</span>

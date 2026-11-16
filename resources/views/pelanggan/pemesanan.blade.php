@@ -107,10 +107,8 @@
         <div class="max-w-[1440px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
 
             <!-- Logo -->
-            <a href="{{ url('/') }}" class="flex items-center gap-2">
-                <div class="w-9 h-9 md:w-10 md:h-10 bg-[#2F2D59] rounded-xl flex items-center justify-center shadow-lg shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bff108ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
-                </div>
+            <a href="{{ url('/') }}" class="flex items-center gap-2.5">
+                <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="44" height="44" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-contain shadow-xs shrink-0 bg-white">
                 <div>
                     <div class="text-base md:text-lg font-semibold leading-none">
                         Rodeo Laundry<span class="text-[#bff108ff]">.</span>
@@ -473,9 +471,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
-                        <div class="w-9 h-9 md:w-10 md:h-10 bg-[#252250] rounded-xl flex items-center justify-center shadow-lg shrink-0 border border-white/10">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BFF108" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3"/><path d="M17 6h.01"/><rect width="18" height="20" x="3" y="2" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5"/></svg>
-                        </div>
+                        <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="44" height="44" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-contain shadow-lg shrink-0 bg-white p-0.5">
                         <span class="text-lg md:text-xl font-bold tracking-tight text-white">Rodeo Laundry<span class="text-[#BFF108]">.</span></span>
                     </div>
                     <p class="text-slate-300 text-xs md:text-sm mb-5 leading-relaxed">
