@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <!-- TAMBAHKAN editingAddress: null DI SINI -->
-<body class="bg-[#FAF8FF] text-[#1A1743] font-sans antialiased pb-12" x-data="{ showAddForm: false, editingAddress: null }">
+<body class="bg-[#D8E1F0] text-[#1A1743] font-sans antialiased pb-12" x-data="{ showAddForm: false, editingAddress: null }">
 
     <!-- HEADER -->
-    <header class="fixed top-0 w-full h-16 md:h-20 bg-[#FAF8FF]/85 backdrop-blur-md shadow-sm z-50 border-b border-[#E2E7FF]/60">
+    <header class="fixed top-0 w-full h-16 md:h-20 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-slate-200/80">
         <div class="max-w-[1440px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center gap-2.5">
                 <img src="{{ asset('images/logo-rodeo.png') }}" alt="Logo Rodeo Laundry" width="44" height="44" class="w-10 h-10 md:w-11 md:h-11 rounded-full object-contain shadow-xs shrink-0 bg-white">

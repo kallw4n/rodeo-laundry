@@ -15,7 +15,7 @@
         }
     </style>
 </head>
-<body class="bg-[#EEF1F8] text-[#1A1743] antialiased min-h-screen selection:bg-[#BFF108] selection:text-[#1E1B4B]">
+<body class="bg-[#D8E1F0] text-[#1A1743] antialiased min-h-screen selection:bg-[#BFF108] selection:text-[#1E1B4B]">
     <div class="min-h-screen flex" x-data="{ sidebarOpen: false }">
 
         <!-- ================= SIDEBAR ================= -->

@@ -13,7 +13,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-[#FAF8FF] font-sans antialiased text-[#1A1743] min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10">
+<body class="bg-[#D8E1F0] font-sans antialiased text-[#1A1743] min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10">
 
     <!-- ================= CENTERED CARD CONTAINER ================= -->
     <div class="w-full max-w-5xl bg-white rounded-[32px] md:rounded-[40px] shadow-2xl border border-[#E2E7FF]/70 overflow-hidden grid grid-cols-1 lg:grid-cols-2">

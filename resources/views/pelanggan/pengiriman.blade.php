@@ -24,7 +24,7 @@
     };
     </script>
 </head>
-<body class="bg-[#EEF1F8] text-[#1A1743] font-sans antialiased pb-40 md:pb-36 min-h-screen flex flex-col justify-between"
+<body class="bg-[#D8E1F0] text-[#1A1743] font-sans antialiased pb-40 md:pb-36 min-h-screen flex flex-col justify-between"
       x-data="{
         ...window.pengirimanData,
 

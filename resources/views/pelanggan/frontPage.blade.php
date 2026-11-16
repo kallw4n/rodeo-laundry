@@ -16,7 +16,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-[#EEF1F8] text-[#1A1743] font-sans antialiased selection:bg-[#BFF108] selection:text-[#1A1743] min-h-screen flex flex-col justify-between">
+<body class="bg-[#D8E1F0] text-[#1A1743] font-sans antialiased selection:bg-[#BFF108] selection:text-[#1A1743] min-h-screen flex flex-col justify-between">
 
     <!-- ================= HEADER ================= -->
     <header class="fixed top-0 w-full h-16 md:h-20 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-slate-200/80"
