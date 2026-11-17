@@ -42,9 +42,58 @@
         error: '',
         
         showQrisModal: false,
+        showTransferModal: false,
+        copiedRekening: false,
+        copiedNominal: false,
+        transferSenderName: '',
+        transferSenderBank: 'Bank Jatim',
+        transferRef: '',
         orderNumber: '#RD-' + Math.floor(10000 + Math.random() * 90000),
         timer: 899,
         timerInterval: null,
+
+        copyToClipboard(text, type = 'rekening') {
+            const strText = String(text);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(strText);
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = strText;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+            if (type === 'rekening') {
+                this.copiedRekening = true;
+                setTimeout(() => { this.copiedRekening = false; }, 2000);
+            } else if (type === 'nominal') {
+                this.copiedNominal = true;
+                setTimeout(() => { this.copiedNominal = false; }, 2000);
+            }
+        },
+
+        get waTransferLink() {
+            const lines = [
+                'Halo Admin Rodeo Laundry, saya ingin konfirmasi pembayaran Transfer Bank untuk pesanan ' + this.orderNumber + ':',
+                '',
+                '• Total Tagihan: ' + this.formatRp(this.totalBayar),
+                '• Rekening Tujuan: Bank Jatim 0402667320 a.n Dzauq Bachrul \'Ulum',
+                '• Nama Pengirim: ' + (this.transferSenderName || '-'),
+                '• Bank Pengirim: ' + (this.transferSenderBank || 'Bank Jatim'),
+            ];
+            if (this.transferRef && this.transferRef.trim() !== '') {
+                lines.push('• Catatan/Ref: ' + this.transferRef.trim());
+            }
+            lines.push('');
+            lines.push('Mohon dicek dan diverifikasi ya min, terima kasih!');
+            return 'https://wa.me/6281358055257?text=' + encodeURIComponent(lines.join('\n'));
+        },
 
         startTimer() {
             if (this.timerInterval) clearInterval(this.timerInterval);
@@ -77,6 +126,9 @@
             if (this.paymentMethod === 'qris') {
                 this.startTimer();
                 this.showQrisModal = true;
+            } else if (this.paymentMethod === 'va') {
+                this.startTimer();
+                this.showTransferModal = true;
             } else {
                 this.checkout();
             }
@@ -106,6 +158,18 @@
             // Ambil catatan kurir dari halaman pengiriman
             if (this.courierNotes && this.courierNotes.trim() !== '') {
                 notesArray.push(`Catatan Kurir: ${this.courierNotes.trim()}`);
+            }
+
+            // Ambil catatan transfer jika metode pembayaran VA / Transfer Bank
+            if (this.paymentMethod === 'va') {
+                const sender = (this.transferSenderName || '').trim();
+                const bank = (this.transferSenderBank || '').trim();
+                const ref = (this.transferRef || '').trim();
+                let tfInfo = 'Transfer: Bank Jatim (0402667320 a.n Dzauq Bachrul \'Ulum)';
+                if (sender) tfInfo += ` | Pengirim: ${sender}`;
+                if (bank) tfInfo += ` via ${bank}`;
+                if (ref) tfInfo += ` | Ref: ${ref}`;
+                notesArray.push(tfInfo);
             }
 
             // Ambil catatan lama (kalau ada dari versi sebelumnya)
@@ -583,19 +647,24 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 flex-wrap mb-1">
-                                        <p class="font-bold text-[#1A1743] text-sm md:text-base">Transfer Bank / Virtual Account</p>
+                                        <p class="font-bold text-[#1A1743] text-sm md:text-base">Transfer Bank (Bank Jatim)</p>
                                         <template x-if="hasKiloan">
                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shrink-0">
                                                 <i class="fa-solid fa-lock text-[9px]"></i> Terkunci untuk Kiloan
                                             </span>
                                         </template>
+                                        <template x-if="!hasKiloan">
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1 shrink-0">
+                                                <i class="fa-solid fa-check text-[9px]"></i> Bank Jatim
+                                            </span>
+                                        </template>
                                     </div>
                                     <p class="text-xs text-[#47464E]"
-                                       x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'BCA Virtual Account, Mandiri, BNI, BRI, Permata Bank'"></p>
+                                       x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'Bank Jatim 0402667320 a.n Dzauq Bachrul \'Ulum (Bisa dari m-Banking / ATM semua bank)'"></p>
                                 </div>
                             </div>
                             <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">
-                                <i class="fa-solid fa-building-columns text-xs"></i> VA Bank
+                                <i class="fa-solid fa-building-columns text-xs text-[#4E6700]"></i> Bank Jatim
                             </span>
                         </div>
                     </div>
@@ -737,6 +806,190 @@
             <button type="button"
                     @click="showQrisModal = false"
                     class="w-full text-center text-xs font-semibold text-[#717082] hover:text-[#1A1743] mt-3 transition">
+                Batal / Ubah Metode Pembayaran
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= MODAL SIMULASI TRANSFER BANK ================= -->
+    <div x-show="showTransferModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-[#0E0E1B]/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto"
+         style="display: none;">
+        
+        <div @click.outside="showTransferModal = false"
+             class="w-full max-w-[480px] bg-white rounded-[28px] p-6 sm:p-7 shadow-2xl relative text-[#1A1743] my-8 max-h-[92vh] overflow-y-auto">
+
+            <!-- Close Button -->
+            <button @click="showTransferModal = false"
+                    class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 transition w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-8 h-8 rounded-xl bg-[#1A1743] text-[#BFF138] flex items-center justify-center text-xs shadow-xs">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-[#1A1743]">Transfer Bank</h3>
+                    <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-extrabold">Bank Jatim</span>
+                </div>
+                <p class="text-xs text-[#717082]">Silakan transfer sesuai total tagihan ke rekening resmi Rodeo Laundry di bawah ini</p>
+            </div>
+
+            <!-- Countdown Banner -->
+            <div class="bg-[#EAEDFF]/70 rounded-xl px-4 py-2.5 flex items-center justify-between text-xs font-semibold text-[#1A1743] mt-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-hourglass-half text-[#1A1743]"></i>
+                    <span>Selesaikan transfer dalam</span>
+                </div>
+                <div class="font-extrabold tracking-wider" x-text="formattedTimer">14 : 59</div>
+            </div>
+
+            <!-- Bank Account Card -->
+            <div class="bg-gradient-to-br from-[#1A1743] to-[#2B276B] rounded-2xl p-5 text-white shadow-md mt-4 relative overflow-hidden">
+                <!-- Watermark shape -->
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 pointer-events-none"></div>
+
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/15 text-white text-xs font-black tracking-wider uppercase border border-white/10">
+                            Bank Jatim
+                        </span>
+                        <span class="text-[10px] text-white/70">Cabang Batu / Malang</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-[#BFF138] flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved"></i> Rekening Resmi
+                    </span>
+                </div>
+
+                <div class="text-[11px] text-white/75 font-medium uppercase tracking-wider mb-1">Nomor Rekening Tujuan</div>
+                <div class="flex items-center justify-between gap-3 bg-white/10 rounded-xl px-3.5 py-2.5 backdrop-blur-xs border border-white/10">
+                    <span class="font-mono text-xl sm:text-2xl font-black tracking-widest text-[#BFF138]">0402667320</span>
+                    <button type="button"
+                            @click="copyToClipboard('0402667320', 'rekening')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                            :class="copiedRekening ? 'bg-emerald-500 text-white' : 'bg-white text-[#1A1743] hover:bg-slate-100'">
+                        <i :class="copiedRekening ? 'fa-solid fa-check' : 'fa-regular fa-copy'"></i>
+                        <span x-text="copiedRekening ? 'Tersalin!' : 'Salin'"></span>
+                    </button>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-xs pt-2.5 border-t border-white/10">
+                    <div>
+                        <div class="text-[10px] text-white/70 uppercase tracking-wider">Atas Nama (a.n)</div>
+                        <div class="font-bold text-sm text-white tracking-wide">Dzauq Bachrul 'Ulum</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-white/70 uppercase tracking-wider">Jaringan</div>
+                        <div class="font-bold text-xs text-white">m-Banking / ATM / BI-FAST</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Section (Nominal & Order) -->
+            <div class="mt-4 p-3.5 bg-[#FAF8FF] border border-[#E2E7FF] rounded-2xl space-y-2 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="text-[#717082] font-medium">Total yang Harus Ditransfer</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-base font-black text-[#1A1743]" x-text="formatRp(totalBayar)"></span>
+                        <button type="button"
+                                @click="copyToClipboard(totalBayar, 'nominal')"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#CAD2FF] text-[#1A1743] hover:bg-[#EAEDFF] cursor-pointer"
+                                :title="'Salin nominal ' + totalBayar">
+                            <span x-text="copiedNominal ? 'Tersalin' : 'Salin'"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-[#E2E7FF]/70">
+                    <span class="text-[#717082]">Nomor Pesanan</span>
+                    <span class="font-bold text-[#1A1743]" x-text="orderNumber"></span>
+                </div>
+            </div>
+
+            <!-- Section Input Pelanggan ("tolong ditambahkan ya buat inputannya") -->
+            <div class="mt-4 pt-3.5 border-t border-slate-100 space-y-3">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-extrabold text-[#1A1743] flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen-to-square text-[#4E6700]"></i>
+                        <span>Konfirmasi Data Pengirim</span>
+                    </label>
+                    <span class="text-[10px] text-slate-500 font-semibold">(Untuk pencocokan mutasi)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Nama Pemilik Rekening</label>
+                        <input type="text"
+                               x-model="transferSenderName"
+                               placeholder="Nama pengirim di buku rekening"
+                               class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#1A1743] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1A1743] focus:ring-1 focus:ring-[#1A1743]">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Bank yang Digunakan</label>
+                        <select x-model="transferSenderBank"
+                                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#1A1743] focus:outline-none focus:bg-white focus:border-[#1A1743] focus:ring-1 focus:ring-[#1A1743]">
+                            <option value="Bank Jatim">Bank Jatim</option>
+                            <option value="BCA">BCA (Bank Central Asia)</option>
+                            <option value="Mandiri">Bank Mandiri</option>
+                            <option value="BRI">Bank BRI</option>
+                            <option value="BNI">Bank BNI</option>
+                            <option value="BSI">BSI (Bank Syariah Indonesia)</option>
+                            <option value="SeaBank">SeaBank</option>
+                            <option value="Bank Jago">Bank Jago</option>
+                            <option value="DANA / E-Wallet">DANA / E-Wallet</option>
+                            <option value="Lainnya">Bank Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Catatan / No. Referensi Transfer <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                    <input type="text"
+                           x-model="transferRef"
+                           placeholder="Contoh: No Ref 123456 / transfer via Livin"
+                           class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#1A1743] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1A1743] focus:ring-1 focus:ring-[#1A1743]">
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button type="button"
+                    @click="checkout()"
+                    :disabled="submitting"
+                    class="w-full bg-[#BFF108] hover:brightness-105 text-[#131B2E] font-extrabold rounded-2xl py-3.5 flex items-center justify-center gap-2 mt-5 transition shadow-sm cursor-pointer active:scale-98">
+                <template x-if="submitting">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        Memproses Pesanan Anda...
+                    </span>
+                </template>
+                <template x-if="!submitting">
+                    <span class="flex items-center gap-2">
+                        <span>Saya Sudah Transfer &amp; Selesaikan Pesanan</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </span>
+                </template>
+            </button>
+
+            <!-- WA Confirmation Button -->
+            <a :href="waTransferLink"
+               target="_blank"
+               class="w-full bg-[#EAEDFF] hover:bg-[#dfe4ff] text-[#1A1743] font-bold rounded-2xl py-3 flex items-center justify-center gap-2 mt-2.5 transition text-xs shadow-2xs">
+                <i class="fa-brands fa-whatsapp text-base text-[#25D366]"></i>
+                <span>Kirim Bukti Transfer ke WhatsApp Admin</span>
+            </a>
+
+            <!-- Cancel Button -->
+            <button type="button"
+                    @click="showTransferModal = false"
+                    class="w-full text-center text-xs font-semibold text-[#717082] hover:text-[#1A1743] mt-3 transition cursor-pointer">
                 Batal / Ubah Metode Pembayaran
             </button>
         </div>

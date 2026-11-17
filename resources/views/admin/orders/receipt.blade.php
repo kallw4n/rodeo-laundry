@@ -176,6 +176,16 @@
                 <span>Metode Pembayaran:</span>
                 <span class="bold">{{ strtoupper($payment->method ?? 'Cash / Tunai') }}</span>
             </div>
+            @if(($payment->method ?? '') === 'transfer')
+            <div class="flex-between" style="margin-top: 2px; font-size: 10px;">
+                <span>Rekening Tujuan:</span>
+                <span class="bold">Bank Jatim 0402667320</span>
+            </div>
+            <div class="flex-between" style="margin-top: 1px; font-size: 10px;">
+                <span>Atas Nama (a.n):</span>
+                <span class="bold">Dzauq Bachrul 'Ulum</span>
+            </div>
+            @endif
             <div class="flex-between" style="margin-top: 2px;">
                 <span>Status Pembayaran:</span>
                 <span class="bold" style="color: {{ $isPaid ? '#15803d' : '#b91c1c' }};">

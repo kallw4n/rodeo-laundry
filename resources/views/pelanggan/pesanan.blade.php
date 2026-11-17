@@ -35,6 +35,26 @@
         monthlyArchives: window.pesananData.monthlyArchives || [],
         openFolders: {}, // { 'November 2026': true }
         selectedMonthFilter: 'all',
+        copiedOrderRekId: null,
+
+        copyRekening(text, orderId) {
+            const strText = String(text);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(strText);
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = strText;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try { document.execCommand('copy'); } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+            this.copiedOrderRekId = orderId;
+            setTimeout(() => { this.copiedOrderRekId = null; }, 2000);
+        },
 
         init() {
             // Otomatis buka folder bulan pertama/terbaru
@@ -403,6 +423,55 @@
                         </div>
                     </div>
 
+                    <!-- Box Petunjuk Pembayaran Transfer Bank Jatim (Khusus Menunggu Pembayaran via Transfer) -->
+                    <template x-if="order.payment_status === 'pending' && order.payment_method === 'transfer'">
+                        <div class="mx-4 md:mx-8 mb-5 p-4 md:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-slate-50 border-2 border-indigo-200/90 shadow-xs">
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                <div class="flex items-start gap-3.5 min-w-0">
+                                    <div class="w-10 h-10 rounded-xl bg-[#1A1743] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                                        <i class="fa-solid fa-building-columns text-sm text-[#BFF138]"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                                            <span class="font-extrabold text-[#1A1743] text-sm md:text-base">Instruksi Transfer Bank Jatim</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                                                Menunggu Transfer
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-wrap text-xs text-[#1A1743] mt-1">
+                                            <span class="font-medium text-slate-600">Bank: <strong class="text-[#1A1743]">Bank Jatim</strong></span>
+                                            <span class="text-slate-300">•</span>
+                                            <span class="font-medium text-slate-600">No. Rek: <strong class="text-[#1A1743] tracking-widest font-mono text-sm bg-white px-2 py-0.5 rounded-md border border-slate-200">0402667320</strong></span>
+                                            <span class="text-slate-300">•</span>
+                                            <span class="font-medium text-slate-600">a.n <strong class="text-[#1A1743]">Dzauq Bachrul 'Ulum</strong></span>
+                                        </div>
+                                        <p class="text-[11px] text-[#47464E] mt-1.5 leading-relaxed">
+                                            Silakan transfer tepat sebesar <strong class="text-[#1A1743]" x-text="formatRp(order.total)"></strong>, lalu kirim bukti transfer ke WhatsApp admin kami agar pesanan segera dicuci.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                                    <!-- Tombol Salin No Rekening -->
+                                    <button type="button"
+                                            @click="copyRekening('0402667320', order.id)"
+                                            class="px-3.5 py-2 bg-white border border-slate-300 hover:border-[#1A1743] text-[#1A1743] rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95">
+                                        <i :class="copiedOrderRekId === order.id ? 'fa-solid fa-check text-emerald-600' : 'fa-regular fa-copy'"></i>
+                                        <span x-text="copiedOrderRekId === order.id ? 'Tersalin!' : 'Salin Rekening'"></span>
+                                    </button>
+
+                                    <!-- Tombol Kirim Bukti ke WhatsApp -->
+                                    <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin konfirmasi pembayaran transfer untuk pesanan #' + order.id + ' sebesar ' + formatRp(order.total) + ' ke Bank Jatim (0402667320 a.n Dzauq Bachrul \'Ulum). Berikut bukti transfer saya:')"
+                                       target="_blank"
+                                       class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-xs active:scale-95">
+                                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                                        <span>Kirim Bukti Transfer</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
                     <!-- Footer Kartu -->
                     <div class="px-4 md:px-8 py-4 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
@@ -416,6 +485,15 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2">
+                            <template x-if="order.payment_status === 'pending' && order.payment_method === 'transfer'">
+                                <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin konfirmasi pembayaran transfer untuk pesanan #' + order.id + ' sebesar ' + formatRp(order.total) + ' ke Bank Jatim (0402667320 a.n Dzauq Bachrul \'Ulum). Berikut bukti transfer saya:')"
+                                   target="_blank"
+                                   class="px-3.5 md:px-4 py-2 bg-[#BFF138] hover:brightness-105 text-[#131B2E] rounded-full text-xs font-black transition flex items-center gap-1.5 shadow-xs">
+                                    <i class="fa-brands fa-whatsapp text-emerald-700"></i>
+                                    <span>Konfirmasi Transfer</span>
+                                </a>
+                            </template>
+
                             <template x-if="order.canCancel">
                                 <button @click="cancelOrder(order.raw_id)" class="px-3 md:px-4 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 text-red-600 rounded-full text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                                     <i class="fa-solid fa-xmark"></i>

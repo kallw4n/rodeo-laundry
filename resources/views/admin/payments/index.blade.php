@@ -426,8 +426,8 @@
                                     :class="formData.method === 'transfer' ? 'bg-[#1E1B4B] text-white shadow-md' : 'bg-[#F8F9FD] text-[#1E1B4B] border border-[#E9ECF4]'"
                                     class="p-2.5 rounded-2xl text-center transition flex flex-col items-center justify-center">
                                 <svg class="w-5 h-5 mb-1" :class="formData.method === 'transfer' ? 'text-[#BFF108]' : 'text-[#1E1B4B]'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
-                                <span class="text-xs font-bold">Transfer / EDC</span>
-                                <span class="text-[9px] opacity-75">Bank/Debit</span>
+                                <span class="text-xs font-bold">Transfer Bank</span>
+                                <span class="text-[9px] opacity-75">Bank Jatim</span>
                             </button>
                         </div>
                     </div>
