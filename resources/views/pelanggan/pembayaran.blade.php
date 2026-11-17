@@ -119,16 +119,28 @@
             }
         },
 
+        openTransferModal() {
+            if (this.hasKiloan) return;
+            this.paymentMethod = 'va';
+            this.startTimer();
+            this.showTransferModal = true;
+        },
+
+        openQrisModal() {
+            if (this.hasKiloan) return;
+            this.paymentMethod = 'qris';
+            this.startTimer();
+            this.showQrisModal = true;
+        },
+
         handleConfirmPayment() {
             if (this.hasKiloan) {
                 this.paymentMethod = 'cod';
             }
             if (this.paymentMethod === 'qris') {
-                this.startTimer();
-                this.showQrisModal = true;
+                this.openQrisModal();
             } else if (this.paymentMethod === 'va') {
-                this.startTimer();
-                this.showTransferModal = true;
+                this.openTransferModal();
             } else {
                 this.checkout();
             }
@@ -621,15 +633,26 @@
                                        x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'BCA Mobile, Livin\' by Mandiri, Wondr by BNI, BRImo, GoPay, OVO, ShopeePay, DANA'"></p>
                                 </div>
                             </div>
-                            <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">
-                                <i class="fa-solid fa-qrcode text-xs"></i> QRIS
-                            </span>
+                            <div class="hidden sm:flex items-center gap-2 shrink-0">
+                                <button type="button"
+                                        x-show="!hasKiloan"
+                                        @click.prevent.stop="openQrisModal()"
+                                        class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-[#EAEDFF] text-[#1A1743] border border-[#CAD2FF] rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
+                                    <i class="fa-solid fa-qrcode text-xs text-[#1A1743]"></i>
+                                    <span>Lihat QR</span>
+                                </button>
+                                <span class="inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] bg-white">
+                                    QRIS
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </label>
 
                 <!-- 3. Transfer Bank / VA -->
-                <label :class="hasKiloan ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'" class="block">
+                <label :class="hasKiloan ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'"
+                       @click="if (!hasKiloan) paymentMethod = 'va'"
+                       class="block">
                     <input type="radio" name="payment" value="va" class="sr-only" x-model="paymentMethod" :disabled="hasKiloan">
                     <div class="p-4 md:p-5 rounded-2xl border-2 transition-all duration-200"
                          :class="hasKiloan ? 'border-dashed border-slate-300 bg-slate-50' : (paymentMethod === 'va' ? 'border-[#BFF138] bg-[#FAF8FF] shadow-sm' : 'border-[#E2E7FF] bg-white hover:border-[#CAD2FF]')">
@@ -663,9 +686,18 @@
                                        x-text="hasKiloan ? 'Metode bayar di depan dikunci khusus kiloan karena berat pakaian (seperti 2.7 kg) wajib ditimbang resmi di outlet/kasir.' : 'Bank Jatim 0402667320 a.n Dzauq Bachrul \'Ulum (Bisa dari m-Banking / ATM semua bank)'"></p>
                                 </div>
                             </div>
-                            <span class="hidden sm:inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] shrink-0 bg-white">
-                                <i class="fa-solid fa-building-columns text-xs text-[#4E6700]"></i> Bank Jatim
-                            </span>
+                            <div class="hidden sm:flex items-center gap-2 shrink-0">
+                                <button type="button"
+                                        x-show="!hasKiloan"
+                                        @click.prevent.stop="openTransferModal()"
+                                        class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-[#EAEDFF] text-[#1A1743] border border-[#CAD2FF] rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
+                                    <i class="fa-solid fa-eye text-xs text-[#4E6700]"></i>
+                                    <span>Lihat Rekening</span>
+                                </button>
+                                <span class="inline-flex items-center gap-1 px-3 py-1 border border-[#E2E7FF] rounded-lg text-xs font-bold text-[#1A1743] bg-white">
+                                    <i class="fa-solid fa-building-columns text-xs text-[#4E6700]"></i> Bank Jatim
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </label>

@@ -36,6 +36,13 @@
         openFolders: {}, // { 'November 2026': true }
         selectedMonthFilter: 'all',
         copiedOrderRekId: null,
+        showTransferModal: false,
+        selectedOrder: null,
+
+        openTransferModal(order) {
+            this.selectedOrder = order;
+            this.showTransferModal = true;
+        },
 
         copyRekening(text, orderId) {
             const strText = String(text);
@@ -424,7 +431,7 @@
                     </div>
 
                     <!-- Box Petunjuk Pembayaran Transfer Bank Jatim (Khusus Menunggu Pembayaran via Transfer) -->
-                    <template x-if="order.payment_status === 'pending' && order.payment_method === 'transfer'">
+                    <template x-if="order.payment_status === 'pending' && (order.payment_method === 'transfer' || (order.payment_method_label && order.payment_method_label.toLowerCase().includes('transfer')))">
                         <div class="mx-4 md:mx-8 mb-5 p-4 md:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-slate-50 border-2 border-indigo-200/90 shadow-xs">
                             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                                 <div class="flex items-start gap-3.5 min-w-0">
@@ -452,6 +459,14 @@
                                 </div>
 
                                 <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                                    <!-- Tombol Popup Detail Lengkap -->
+                                    <button type="button"
+                                            @click="openTransferModal(order)"
+                                            class="px-3.5 py-2 bg-[#1A1743] hover:bg-[#2A2655] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95">
+                                        <i class="fa-solid fa-receipt text-[#BFF138] text-xs"></i>
+                                        <span>Buka Petunjuk</span>
+                                    </button>
+
                                     <!-- Tombol Salin No Rekening -->
                                     <button type="button"
                                             @click="copyRekening('0402667320', order.id)"
@@ -485,13 +500,13 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2">
-                            <template x-if="order.payment_status === 'pending' && order.payment_method === 'transfer'">
-                                <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin konfirmasi pembayaran transfer untuk pesanan #' + order.id + ' sebesar ' + formatRp(order.total) + ' ke Bank Jatim (0402667320 a.n Dzauq Bachrul \'Ulum). Berikut bukti transfer saya:')"
-                                   target="_blank"
-                                   class="px-3.5 md:px-4 py-2 bg-[#BFF138] hover:brightness-105 text-[#131B2E] rounded-full text-xs font-black transition flex items-center gap-1.5 shadow-xs">
-                                    <i class="fa-brands fa-whatsapp text-emerald-700"></i>
-                                    <span>Konfirmasi Transfer</span>
-                                </a>
+                            <template x-if="order.payment_status === 'pending' && (order.payment_method === 'transfer' || (order.payment_method_label && order.payment_method_label.toLowerCase().includes('transfer')))">
+                                <button type="button"
+                                        @click="openTransferModal(order)"
+                                        class="px-3.5 md:px-4 py-2 bg-[#BFF138] hover:brightness-105 text-[#131B2E] rounded-full text-xs font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95">
+                                    <i class="fa-solid fa-building-columns text-xs"></i>
+                                    <span>Petunjuk Transfer</span>
+                                </button>
                             </template>
 
                             <template x-if="order.canCancel">
@@ -695,6 +710,111 @@
             </template>
         </div>
     </main>
+
+    <!-- ================= MODAL PETUNJUK TRANSFER BANK JATIM ================= -->
+    <div x-show="showTransferModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-[#0E0E1B]/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto"
+         style="display: none;">
+        
+        <div @click.outside="showTransferModal = false"
+             class="w-full max-w-[480px] bg-white rounded-[28px] p-6 sm:p-7 shadow-2xl relative text-[#1A1743] my-8 max-h-[92vh] overflow-y-auto">
+
+            <!-- Close Button -->
+            <button @click="showTransferModal = false"
+                    class="absolute top-5 right-5 text-gray-400 hover:text-gray-700 transition w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-8 h-8 rounded-xl bg-[#1A1743] text-[#BFF138] flex items-center justify-center text-xs shadow-xs">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-[#1A1743]">Transfer Bank Jatim</h3>
+                    <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-extrabold">Bank Jatim</span>
+                </div>
+                <p class="text-xs text-[#717082]">Silakan transfer sesuai total tagihan ke rekening resmi Rodeo Laundry di bawah ini</p>
+            </div>
+
+            <!-- Bank Account Card -->
+            <div class="bg-gradient-to-br from-[#1A1743] to-[#2B276B] rounded-2xl p-5 text-white shadow-md mt-4 relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 pointer-events-none"></div>
+
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/15 text-white text-xs font-black tracking-wider uppercase border border-white/10">
+                            Bank Jatim
+                        </span>
+                        <span class="text-[10px] text-white/70">Cabang Batu / Malang</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-[#BFF138] flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved"></i> Rekening Resmi
+                    </span>
+                </div>
+
+                <div class="text-[11px] text-white/75 font-medium uppercase tracking-wider mb-1">Nomor Rekening Tujuan</div>
+                <div class="flex items-center justify-between gap-3 bg-white/10 rounded-xl px-3.5 py-2.5 backdrop-blur-xs border border-white/10">
+                    <span class="font-mono text-xl sm:text-2xl font-black tracking-widest text-[#BFF138]">0402667320</span>
+                    <button type="button"
+                            @click="copyRekening('0402667320', selectedOrder ? selectedOrder.id : 'modal')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                            :class="copiedOrderRekId === (selectedOrder ? selectedOrder.id : 'modal') ? 'bg-emerald-500 text-white' : 'bg-white text-[#1A1743] hover:bg-slate-100'">
+                        <i :class="copiedOrderRekId === (selectedOrder ? selectedOrder.id : 'modal') ? 'fa-solid fa-check' : 'fa-regular fa-copy'"></i>
+                        <span x-text="copiedOrderRekId === (selectedOrder ? selectedOrder.id : 'modal') ? 'Tersalin!' : 'Salin'"></span>
+                    </button>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-xs pt-2.5 border-t border-white/10">
+                    <div>
+                        <div class="text-[10px] text-white/70 uppercase tracking-wider">Atas Nama (a.n)</div>
+                        <div class="font-bold text-sm text-white tracking-wide">Dzauq Bachrul 'Ulum</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-white/70 uppercase tracking-wider">Jaringan</div>
+                        <div class="font-bold text-xs text-white">m-Banking / ATM / BI-FAST</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Section (Nominal & Order) -->
+            <template x-if="selectedOrder">
+                <div class="mt-4 p-3.5 bg-[#FAF8FF] border border-[#E2E7FF] rounded-2xl space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[#717082] font-medium">Total yang Harus Ditransfer</span>
+                        <span class="text-base font-black text-[#1A1743]" x-text="formatRp(selectedOrder.total)"></span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-[#E2E7FF]/70">
+                        <span class="text-[#717082]">Nomor Pesanan</span>
+                        <span class="font-bold text-[#1A1743]" x-text="'#' + selectedOrder.id"></span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- WA Confirmation Button -->
+            <template x-if="selectedOrder">
+                <a :href="'https://wa.me/6281358055257?text=' + encodeURIComponent('Halo Admin Rodeo Laundry, saya ingin konfirmasi pembayaran transfer untuk pesanan #' + selectedOrder.id + ' sebesar ' + formatRp(selectedOrder.total) + ' ke Bank Jatim (0402667320 a.n Dzauq Bachrul \'Ulum). Berikut bukti transfer saya:')"
+                   target="_blank"
+                   class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl py-3.5 flex items-center justify-center gap-2 mt-5 transition text-xs shadow-sm cursor-pointer">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span>Kirim Bukti Transfer via WhatsApp Admin</span>
+                </a>
+            </template>
+
+            <!-- Close Button -->
+            <button type="button"
+                    @click="showTransferModal = false"
+                    class="w-full text-center text-xs font-semibold text-[#717082] hover:text-[#1A1743] mt-3 transition cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
 
     <!-- ================= FOOTER ================= -->
     <footer class="bg-[#17143A] text-white border-t border-[#2A2655] mt-12 md:mt-16">
