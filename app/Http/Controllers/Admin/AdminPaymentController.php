@@ -15,7 +15,22 @@ class AdminPaymentController extends Controller
 {
     public function index(Request $request)
     {
+        $tab = $request->get('tab', 'active');
+        if (!in_array($tab, ['active', 'cancelled'], true)) {
+            $tab = 'active';
+        }
+
         $query = Payment::with(['order.customer', 'order.items.service']);
+
+        if ($tab === 'cancelled') {
+            $query->whereHas('order', function ($oq) {
+                $oq->where('status', 'cancelled');
+            });
+        } else {
+            $query->whereHas('order', function ($oq) {
+                $oq->where('status', '!=', 'cancelled');
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -30,7 +45,7 @@ class AdminPaymentController extends Controller
             });
         }
 
-        if ($request->filled('status') && $request->status !== 'all') {
+        if ($tab === 'active' && $request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
@@ -46,10 +61,14 @@ class AdminPaymentController extends Controller
         }
 
         $payments = $query->paginate(10)->withQueryString();
-        $totalPayments = Payment::count();
 
-        // Data for Add Payment Modal
+        $activePaymentsCount = Payment::whereHas('order', fn ($oq) => $oq->where('status', '!=', 'cancelled'))->count();
+        $cancelledPaymentsCount = Payment::whereHas('order', fn ($oq) => $oq->where('status', 'cancelled'))->count();
+        $totalPayments = $tab === 'cancelled' ? $cancelledPaymentsCount : $activePaymentsCount;
+
+        // Data for Add Payment Modal (kecualikan order yang sudah dibatalkan)
         $unpaidOrders = Order::with('customer', 'items.service')
+            ->where('status', '!=', 'cancelled')
             ->whereDoesntHave('payment', function ($pq) {
                 $pq->where('status', 'completed');
             })
@@ -62,6 +81,9 @@ class AdminPaymentController extends Controller
         return view('admin.payments.index', compact(
             'payments',
             'totalPayments',
+            'tab',
+            'activePaymentsCount',
+            'cancelledPaymentsCount',
             'unpaidOrders',
             'allCustomers',
             'allServices'

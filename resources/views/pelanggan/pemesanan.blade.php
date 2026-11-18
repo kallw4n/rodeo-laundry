@@ -26,7 +26,7 @@
         };
     </script>
 </head>
-<body class="bg-[#D8E1F0] text-[#1A1743] font-sans antialiased pb-40 md:pb-36 min-h-screen flex flex-col justify-between"
+<body class="bg-[#D8E1F0] text-[#1A1743] font-sans antialiased min-h-screen flex flex-col justify-between"
       x-data="{
         ...window.pemesananData,
 
@@ -204,7 +204,7 @@
         </div>
     </header>
 
-    <main class="pt-24 md:pt-28 max-w-[1440px] mx-auto px-4 md:px-6">
+    <main class="pt-24 md:pt-28 max-w-[1440px] w-full mx-auto px-4 md:px-6 flex-1">
 
         <!-- ================= HERO + STEPPER ================= -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 mb-6 md:mb-8">
@@ -466,7 +466,7 @@
     </main>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="bg-[#17143A] text-white border-t border-[#2A2655] mt-12 md:mt-16">
+    <footer class="bg-[#17143A] text-white border-t border-[#2A2655] mt-12 md:mt-16 pb-32 md:pb-24">
         <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-12 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
                 <div>
@@ -591,7 +591,7 @@
                                 title="Pilih minimal 1 layanan dulu">
                             <span class="hidden md:inline">Pilih Layanan Dulu</span>
                             <span class="md:hidden">Pilih</span>
-                            <i class="fa-solid fa-arrow-right"></i>
+                            <i class="fa-solid fa-arrow-up"></i>
                         </button>
                     </template>
                 </div>
@@ -613,7 +613,7 @@
                         class="sm:hidden mt-3 w-full py-3 bg-[#E2E7FF] text-[#9895C8] font-bold rounded-full text-sm
                                cursor-not-allowed flex items-center justify-center gap-2">
                     Pilih Layanan Dulu
-                    <i class="fa-solid fa-arrow-right"></i>
+                    <i class="fa-solid fa-arrow-up"></i>
                 </button>
             </template>
         </div>

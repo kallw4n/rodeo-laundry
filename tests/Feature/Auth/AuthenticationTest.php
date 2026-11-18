@@ -51,4 +51,21 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_login_notice_only_shows_on_auth_redirect_and_not_when_returning_from_register(): void
+    {
+        // 1. Akses rute terproteksi saat guest memicu notif sekali saja di /login
+        $redirected = $this->get('/pemesanan');
+        $redirected->assertRedirect('/login');
+        $this->get('/login')->assertOk()->assertSee('Silakan login terlebih dahulu ya!');
+
+        // 2. Pindah ke /register lalu kembali ke /login tidak memunculkan notif meski url.intended masih ada
+        $this->get('/register')->assertOk()->assertSee(route('login', ['ref' => 'register']), false);
+        $this->get(route('login', ['ref' => 'register']))
+            ->assertOk()
+            ->assertDontSee('Silakan login terlebih dahulu ya!');
+
+        // 3. Kunjungan langsung ke /login tanpa redirect auth juga tidak memunculkan notif
+        $this->get('/login')->assertOk()->assertDontSee('Silakan login terlebih dahulu ya!');
+    }
 }

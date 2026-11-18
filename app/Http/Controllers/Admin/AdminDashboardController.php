@@ -101,11 +101,19 @@ class AdminDashboardController extends Controller
 
         $order->update(['status' => $request->status]);
 
+        if ($request->status === 'cancelled') {
+            $order->payments()->where('status', 'pending')->update(['status' => 'failed']);
+        } elseif (in_array($request->status, ['pending', 'processing', 'ready', 'completed'])) {
+            $order->payments()->where('status', 'failed')->update(['status' => 'pending']);
+        }
+
         if ($order->delivery) {
             if ($request->status === 'ready') {
                 $order->delivery->update(['status' => 'on-way']);
             } elseif ($request->status === 'completed') {
                 $order->delivery->update(['status' => 'completed']);
+            } elseif ($request->status === 'cancelled') {
+                $order->delivery->update(['status' => 'failed']);
             } elseif (in_array($request->status, ['pending', 'processing'])) {
                 $order->delivery->update(['status' => 'scheduled']);
             }

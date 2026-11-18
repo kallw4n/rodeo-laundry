@@ -141,7 +141,11 @@ class OrderController extends Controller
         }
 
         if ($order->status === 'pending') {
-            $order->update(['status' => 'cancelled']);
+            DB::transaction(function () use ($order) {
+                $order->update(['status' => 'cancelled']);
+                $order->payments()->where('status', 'pending')->update(['status' => 'failed']);
+                $order->deliveries()->where('status', '!=', 'completed')->update(['status' => 'failed']);
+            });
             return back()->with('success', 'Pesanan berhasil dibatalkan.');
         }
 

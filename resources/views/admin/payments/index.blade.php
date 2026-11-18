@@ -17,9 +17,28 @@
             </button>
         </div>
 
+        <!-- ================= TAB PEMBAYARAN AKTIF VS DIBATALKAN ================= -->
+        <div class="inline-flex flex-wrap items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-300/80 shadow-sm">
+            <a href="{{ route('admin.payments.index', ['tab' => 'active']) }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition {{ $tab === 'active' ? 'bg-[#1E1B4B] text-white shadow' : 'text-slate-600 hover:bg-slate-100' }}">
+                <span>Pembayaran Aktif</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ $tab === 'active' ? 'bg-[#BFF108] text-[#1E1B4B]' : 'bg-slate-200 text-slate-700' }}">
+                    {{ $activePaymentsCount }}
+                </span>
+            </a>
+            <a href="{{ route('admin.payments.index', ['tab' => 'cancelled']) }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition {{ $tab === 'cancelled' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:bg-slate-100' }}">
+                <span>Pesanan Dibatalkan</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-black {{ $tab === 'cancelled' ? 'bg-white text-rose-600' : 'bg-rose-100 text-rose-700' }}">
+                    {{ $cancelledPaymentsCount }}
+                </span>
+            </a>
+        </div>
+
         <!-- ================= SEARCH & FILTER CONTROLS ================= -->
         <div class="bg-white rounded-3xl p-5 border border-slate-300/80 shadow-[0_10px_30px_-5px_rgba(26,23,67,0.06),0_4px_12px_rgba(0,0,0,0.03)]">
             <form method="GET" action="{{ route('admin.payments.index') }}" class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                <input type="hidden" name="tab" value="{{ $tab }}">
                 <!-- Search text -->
                 <div class="relative flex-1">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -34,6 +53,7 @@
                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300/80 rounded-2xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#1E1B4B] focus:ring-2 focus:ring-[#1E1B4B]/10 transition">
                 </div>
 
+                @if($tab === 'active')
                 <!-- Filter Status -->
                 <div class="relative min-w-[180px]">
                     <select name="status"
@@ -49,6 +69,7 @@
                         </svg>
                     </div>
                 </div>
+                @endif
 
                 <!-- Sort Order -->
                 <div class="relative min-w-[160px]">
@@ -87,7 +108,7 @@
                     <tbody class="divide-y divide-slate-200/80 text-xs">
                         @forelse($payments as $item)
                             @php
-                                $customerName = $item->order->customer->name ?? 'Pelanggan Walk-in';
+                                $customerName = $item->order?->customer_display_name ?? 'Pelanggan Walk-in';
                                 $items = $item->order->items ?? collect();
                                 $serviceName = $items->count() > 1 
                                     ? ($items->first()->service->name ?? 'Layanan') . ' (+' . ($items->count() - 1) . ' item)'
@@ -96,9 +117,11 @@
                                 $unit = $items->first() && $items->first()->service 
                                     ? \App\Models\ServiceType::resolveUnit($items->first()->service->name) 
                                     : 'kg';
+                                $isOrderCancelled = ($item->order->status ?? '') === 'cancelled';
                                 $isPaid = $item->status === 'completed';
+                                $isFailed = $item->status === 'failed';
                             @endphp
-                            <tr class="hover:bg-indigo-50/40 transition">
+                            <tr class="hover:bg-indigo-50/40 transition {{ $isOrderCancelled ? 'bg-slate-50/70' : '' }}">
                                 <td class="py-4 px-6 font-extrabold text-[#1E1B4B] text-sm">
                                     #RD-{{ str_pad($item->order_id ?? $item->id, 4, '0', STR_PAD_LEFT) }}
                                 </td>
@@ -112,15 +135,25 @@
                                     {{ $weight + 0 }} {{ $unit }}
                                 </td>
                                 <td class="py-4 px-6">
-                                    <span class="inline-block px-3.5 py-1.5 bg-[#EEF2FF] text-[#1E1B4B] font-extrabold rounded-full text-xs">
+                                    <span class="inline-block px-3.5 py-1.5 {{ $isOrderCancelled ? 'bg-slate-200/80 text-slate-500 line-through' : 'bg-[#EEF2FF] text-[#1E1B4B]' }} font-extrabold rounded-full text-xs">
                                         Rp {{ number_format($item->amount, 0, ',', '.') }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-6">
-                                    @if($isPaid)
+                                    @if($isOrderCancelled)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-200/80 text-slate-600 text-xs font-bold rounded-full">
+                                            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                            <span>Pesanan Dibatalkan</span>
+                                        </span>
+                                    @elseif($isPaid)
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E8FAD6] text-[#22C55E] text-xs font-bold rounded-full">
                                             <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
                                             <span>Lunas</span>
+                                        </span>
+                                    @elseif($isFailed)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-100 text-rose-600 text-xs font-bold rounded-full">
+                                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                            <span>Pembayaran Gagal</span>
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FEE2E2] text-[#EF4444] text-xs font-bold rounded-full">
@@ -131,25 +164,27 @@
                                 </td>
                                 <td class="py-4 px-6 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <!-- Cetak Struk Button -->
-                                        <button type="button"
-                                                @click="window.open('/admin/orders/' + {{ $item->order_id }} + '/receipt', '_blank', 'width=450,height=650')"
-                                                class="w-8 h-8 rounded-full bg-[#E0E7FF] hover:bg-[#4338CA] text-[#4338CA] hover:text-white flex items-center justify-center transition shadow-sm"
-                                                title="Cetak Struk">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                                            </svg>
-                                        </button>
+                                        @if(!$isOrderCancelled)
+                                            <!-- Cetak Struk Button -->
+                                            <button type="button"
+                                                    @click="window.open('/admin/orders/' + {{ $item->order_id }} + '/receipt', '_blank', 'width=450,height=650')"
+                                                    class="w-8 h-8 rounded-full bg-[#E0E7FF] hover:bg-[#4338CA] text-[#4338CA] hover:text-white flex items-center justify-center transition shadow-sm"
+                                                    title="Cetak Struk">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                </svg>
+                                            </button>
 
-                                        <!-- Edit Button -->
-                                        <button type="button"
-                                                @click="openEditModal({{ json_encode($item) }})"
-                                                class="w-8 h-8 rounded-full bg-[#EEF0FA] hover:bg-[#1E1B4B] text-[#1E1B4B] hover:text-white flex items-center justify-center transition shadow-sm"
-                                                title="Ubah Pembayaran">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                            </svg>
-                                        </button>
+                                            <!-- Edit Button -->
+                                            <button type="button"
+                                                    @click="openEditModal({{ json_encode($item) }})"
+                                                    class="w-8 h-8 rounded-full bg-[#EEF0FA] hover:bg-[#1E1B4B] text-[#1E1B4B] hover:text-white flex items-center justify-center transition shadow-sm"
+                                                    title="Ubah Pembayaran">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                                </svg>
+                                            </button>
+                                        @endif
 
                                         <!-- Delete Button -->
                                         <form method="POST" action="{{ route('admin.payments.destroy', $item->id) }}" onsubmit="return confirm('Hapus catatan pembayaran Nota #{{ $item->order_id }}?');" class="inline">
@@ -169,7 +204,7 @@
                         @empty
                             <tr>
                                 <td colspan="7" class="py-12 text-center text-[#94A3B8]">
-                                    Belum ada transaksi pembayaran ditemukan.
+                                    {{ $tab === 'cancelled' ? 'Belum ada pesanan dibatalkan.' : 'Belum ada transaksi pembayaran ditemukan.' }}
                                 </td>
                             </tr>
                         @endforelse
@@ -180,7 +215,7 @@
             <!-- Footer Pagination -->
             <div class="p-5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
                 <div>
-                    Menampilkan <span class="font-bold text-[#1E1B4B]">{{ $payments->count() }}</span> dari <span class="font-bold text-[#1E1B4B]">{{ $totalPayments }}</span> transaksi pembayaran aktif
+                    Menampilkan <span class="font-bold text-[#1E1B4B]">{{ $payments->count() }}</span> dari <span class="font-bold text-[#1E1B4B]">{{ $totalPayments }}</span> {{ $tab === 'cancelled' ? 'pesanan dibatalkan' : 'transaksi pembayaran aktif' }}
                 </div>
                 <div>
                     {{ $payments->links() }}

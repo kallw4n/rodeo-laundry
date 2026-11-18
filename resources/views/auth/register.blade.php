@@ -193,7 +193,7 @@
             <!-- Login Link -->
             <p class="text-center text-xs text-[#717082] mt-5">
                 Sudah memiliki akun?
-                <a href="{{ route('login') }}" class="font-extrabold text-[#1A1743] underline hover:text-[#8FB300] transition ml-0.5">
+                <a href="{{ route('login', ['ref' => 'register']) }}" class="font-extrabold text-[#1A1743] underline hover:text-[#8FB300] transition ml-0.5">
                     Masuk
                 </a>
             </p>
